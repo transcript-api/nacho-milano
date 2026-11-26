@@ -1,0 +1,37 @@
+.nmServiceFoot{display:block;padding:46px clamp(18px,5.4vw,96px) 22px;color:#f5f2ed;background:#202021;font:400 14px/1.45 NachoShop,system-ui,sans-serif}
+.nmServiceFoot [hidden],.nmHelp [hidden]{display:none!important}
+.nmServiceFoot>.nmServiceFoot__grid{display:grid;grid-template-columns:minmax(240px,1.7fr) repeat(4,minmax(105px,1fr));gap:24px 30px;max-width:1440px;margin:auto;align-items:start}
+.nmServiceFoot h2{font:550 16px/1.25 NachoShop,system-ui,sans-serif;margin:0 0 9px;color:#fff;letter-spacing:-.018em}
+.nmServiceFoot nav{display:grid;justify-items:start;align-content:start}
+.nmServiceFoot nav a{display:flex;min-height:33px;color:#dad8d4;font-size:13px}
+.nmServiceFoot nav a:hover{color:white}
+.nmServiceFoot__news p{max-width:31ch;color:#dad8d4;margin:0 0 12px}
+.nmServiceFoot__news [data-newsletter-pending],.nmServiceFoot__news form{display:grid;gap:8px;justify-items:start}
+.nmServiceFoot__news input[type=email]{width:100%;max-width:330px;min-height:43px;padding:0 12px;border-radius:4px;background:#2c2c2c;border:1px solid #777672;color:#fff;font:inherit}
+.nmServiceFoot__news input::placeholder{color:#c1beb7}
+.nmServiceFoot__news button{border:1px solid #aaa79f;border-radius:4px;padding:0 13px;font:inherit;min-height:38px;color:inherit;background:none}
+.nmServiceFoot__news button:disabled{opacity:.55;cursor:default}
+.nmServiceFoot__news small{color:#bfbab1;font-size:11px}
+.nmServiceFoot__consent{font-size:12px;color:#e6e2db}
+.nmServiceFoot>.nmServiceFoot__bottom{border-top:1px solid #ffffff31;max-width:1440px;margin:28px auto 0;padding-top:17px;display:flex;align-items:center;justify-content:space-between;gap:8px 16px;flex-wrap:wrap}
+.nmServiceFoot__bottom img{width:110px}
+.bar .nmTrackNav{white-space:nowrap}
+.nmHelp{font-family:NachoShop,system-ui,sans-serif;max-width:880px;margin:auto;padding:clamp(46px,8vw,100px) clamp(17px,5vw,46px);min-height:min(58vh,570px)}
+.nmHelp h1{margin:0 0 11px;font:650 clamp(34px,6.2vw,68px)/1 NachoShop,system-ui,sans-serif;letter-spacing:-.064em}
+.nmHelp h2{margin:0 0 8px;letter-spacing:-.034em;font-size:22px}
+.nmHelp p{margin:0 0 14px;line-height:1.52;color:#55534e;max-width:62ch}
+.nmHelp__heading{text-align:center}
+.nmHelp__heading p{margin:0 auto 24px}
+.nmHelp__module{border-top:1px solid #d7d5ce;margin-top:22px;padding-top:19px;scroll-margin-top:75px}
+.nmHelp__actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:15px}
+.nmHelp__button{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 16px;border:1px solid #242424;border-radius:4px;background:#242424;color:#fff;font:600 14px/1.2 NachoShop,system-ui,sans-serif;text-decoration:none;white-space:nowrap}
+.nmHelp__button.secondary{background:none;color:#242424}
+.nmTrackForm{display:grid;grid-template-columns:1fr 1fr auto;align-items:end;gap:10px;margin-top:8px}
+.nmTrackForm label{display:grid;gap:5px;font-size:13px;font-weight:560}
+.nmTrackForm input{background:#fdfcf9;color:#252421;border:1px solid #c9c6be;border-radius:4px;padding:0 11px;height:46px;width:100%;min-width:0;font:inherit}
+.nmTrackForm input:disabled,.nmTrackForm button:disabled{opacity:.58;cursor:default}
+.nmTrackNote{margin-top:9px!important;font-size:13px}
+.nmHelp [data-nm-policy]{white-space:pre-line}
+@media(max-width:1000px){.nmServiceFoot>.nmServiceFoot__grid{grid-template-columns:1.4fr repeat(2,minmax(135px,1fr))}}
+@media(max-width:680px){.bar .nmTrackNav{display:none}}
+@media(max-width:560px){.nmServiceFoot{padding-top:31px}.nmServiceFoot>.nmServiceFoot__grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:19px 12px}.nmServiceFoot__news{grid-column:1/-1}.nmServiceFoot nav a{min-height:37px}.nmServiceFoot h2{font-size:15px}.nmHelp__heading{text-align:left}.nmHelp__heading p{margin-left:0}.nmTrackForm{grid-template-columns:1fr}.nmTrackForm input{font-size:16px}}

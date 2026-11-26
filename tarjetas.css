@@ -1,0 +1,24 @@
+.cardVisual{position:relative;isolation:isolate}
+.cardVisual .cardPic{aspect-ratio:1/1.02;background:#eeece8}
+.cardVisual .cardPic img:first-child{padding:0 1%}
+.cardVisual .cardPic img.back{object-position:center}
+.cardLine,.collectionPage .cardLine{display:block;margin:0;padding:9px 0 0}
+.cardLine h3,.collectionPage .cardLine h3{font-weight:460;line-height:1.27;font-size:clamp(15px,1.5vw,20px);letter-spacing:-.022em;overflow-wrap:anywhere}
+.cardLine .cardPrice,.collectionPage .cardLine .cardPrice{font-size:14px;line-height:1.27;font-weight:650;color:#242423;padding-top:4px}
+.cardLine .colorNote{font-size:11px;letter-spacing:.015em;padding-top:3px}
+.cardVisual .cardAdd,.cardVisual .cardSave{position:absolute;z-index:3;display:grid;place-items:center;width:44px;height:44px;min-width:44px;min-height:44px;border:0;border-radius:50%;color:#252523;background:none;padding:0;cursor:pointer;isolation:isolate}
+.cardVisual .cardAdd{right:7px;bottom:7px}
+.cardVisual .cardSave{right:5px;top:5px}
+.cardVisual .cardAdd::before,.cardVisual .cardSave::before{content:"";position:absolute;border-radius:50%;background:#fffefa;z-index:-1;transition:background .15s,border-color .15s}
+.cardVisual .cardAdd::before{inset:1px;border:1.5px solid #c7c5c0}
+.cardVisual .cardSave::before{inset:6px;background:#fffef5e8;border:1px solid #fffef5}
+.cardVisual .cardAdd:hover::before,.cardVisual .cardSave:hover::before{background:#fbf8f1;border-color:#86817a}
+.cardVisual .cardAdd svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.85;stroke-linecap:round;stroke-linejoin:round}
+.cardVisual .cardSave svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.cardVisual .cardSave[aria-pressed=true] svg{fill:currentColor}
+.cardVisual .cardSave[aria-pressed=true]::before{background:#fffefa}
+.cardVisual :is(.cardAdd,.cardSave):focus-visible{outline:2px solid #252523;outline-offset:1px}
+@media(max-width:650px){.cardVisual .cardAdd{right:5px;bottom:5px}.cardVisual .cardSave{right:3px;top:3px}.cardLine .cardPrice,.collectionPage .cardLine .cardPrice{display:block}.cardLine h3,.collectionPage .cardLine h3{font-size:14px}.grid,.collectionPage .grid{gap:16px 8px}}
+@media(hover:none){.cardVisual .cardPic .back{opacity:0}.cardVisual .cardPic img:first-child{opacity:1}}
+.nmHome .card .cardLine h3,.collectionPage .card .cardLine h3{font-weight:460}
+@media(hover:none){.card:hover .cardVisual .back{opacity:0}.card:hover .cardVisual .cardPic img:first-child{opacity:1}}

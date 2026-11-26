@@ -1,0 +1,25 @@
+.shopActions .accountTrigger{display:grid;place-items:center;min-width:40px;min-height:44px;color:inherit}
+.shopActions .accountTrigger svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.55;stroke-linecap:round;stroke-linejoin:round}
+.shopActions .accountTrigger:hover,.shopActions .accountTrigger:focus-visible{text-decoration:none}
+.nmCampaignNav,.nmInnerNav{display:none}
+@media(max-width:650px){
+ .bar{grid-template-columns:42px minmax(0,1fr) auto minmax(0,1fr) 42px 42px;grid-template-areas:"search . logo . account cart";gap:0;padding-inline:clamp(10px,4.6vw,24px)}
+ .bar .brandMark{grid-area:logo;align-self:center}
+ .bar nav{display:none}
+ .bar .shopActions{display:contents}
+ .bar .shopActions [data-search]{grid-area:search;justify-self:start;justify-items:start;width:42px;height:44px;padding:0 0 0 3px;margin:0}
+ .bar .accountTrigger{grid-area:account;width:42px}
+ .bar .cartTrigger{grid-area:cart;width:42px}
+ .bar .accountTrigger svg{width:23px;height:23px}
+ .bar .brandMark{transform:translateX(21px)}
+ .nmCampaignNav{display:grid;position:absolute;inset:12px auto auto calc(clamp(10px,4.6vw,24px) + 3px);z-index:4;justify-items:start;color:#fffefa;line-height:1.45}
+ .nmCampaignNav a,.nmInnerNav a{display:flex;align-items:center;min-height:31px;padding:0 12px 0 0;font:500 var(--nm-nav-size,9px)/1.45 NachoShop,Arial,sans-serif;letter-spacing:.11em;text-transform:uppercase;text-underline-offset:3px}
+ .nmCampaignNav a{text-shadow:0 1px 3px #121716a6,0 0 12px #1117}
+ .nmCampaignNav a:hover,.nmCampaignNav a:focus-visible,.nmInnerNav a:hover,.nmInnerNav a:focus-visible{text-decoration:underline}
+ .nmInnerNav{display:flex;overflow-x:auto;scrollbar-width:none;gap:9px;align-items:center;padding:0 clamp(12px,4.6vw,24px);border-bottom:1px solid #d9d6d0;background:#fffefa;overscroll-behavior-x:contain}
+ .nmInnerNav a{min-height:42px;white-space:nowrap}
+ .nmInnerNav::-webkit-scrollbar{display:none}
+}
+@media(max-width:380px){.nmCampaignNav a,.nmInnerNav a{--nm-nav-size:8px}.nmCampaignNav a{min-height:29px}}
+
+@media(max-width:650px){.nmCampaignNav::before{content:"";position:absolute;inset:-12px -74px -14px -24px;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 5% 44%,#0b142565,transparent 75%)}}

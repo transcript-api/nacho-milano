@@ -1,0 +1,31 @@
+.shopActions .nmMenuTrigger{display:none}
+.nmMobileMenu{position:fixed;inset:0;width:100%;height:100dvh;max-width:none;max-height:none;margin:0;padding:0;border:0;background:linear-gradient(180deg,#a7a7a658 0%,#3131339c 29%,#46566a99 69%,#a1a39e9c 100%);color:#fffefa;overscroll-behavior:contain;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin}
+.nmMobileMenu::backdrop{background:#2d302d55;backdrop-filter:blur(22px) brightness(.78) saturate(.62);-webkit-backdrop-filter:blur(22px) brightness(.78) saturate(.62)}
+.nmMobileMenu[open]{animation:nmMenuEnter .26s cubic-bezier(.17,.65,.28,1) both}
+@keyframes nmMenuEnter{from{opacity:0;transform:translate3d(-12px,0,0)}to{opacity:1;transform:none}}
+.nmMobileMenu__frame{display:flex;min-height:100%;flex-direction:column;box-sizing:border-box;padding:12px 0 max(25px,env(safe-area-inset-bottom));font:400 14px/1.35 NachoShop,Arial,sans-serif}
+.nmMobileMenu__close{display:grid;place-items:center;height:44px;width:44px;margin:0 0 8px 9px;padding:0;color:inherit;border:none;background:none;cursor:pointer}
+.nmMobileMenu__close svg,.nmMenuTrigger svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:1.65;stroke-linecap:round}
+.nmMobileMenu__links{padding:0 clamp(18px,4.7vw,34px)}
+.nmMobileMenu__links>a,.nmMobileMenu__links summary{display:flex;align-items:center;justify-content:space-between;min-height:47px;border-bottom:1px solid #171b204f;padding:6px 1px;color:inherit;font-size:clamp(23px,6vw,30px);font-weight:410;line-height:1.1;letter-spacing:-.032em;text-decoration:none;cursor:pointer;text-shadow:0 1px 8px #1114}
+.nmMobileMenu__links summary::-webkit-details-marker{display:none}
+.nmMobileMenu__links details summary::after{content:"+";display:block;font-size:23px;margin-inline:8px 1px}
+.nmMobileMenu__links details[open] summary::after{content:"−"}
+.nmMobileMenu__categories{padding:6px 0 8px 2px;display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid #171b204f}
+.nmMobileMenu__categories a{display:flex;align-items:center;min-height:36px;font-size:15px;font-weight:420;color:inherit}
+.nmMobileMenu__links a:focus-visible,.nmMobileMenu__links summary:focus-visible,.nmMobileMenu__close:focus-visible,.nmMobileMenu__products a:focus-visible,.nmMobileMenu__products:focus-visible{outline:1px solid currentColor;outline-offset:-2px;border-radius:2px}
+.nmMobileMenu__rail{margin-top:0;padding-top:clamp(45px,17dvh,145px)}
+.nmMobileMenu__products{display:grid;grid-auto-flow:column;grid-auto-columns:min(39vw,185px);gap:clamp(9px,3vw,15px);overflow-x:auto;overflow-y:hidden;overscroll-behavior-inline:contain;scroll-snap-type:x proximity;scrollbar-width:none}
+.nmMobileMenu__products::-webkit-scrollbar{display:none}
+.nmMobileMenu__products a{display:flex;flex-direction:column;gap:8px;scroll-snap-align:start;text-decoration:none;color:inherit}
+.nmMobileMenu__products img{display:block;width:100%;height:auto;aspect-ratio:4/5;object-fit:contain;background:#eae9e5;padding:0}
+.nmMobileMenu__products span{font:450 clamp(12px,3.13vw,15px)/1.24 NachoShop,Arial,sans-serif;padding:0 5px 2px}
+html.nmMenuOpen{overflow:hidden}
+@media(max-width:650px){
+ .bar{grid-template-columns:42px 42px minmax(0,1fr) auto minmax(0,1fr) 42px 42px;grid-template-areas:"menu search . logo . account cart"}
+ .bar .brandMark{transform:none}
+ .bar .shopActions .nmMenuTrigger{grid-area:menu;display:grid;place-items:center;justify-self:center;width:42px;height:44px;padding:0;margin:0;color:inherit}
+ .bar .shopActions [data-search]{justify-items:center;padding-left:0}
+}
+@media(max-width:350px){.bar{grid-template-columns:37px 37px minmax(0,1fr) auto minmax(0,1fr) 37px 37px}.bar .shopActions :is(.nmMenuTrigger,[data-search],.accountTrigger,.cartTrigger){width:37px;min-width:37px;justify-self:center}.nmMobileMenu__links>a,.nmMobileMenu__links summary{font-size:22px}.nmMobileMenu__rail{padding-top:32px}}
+@media(prefers-reduced-motion:reduce){.nmMobileMenu[open]{animation:none}}

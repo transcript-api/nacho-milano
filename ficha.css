@@ -1,0 +1,99 @@
+.refShop{--ref-paper:#fbfaf7;--ref-panel:#eeece7;--ref-ink:#202021;--ref-line:#dedbd5;--ref-muted:#575650;background:var(--ref-paper);color:var(--ref-ink);font-family:NachoShop,Arial,sans-serif}
+.refShop .bar{background:var(--ref-paper);border-color:var(--ref-line)}
+.refShop .bar nav,.refShop .shopActions{font-size:.73rem;letter-spacing:.05em}
+.manlyProduct,.refShop .shopSimple{width:min(100% - 2 * var(--pad),1220px);padding-top:clamp(16px,3vw,35px)}
+.manlyProduct .productLayout{grid-template-columns:1.3fr 1fr;gap:clamp(28px,5vw,72px);align-items:start}
+.manlyProduct .productMedia{position:relative;padding:0;min-width:0;border-radius:4px;overflow:hidden;background:var(--ref-panel)}
+.manlyProduct .referencePhoto,.manlyProduct .fallbackMedia{display:grid;place-items:center;width:100%;height:auto;aspect-ratio:1/1.08;background:#ebe9e3;padding:0;overflow:hidden;touch-action:pan-y pinch-zoom;cursor:zoom-in}
+.manlyProduct .fallbackMedia img{height:100%;width:100%;object-fit:contain}
+.manlyProduct .referencePhoto img{height:100%;width:100%;min-width:0;min-height:0;object-fit:cover;mix-blend-mode:normal}
+.manlyProduct .referencePhoto[data-mode=model] img{position:absolute;inset:4% 6% 3%;width:88%;height:93%;object-fit:contain;filter:drop-shadow(0 12px 15px #55544815)}
+.manlyProduct .referencePhoto[data-mode=garment] img{object-fit:contain;mix-blend-mode:multiply}
+.referenceDots{position:absolute;z-index:1;right:8px;top:50%;transform:translateY(-50%);display:grid;pointer-events:auto}
+.referenceDots button{width:32px;height:27px;display:grid;place-items:center}
+.referenceDots button::before{content:"";width:6px;height:6px;border-radius:100%;background:#828078}
+.referenceDots button[aria-current=true]::before{background:#252525;outline:1px solid #252525;outline-offset:2px}
+.referenceIndex{position:absolute;left:12px;bottom:12px;padding:.25rem .45rem;border-radius:3px;background:#fdfcf8dc;font-size:.73rem;pointer-events:none}
+.manlyProduct .productInfo{display:block;padding:clamp(5px,2.3vw,32px) 0 0;min-width:0}
+.productCrumbs{display:flex;gap:8px;align-items:center;font-size:.8rem;color:var(--ref-muted);margin:0 0 .85rem}
+.productCrumbs a:hover,.productServices a:hover{text-decoration:underline;text-underline-offset:3px}
+.productPill{display:inline-block;background:#ebe8e1;color:#47443e;font-size:.69rem;border-radius:20px;padding:.26rem .56rem}
+.manlyProduct .productInfo h1,.refShop .shopSimple .pageTitle,.refShop .drawer h2{font:570 clamp(30px,3.5vw,52px)/1.07 NachoShop,Arial,sans-serif;letter-spacing:-.05em;overflow-wrap:normal}
+.manlyProduct .productInfo h1{margin:.7rem 0 .5rem}
+.manlyProduct .productInfo .productDesc{font-size:clamp(.9rem,1.2vw,1rem);line-height:1.55;color:var(--ref-muted);max-width:52ch}
+.manlyProduct .productPrice{font-size:1.18rem;font-weight:550;margin:.5rem 0}
+.manlyProduct .buyForm{margin-top:1rem;display:block}
+.manlyProduct .buyForm fieldset{padding:0;border:0;margin:0 0 .9rem;display:flex;gap:.45rem;flex-wrap:wrap;align-items:center}
+.manlyProduct .buyForm legend{font-size:.82rem;font-weight:550;margin:0 0 .35rem;padding:0;text-transform:none;letter-spacing:0}
+.manlyProduct .activeColor{font-weight:400;color:var(--ref-muted)}
+.manlyProduct .buyForm fieldset button{height:37px;min-width:41px;border:1px solid var(--ref-line);border-radius:4px;font-size:.84rem;padding:.25rem .6rem;color:var(--ref-ink);background:transparent;min-height:0}
+.manlyProduct .buyForm fieldset button[aria-pressed=true]{border-color:#303030;background:#ece9e2;color:#171715}
+.manlyProduct .buyForm .swatch{width:30px;min-width:30px;height:30px;border-radius:99px;padding:0;display:grid;place-items:center;font-size:0;border:1px solid transparent;background:transparent}
+.manlyProduct .buyForm .swatch:before{width:19px;height:19px;box-shadow:0 0 0 1px #0003}
+.manlyProduct .buyForm .swatch[aria-pressed=true]{border-color:#303030;background:transparent}
+.manlyProduct .quantityControl{margin:.05rem 0 .95rem;font-size:.82rem;gap:.55rem}
+.manlyProduct .quantityControl button{height:33px;min-height:33px;min-width:33px;border-radius:3px;border:1px solid var(--ref-line);padding:0}
+.manlyProduct .purchaseRow{display:grid;grid-template-columns:minmax(0,1fr) 49px;gap:10px;align-items:stretch}
+.manlyProduct .purchaseRow .buy{min-height:48px;margin:0;border-radius:5px;padding:.6rem .75rem;display:flex;justify-content:center;align-items:center;gap:.55rem;font:500 .88rem/1.2 NachoShop,Arial,sans-serif}
+.manlyProduct .purchaseRow .buy:before{content:"";width:16px;height:16px;background:currentColor;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.6'%3E%3Cpath d='M4 8h16l1 13H3zM8 10V6a4 4 0 0 1 8 0v4'/%3E%3C/svg%3E") center/contain no-repeat}
+.manlyProduct .productInfo .productSave{width:49px;min-height:48px;border:1px solid #c8c4bb;border-radius:5px;font-size:1.25rem}
+.manlyProduct .productSave[aria-pressed=true],.referenceSave[aria-pressed=true]{color:#242423;background:#eae6df}
+.manlyProduct .productInfo .statusText:empty{display:none}
+.manlyProduct .productServices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:1.1rem 0 .8rem;gap:6px}
+.productServices a,.productServices button{display:flex;gap:7px;min-height:42px;align-items:center;justify-content:flex-start;font-size:.74rem;text-align:left}
+.productServices svg{width:19px;height:19px;flex:none;fill:none;stroke:currentColor;stroke-linejoin:round;stroke-linecap:round;stroke-width:1.5}
+.manlyProduct .productInfo summary{padding:.72rem 0;font-size:.83rem;font-weight:540}
+.manlyProduct .productInfo .productDemo{font-size:.74rem;margin:.55rem 0;color:var(--ref-muted)}
+.manlyProduct #productRelated{margin:clamp(26px,5vw,65px) 0}
+.referenceRelatedHead{display:flex;justify-content:space-between;align-items:center;gap:20px;margin-bottom:14px}
+.manlyProduct #productRelated h2{font:555 clamp(22px,2.8vw,38px)/1.1 NachoShop,Arial,sans-serif;letter-spacing:-.045em;margin:0}
+.referenceRelatedHead>div{display:flex;gap:6px}.referenceRelatedHead button{border:1px solid var(--ref-line);border-radius:50%;width:37px;height:37px}
+.referenceRelatedHead button:hover{background:#ebe8e1}
+.referenceRail{display:grid;grid-auto-flow:column;grid-auto-columns:calc((100% - 4 * 16px)/5);gap:16px;overflow-x:auto;scroll-snap-type:x proximity;padding-bottom:10px;scrollbar-width:thin}
+.referenceRail article{position:relative;min-width:0;scroll-snap-align:start}
+.referenceCardPhoto{display:block;aspect-ratio:1/1.06;background:var(--ref-panel);border-radius:4px;overflow:hidden}
+.referenceCardPhoto img{width:100%;height:100%;object-fit:contain;mix-blend-mode:multiply}
+.referenceSave{position:absolute;top:6px;right:6px;width:34px;height:34px;border-radius:50%;background:#fffdf8ec;font-size:1.08rem}
+.referenceCardTitle{display:block;margin:.55rem 0 .2rem;font-size:.82rem;font-weight:500}
+.referenceCardColors{display:flex;gap:3px;margin-top:4px}.referenceCardColors a{width:26px;height:26px;display:grid;place-items:center}.referenceCardColors a:before{content:"";width:11px;height:11px;border:1px solid #0002;border-radius:100%;background:var(--chip)}
+.productCampaign{min-height:clamp(230px,30vw,390px);display:grid;align-items:center;position:relative;isolation:isolate;overflow:hidden;border-radius:4px;background:#222;color:#fffdf6}
+.productCampaign picture,.productCampaign img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:55% 44%;z-index:-2}
+.productCampaign::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#101215d9,transparent 78%);z-index:-1}
+.productCampaign>div{padding:clamp(22px,5vw,64px)}
+.productCampaign h2{font:555 clamp(26px,4.4vw,56px)/1 NachoShop,Arial,sans-serif;letter-spacing:-.055em;margin-bottom:18px}
+.productCampaign a{display:inline-flex;min-height:42px;align-items:center;padding:0 16px;border-radius:99px;color:#1c1c1b;background:#fffdf6;font-size:.8rem;font-weight:530}
+.refShop .drawer[data-cart=true],.refShop .shopDialog{background:var(--ref-paper);border-radius:0}
+.refShop .drawer header{border-color:var(--ref-line)}
+.refShop .drawer h2{font-size:clamp(26px,4vw,36px);margin-bottom:12px}
+.refShop .lineItem{grid-template-columns:74px 1fr;font-size:.83rem;gap:12px;padding:12px 0}
+.refShop .lineItem img{width:74px;height:89px;background:var(--ref-panel);border-radius:4px}
+.refShop .lineItem strong{font-weight:625}
+.refShop .lineItem .control{min-height:34px;padding:.22rem .55rem;border-radius:4px}
+.refShop .bagActions .buy{border-radius:5px}
+.refShop .shopSimple{padding-block:clamp(30px,6vw,72px)}
+.refShop .foot{background:var(--ref-paper);color:var(--ref-ink);border-top:1px solid var(--ref-line)}
+.refShop .foot img{filter:none;mix-blend-mode:multiply}
+@media(max-width:900px){.referenceRail{grid-auto-columns:calc((100% - 2 * 16px)/3.25)}}
+@media(max-width:650px){.manlyProduct,.refShop .shopSimple{width:calc(100% - 2 * var(--pad))}.manlyProduct .productLayout{grid-template-columns:minmax(0,1fr);gap:14px}.manlyProduct .referencePhoto{aspect-ratio:1/1.14}.referenceDots{top:auto;bottom:6px;right:8px;transform:none;display:flex}.referenceDots button{height:34px;width:28px}.manlyProduct .productInfo{padding-top:4px}.manlyProduct .productInfo h1{font-size:clamp(29px,8vw,43px)}.manlyProduct .productServices{margin-top:.85rem}.referenceRail{grid-auto-columns:45%;gap:12px}.manlyProduct #productRelated h2{font-size:1.3rem}.referenceRelatedHead{gap:8px}.referenceRelatedHead button{width:33px;height:33px}.productCampaign picture,.productCampaign img{object-position:center 40%}.productCampaign::before{background:linear-gradient(90deg,#101215e5,transparent 96%)}.refShop .mobileBuy{background:var(--ref-paper)}.refShop .foot{padding-bottom:80px}}
+
+.manlyProduct .productMedia{--thumbH:68px;overflow:visible;background:transparent}
+.productGalleryTrack{display:flex;aspect-ratio:1/1.08;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;overscroll-behavior-inline:contain;scrollbar-width:none;touch-action:auto;user-select:none;border-radius:4px;background:#ebe9e3}
+.productGalleryTrack::-webkit-scrollbar{display:none}
+.productGalleryTrack.moving{scroll-snap-type:none;cursor:grabbing}
+.productGallerySlide{display:grid;place-items:center;flex:0 0 100%;width:100%;height:100%;overflow:hidden;min-width:0;scroll-snap-align:start;scroll-snap-stop:always;touch-action:auto;cursor:zoom-in}
+.productGallerySlide img{width:100%;height:100%;min-width:0;min-height:0;object-fit:contain;pointer-events:none;mix-blend-mode:multiply;-webkit-user-drag:none}
+.productThumbs{display:flex;gap:8px;padding-top:8px;align-items:center}
+.productThumbs .productThumb{height:var(--thumbH);width:var(--thumbH);flex:none;display:grid;place-items:center;border:1px solid transparent;border-radius:3px;background:#ebe9e3;overflow:hidden}
+.productThumbs .productThumb[aria-current=true]{border-color:#252526}
+.productThumbs img{width:100%;height:100%;object-fit:contain;pointer-events:none;mix-blend-mode:multiply}
+.manlyProduct .referenceIndex{bottom:calc(var(--thumbH) + 18px)}
+#productLooks{margin-top:clamp(24px,5vw,60px)}
+#productLooks h2{font:555 clamp(22px,2.6vw,36px)/1.14 NachoShop,Arial,sans-serif;letter-spacing:-.045em;margin:0 0 12px}
+.productLookCards{display:flex;gap:12px;overflow-x:auto;padding-bottom:6px;scroll-snap-type:x proximity}
+.productLookCards a{display:flex;align-items:center;gap:12px;flex:0 0 min(290px,82vw);min-width:0;scroll-snap-align:start;border:1px solid var(--ref-line);padding:8px;border-radius:4px}
+.productLookCards img{width:73px;height:83px;flex:none;object-fit:cover;border-radius:3px}
+.productLookCards span,.productLookCards small{display:block;font-size:.85rem}
+.productLookCards small{color:var(--ref-muted);font-size:.74rem;margin-top:4px}
+@media(max-width:650px){.manlyProduct .productMedia{--thumbH:58px}.productGalleryTrack{aspect-ratio:1/1.06}}
+.productThumb[data-texture]{position:relative}
+.productThumb[data-texture]::after{content:"Textura";position:absolute;inset:auto 2px 2px;padding:3px 1px 2px;background:#fdfbf5;color:#242423;font:560 clamp(9px,1vw,11px)/1 NachoShop,Arial,sans-serif;text-align:center;pointer-events:none}

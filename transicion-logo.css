@@ -1,0 +1,12 @@
+.nmHome #bar .brandMark img{display:block}
+.nmHome[data-logo-stage] #bar .brandMark img{opacity:var(--logo-dock,1)}
+.nmHome #bar .brandMark:focus-visible img{opacity:1}
+.nmHome[data-logo-stage="voyage"] .campaignWordmark,
+.nmHome[data-logo-stage="header"] .campaignWordmark{opacity:0}
+.nmHome .nmLogoTransit{display:block;position:fixed;inset:0 auto auto 0;pointer-events:none;z-index:17;overflow:visible;visibility:hidden;transform-origin:0 0;will-change:transform,opacity}
+.nmHome[data-logo-stage="voyage"] .nmLogoTransit{visibility:visible}
+.nmHome .nmLogoPale{fill:#fffefa}
+.nmHome .nmLogoInk{fill:#19191a;opacity:0;will-change:opacity}
+.nmHome .heroMedia{transform-origin:66% 46%;will-change:transform}
+@media(max-width:650px){.nmHome .heroMedia{transform-origin:59% 43%}}
+@media(prefers-reduced-motion:reduce){.nmHome .heroMedia{transform:none!important}}
