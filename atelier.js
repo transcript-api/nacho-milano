@@ -5,8 +5,13 @@ const btn=(txt,fn,cl='control')=>{const x=el('button',txt,cl);x.type='button';x.
 const image=(url,alt='',lazy=true)=>{const x=el('img');x.src=url;x.alt=alt;x.decoding='async';if(lazy)x.loading='lazy';return x};
 const link=(txt,href,cl)=>{const x=el('a',txt,cl);x.href=href;return x};
 const {products,looks:rawLooks}=window.NM_BUILD;
-const byId=new Map(products.map(p=>[p.id,p])), looks=rawLooks.filter(l=>l.items.every(i=>byId.has(i.id)));
-const src=(id,view='frente')=>'assets/'+id+'-'+view+'.webp', url=(p,c=0)=>'producto-'+p.id+'.html'+(c?'?color='+encodeURIComponent(p.colors[c][1]):'');
+const draftProducts=window.NM_DRAFT||[];
+const shopProducts=draftProducts.length?draftProducts:products;
+const byId=new Map([...products,...draftProducts].map(p=>[p.id,p])), looks=rawLooks.filter(l=>l.items.every(i=>byId.has(i.id)));
+const src=(id,view='frente')=>'assets/'+id+'-'+view+'.webp', url=(p,c=0)=>'producto-'+p.id+'.html'+(c?'?color='+encodeURIComponent(p.colors[c].name??p.colors[c][1]):'');
+const displayColor=c=>c.name??c[0];
+const draftPhoto=(c,view='front')=>c?.photos?.[view]||null;
+const draftPlaceholder=()=>el('div','Fotos pendientes','draftBlank');
 const num=(n)=>String(n).padStart(2,'0'), clamp=(x,a,z)=>Math.max(a,Math.min(x,z)), period=(x,n)=>((x%n)+n)%n;
 const quiet=matchMedia('(prefers-reduced-motion: reduce)'), touch=matchMedia('(max-width:650px)');
 const money=new Intl.NumberFormat('es-UY',{style:'currency',currency:'UYU',maximumFractionDigits:0});
@@ -209,23 +214,29 @@ function startRunway(){
 }
 function startCatalog(){const filters=$('#filter'),grid=$('#grid');let active='Todo',opened=null,onlySaved=false,sort='featured';
  const search=$('#catalogSearch'),toggleSavedFilter=$('#savedFilter'),sorter=$('#sortCatalog'),letters=s=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
- const cats=['Todo',...new Set(products.map(p=>p.category))], preview=$('#catalogo').dataset.preview==='true';
+ const cats=['Todo',...new Set(shopProducts.map(p=>p.category))], preview=$('#catalogo').dataset.preview==='true';
  if(!preview)try{const stored=JSON.parse(sessionStorage.getItem('nm-catalog-filter-v3')||'{}');if(cats.includes(stored.active))active=stored.active;search.value=typeof stored.q==='string'?stored.q:'';onlySaved=stored.onlySaved===true;if(['az','za'].includes(stored.sort))sort=stored.sort}catch{}
  if(!preview){const params=new URLSearchParams(location.search);if(params.has('categoria')||params.has('q')){active=cats.includes(params.get('categoria'))?params.get('categoria'):'Todo';search.value=params.get('q')||'';onlySaved=false;sort='featured';try{history.replaceState(null,'',location.pathname)}catch{}}sorter.value=sort}
  const persist=()=>{if(!preview)try{sessionStorage.setItem('nm-catalog-filter-v3',JSON.stringify({active,q:search.value,onlySaved,sort}))}catch{}};
  search.addEventListener('input',()=>{opened=null;persist();draw()});toggleSavedFilter.onclick=()=>{opened=null;onlySaved=!onlySaved;persist();draw()};
  sorter.onchange=()=>{sort=sorter.value;opened=null;persist();draw()};$('#resetCatalog').onclick=()=>{active='Todo';onlySaved=false;search.value='';sort='featured';sorter.value=sort;opened=null;persist();draw();search.focus()};if(!preview)persist();
  const keys=cats.map(cat=>{const b=btn(cat,()=>{active=cat;opened=null;persist();draw()},'');filters.append(b);return b});
- function draw(){toggleSavedFilter.setAttribute('aria-pressed',String(onlySaved));keys.forEach((b,i)=>b.setAttribute('aria-pressed',String(cats[i]===active)));const q=letters(search.value.trim());const featured=['tejido','polo','pantalon','chaleco'].map(id=>byId.get(id)).filter(Boolean);const result=preview?[...featured,...products.filter(p=>!featured.includes(p))]:products;const shown=result.filter(p=>(active==='Todo'||p.category===active)&&(!onlySaved||saved.has(p.id))&&(!q||q.split(/\s+/).every(t=>letters([p.name,p.category,p.line,...p.colors.map(z=>z[0])].join(' ')).includes(t))));if(sort!=='featured')shown.sort((a,b)=>a.name.localeCompare(b.name,'es')*(sort==='za'?-1:1));$('#noMatches').hidden=shown.length!==0;$('#catalogCount').textContent=shown.length+(shown.length===1?' PRENDA':' PRENDAS');grid.replaceChildren();const fragment=document.createDocumentFragment();
+ function draw(){toggleSavedFilter.setAttribute('aria-pressed',String(onlySaved));keys.forEach((b,i)=>b.setAttribute('aria-pressed',String(cats[i]===active)));const q=letters(search.value.trim());const featured=['tejido','polo','pantalon','chaleco'].map(id=>byId.get(id)).filter(Boolean);const result=draftProducts.length?draftProducts:preview?[...featured,...products.filter(p=>!featured.includes(p))]:products;const shown=result.filter(p=>(active==='Todo'||p.category===active)&&(!onlySaved||saved.has(p.id))&&(!q||q.split(/\s+/).every(t=>letters([p.name,p.category,p.line,...p.colors.map(displayColor)].join(' ')).includes(t))));if(sort!=='featured')shown.sort((a,b)=>a.name.localeCompare(b.name,'es')*(sort==='za'?-1:1));$('#noMatches').hidden=shown.length!==0;$('#catalogCount').textContent=shown.length+(shown.length===1?' PRENDA':' PRENDAS');grid.replaceChildren();const fragment=document.createDocumentFragment();
  for(const p of shown){
   const state=readChoice(p),card=el('article',undefined,'card'),visual=el('div',undefined,'cardVisual'),pic=link('',url(p,state.color),'cardPic');
-  const front=image(src(p.colors[state.color][1],'rack'),p.name),back=image(src(p.colors[state.color][1],'espalda'));back.className='back';pic.append(front,back);pic.setAttribute('aria-label','Abrir ficha de '+p.name);
-  const add=btn('',()=>quickDrawer(p,null,()=>showBag()),'cardAdd');add.append(cardGlyph('bag'));add.setAttribute('aria-label','Agregar al carrito: '+p.name);add.setAttribute('aria-haspopup','dialog');
+  const c=p.colors[state.color];pic.setAttribute('aria-label','Abrir ficha de '+p.name);
+  if(p.draft){
+    const main=draftPhoto(c), rear=draftPhoto(c,'back');pic.append(main?image(main,p.name):draftPlaceholder());
+    if(main&&rear){const back=image(rear);back.className='back';pic.append(back)}
+  }else{
+    const front=image(src(c[1],'rack'),p.name),back=image(src(c[1],'espalda'));back.className='back';pic.append(front,back);
+    const add=btn('',()=>quickDrawer(p,null,()=>showBag()),'cardAdd');add.append(cardGlyph('bag'));add.setAttribute('aria-label','Agregar al carrito: '+p.name);add.setAttribute('aria-haspopup','dialog');visual.append(add);
+  }
   const save=btn('',()=>{toggleSaved(p);if(onlySaved){draw();toggleSavedFilter.focus()}},'cardSave');save.dataset.save=p.id;save.append(cardGlyph('star'));
   const line=el('div',undefined,'cardLine'),name=el('h3');name.append(link(p.name,url(p,state.color)));line.append(name);
   if(p.price!=null)line.append(el('p','$'+new Intl.NumberFormat('es-UY').format(p.price)+' UYU','cardPrice'));
   if(p.colors.length>1)line.append(el('p',p.colors.length+' colores','colorNote'));
-  visual.append(pic,add,save);card.append(visual,line);fragment.append(card)
+  visual.prepend(pic);visual.append(save);card.append(visual,line);fragment.append(card)
  }
  grid.append(fragment);refreshSaved()}
  draw()
@@ -272,8 +283,36 @@ function showProductRelated(p){
  }
  root.replaceChildren(top,rail);root.hidden=false;refreshSaved()
 }
+function startDraftProduct(p){
+ const params=new URLSearchParams(location.search), requested=params.get('color');
+ const media=$('#productMedia'), choice=$('#productChoice'), save=$('#productSave');
+ let index=Math.max(0,p.colors.findIndex(c=>c.name===requested));
+ save.dataset.save=p.id;save.onclick=()=>toggleSaved(p);
+ const wrap=el('div',undefined,'buyForm draftChoice');
+ const colors=selector('Colores del catálogo',p.colors.map(c=>[c.name]),()=>index,i=>{
+   index=i;colors.update();paint();
+   try{const u=new URL(location.href);u.searchParams.set('color',p.colors[index].name);history.replaceState(null,'',u)}catch{}
+ });
+ wrap.append(colors.field);choice.append(wrap);refreshSaved();
+ function paint(){
+   const c=p.colors[index];const views=[['front','Frente'],['back','Espalda'],['texture','Textura']].filter(([k])=>draftPhoto(c,k));
+   if(!views.length){media.replaceChildren(draftPlaceholder());return}
+   const group=el('div',undefined,'draftGallery'),track=el('div',undefined,'productGalleryTrack'),thumbs=el('div',undefined,'productThumbs draftThumbs');
+   track.tabIndex=0;track.setAttribute('aria-label','Fotos del producto');track.setAttribute('role','region');
+   const go=i=>track.scrollTo({left:i*track.clientWidth,behavior:quiet.matches?'instant':'smooth'});
+   for (const [i,[k,name]] of views.entries()){
+     const path=draftPhoto(c,k), alt=p.name+' · '+c.name+' · '+name;
+     const big=btn('',()=>openZoom(path,alt),'productGallerySlide');big.append(image(path,alt,i!==0));big.setAttribute('aria-label','Ampliar: '+name);track.append(big);
+     const thumb=btn('',()=>go(i),'productThumb');thumb.setAttribute('aria-label','Ver foto: '+name);thumb.setAttribute('aria-current',String(i===0));thumb.append(image(path));thumbs.append(thumb);
+   }
+   track.addEventListener('scroll',()=>{const cur=Math.round(track.scrollLeft/(track.clientWidth||1));[...thumbs.children].forEach((t,i)=>t.setAttribute('aria-current',String(i===cur)))},{passive:true});
+   track.addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight'].includes(e.key))return;e.preventDefault();go(clamp(Math.round(track.scrollLeft/(track.clientWidth||1))+(e.key==='ArrowRight'?1:-1),0,views.length-1))});
+   group.append(track,thumbs);media.replaceChildren(group);
+ }
+ paint();
+}
 function startProduct(){
- const root=$('[data-product]'),p=byId.get(root.dataset.product);if(!p)return;
+ const root=$('[data-product]'),p=byId.get(root.dataset.product);if(!p)return;if(p.draft){startDraftProduct(p);return}
  const params=new URLSearchParams(location.search),param=params.get('color'),size=params.get('talle'),state=readChoice(p,param===null?null:Math.max(0,p.colors.findIndex(c=>c[1]===param)));if(size!==null)state.size=p.sizes.includes(size)?size:null;
  const media=$('#productMedia'),re=productGallery(p,state,media);
  const save=$('#productSave');save.dataset.save=p.id;save.onclick=()=>toggleSaved(p);

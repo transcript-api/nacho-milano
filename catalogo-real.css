@@ -1,0 +1,10 @@
+.draftBlank {background:#eeece8; color:#595754; display:grid; place-content:center; width:100%; min-height:100%; aspect-ratio:1/1; text-align:center; padding:1rem;font-size:.74rem;letter-spacing:.08em}
+.productMedia>.draftBlank{aspect-ratio:4/5}
+.draftNotice{margin:.8rem 0 1rem;color:#5e5b55;line-height:1.55;font-size:.86rem}
+.draftSceneNotice{width:min(92%,1260px);margin:.65rem auto 1rem}
+.shopHit>.draftBlank{width:46px;height:46px;min-height:0;padding:0;font-size:.58rem}
+.draftGallery{display:flex;flex-direction:column;gap:10px}
+.draftGallery .productGalleryTrack:has(> :only-child) {overflow:hidden}
+.draftThumbs button[aria-current=true]{outline:1px solid currentColor;outline-offset:-2px}
+.draftChoice{padding:.8rem 0;margin-bottom:.8rem}
+.draftChoice .statusText{margin-top:.7rem}
