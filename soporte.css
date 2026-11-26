@@ -35,3 +35,13 @@
 @media(max-width:1000px){.nmServiceFoot>.nmServiceFoot__grid{grid-template-columns:1.4fr repeat(2,minmax(135px,1fr))}}
 @media(max-width:680px){.bar .nmTrackNav{display:none}}
 @media(max-width:560px){.nmServiceFoot{padding-top:31px}.nmServiceFoot>.nmServiceFoot__grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:19px 12px}.nmServiceFoot__news{grid-column:1/-1}.nmServiceFoot nav a{min-height:37px}.nmServiceFoot h2{font-size:15px}.nmHelp__heading{text-align:left}.nmHelp__heading p{margin-left:0}.nmTrackForm{grid-template-columns:1fr}.nmTrackForm input{font-size:16px}}
+
+/* Un solo pie grafito: la ficha de producto no lo vuelve beige. */
+.foot.nmServiceFoot,.refShop .foot.nmServiceFoot{background:#202021;color:#fff;border-top-color:#323232}
+.foot.nmServiceFoot h2,.foot.nmServiceFoot nav a,.foot.nmServiceFoot small,.foot.nmServiceFoot p,.foot.nmServiceFoot label{color:#fff}
+.foot.nmServiceFoot a:hover{color:#fff;text-decoration:underline}
+.foot.nmServiceFoot .nmServiceFoot__bottom img{filter:invert(1) brightness(1.5);mix-blend-mode:screen}
+.foot.nmServiceFoot .nmSocialIcons{display:flex;gap:5px}
+.foot.nmServiceFoot .nmSocialIcons a{display:grid;place-items:center;width:44px;height:44px;min-height:44px;border-radius:50%;text-decoration:none}
+.foot.nmServiceFoot .nmSocialIcons a:hover{background:#ffffff1f}
+.nmSocialIcons svg{width:23px;height:23px}

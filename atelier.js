@@ -193,10 +193,11 @@ function outfitDrawer(look){
 }
 function startRunway(){
  const stage=$('#runwayStage'),scene=$('#runwayScene'),port=$('#models'),pins=$('#pins'),info=$('#lookInfo'),all=$('#allLooks');let ix=0,focus=false;
- const buttons=looks.map((l,i)=>{const x=btn('',()=>{if(performance.now()<muteClick)return;if(i===ix)setFocus(!focus);else select(i)},'model');x.setAttribute('aria-label','Elegir look '+l.name);const fig=image('assets/runway-'+(i+1)+'.webp',l.name,true);fig.onerror=()=>{fig.onerror=null;fig.src='assets/'+l.photo+'.webp';fig.classList.add('boxed')};x.append(fig);port.append(x);return x});
+ const buttons=looks.map((l,i)=>{const x=btn('',()=>{if(performance.now()<muteClick)return;if(i===ix)setFocus(!focus);else select(i)},'model');x.setAttribute('aria-label','Elegir look '+l.name);const fig=image(l.draft?'assets/'+l.photo+'.webp':'assets/runway-'+(i+1)+'.webp',l.name+(l.draft?' · Imagen ilustrativa':''),true);if(!l.draft)fig.onerror=()=>{fig.onerror=null;fig.src='assets/'+l.photo+'.webp';fig.classList.add('boxed')};x.append(fig);port.append(x);return x});
  const rr=rail(stage,buttons,{current:()=>ix,select,maxJump:1,stepWidth:w=>w*(touch.matches?.33:.23),style:(x,d,i,active,step,dragging)=>{const abs=Math.abs(d),y=focus?d*step*1.7:d*step;x.style.transform='translate3d(calc(-50% + '+y.toFixed(2)+'px),0,0) scale('+(focus&&active?1.075:clamp(1-abs*.14,.64,1)).toFixed(3)+')';x.style.opacity=focus&&!active&&!dragging?'0':String(abs>1.48?clamp((1.94-abs)*1.4,0,.65):clamp(1-abs*.22,.28,1));x.style.zIndex=String(20-Math.round(abs*7));x.style.pointerEvents=focus&&!active?'none':'';x.tabIndex=active?0:-1;x.setAttribute('aria-current',String(active));x.setAttribute('aria-pressed',String(focus&&active))}});
  function setFocus(f){focus=f;render();rr();if(f){const y=stage.getBoundingClientRect().top,bottom=stage.getBoundingClientRect().bottom;if(y<70||bottom>innerHeight)stage.scrollIntoView({block:'start',behavior:'instant'})}}
  function select(i){ix=period(i,looks.length);render();rr()}
+ const goTo=(p,trigger)=>{if(p.draft){location.href=url(p);return;}quickDrawer(p)};
  const anchors=[
  [[.50,.32],[.59,.60]],
  [[.47,.33],[.69,.43],[.57,.63]],
@@ -206,8 +207,8 @@ function startRunway(){
  function place(){if(!focus)return;const fig=buttons[ix],p=stage.getBoundingClientRect();const baseW=fig.offsetWidth*1.075, baseH=fig.offsetHeight*1.075;const left=(p.width-baseW)/2,top=p.height*.86-baseH;[...pins.children].forEach((pin,n)=>{const [x,y]=anchors[ix]?.[n]||[.5,.3+n*.16];const offset=touch.matches&&n===1&&pins.children.length>2?20:0;pin.style.left=clamp(left+baseW*x+offset,24,p.width-24)+'px';pin.style.top=clamp(top+baseH*y,24,p.height-77)+'px'})}
  new ResizeObserver(place).observe(stage);
  function render(){const look=looks[ix];if(!look)return;scene.dataset.focus=String(focus);all.hidden=!focus;$('#lookIndex').textContent=num(ix+1)+' / '+num(looks.length);pins.replaceChildren();pins.setAttribute('aria-hidden',String(!focus));const list=el('ul');
- look.items.forEach((i,n)=>{const p=byId.get(i.id),row=el('li');row.append(makeLookRow(p,()=>quickDrawer(p)));list.append(row);if(focus){const pin=btn(String(n+1),()=>quickDrawer(p),'pin');pin.setAttribute('aria-label','Elegir '+p.name);pins.append(pin)}});
- info.replaceChildren(el('span',look.label,'smallCaps'),el('h3',look.name),el('p',look.copy),list);if(!focus)info.append(btn('Ver prendas del look →',()=>{setFocus(true);buttons[ix].focus({preventScroll:true})},'textLink'));info.append(btn('Armar el look',()=>outfitDrawer(look),'buy buildLook'));requestAnimationFrame(place);refresh()}
+ look.items.forEach((i,n)=>{const p=byId.get(i.id),row=el('li');if(p.draft){const a=link('',url(p),'lookItem lookItemLink');const photo=draftPhoto(p.colors[0]);a.append(photo?image(photo,''):draftPlaceholder(),el('span',p.name),el('span','↗'));row.append(a)}else row.append(makeLookRow(p,()=>quickDrawer(p)));list.append(row);if(focus){const pin=p.draft?link(String(n+1),url(p),'pin'):btn(String(n+1),()=>goTo(p),'pin');pin.setAttribute('aria-label','Ver '+p.name);pins.append(pin)}});
+ info.replaceChildren(el('span',look.label,'smallCaps'),el('h3',look.name),el('p',look.copy),list);if(!focus)info.append(btn('Ver prendas del look →',()=>{setFocus(true);buttons[ix].focus({preventScroll:true})},'textLink'));if(look.draft)info.append(el('p','Imagen ilustrativa.','quiet lookIllustration'));else info.append(btn('Armar el look',()=>outfitDrawer(look),'buy buildLook'));requestAnimationFrame(place);refresh()}
  all.onclick=()=>{setFocus(false);buttons[ix].focus({preventScroll:true})};$('#lookPrev').onclick=()=>select(ix-1);$('#lookNext').onclick=()=>select(ix+1);$('#looks').addEventListener('keydown',e=>{if(e.key==='Escape'&&focus){setFocus(false);buttons[ix].focus({preventScroll:true})}});render();
  const requested=Number(new URLSearchParams(location.search).get('look'))-1;
  if(Number.isInteger(requested)&&requested>=0&&requested<looks.length){select(requested);requestAnimationFrame(()=>setFocus(true))}
@@ -269,7 +270,7 @@ function showProductLooks(p){
  const section=$('#productLooks');if(!section)return;
  const pairs=looks.map((look,i)=>[look,i]).filter(([l])=>l.items.some(it=>it.id===p.id));if(!pairs.length){section.hidden=true;return}
  const title=el('h2','Looks con esta prenda');title.id='productLooksTitle';const row=el('div',undefined,'productLookCards');
- for(const [look,i] of pairs){const a=link('','index.html?look='+(i+1)+'#looks');const info=el('div');info.append(el('span',look.name));if(p.colors.length>1)info.append(el('small','En '+p.colors[0][0].toLocaleLowerCase('es-UY')));a.append(image('assets/'+look.photo+'.webp',''),info);row.append(a)}
+ for(const [look,i] of pairs){const a=link('','index.html?look='+(i+1)+'#looks');const info=el('div');info.append(el('span',look.name));if(p.colors.length>1)info.append(el('small','En '+displayColor(p.colors[0]).toLocaleLowerCase('es-UY')));a.append(image('assets/'+look.photo+'.webp',''),info);row.append(a)}
  section.replaceChildren(title,row);section.hidden=false
 }
 function showProductRelated(p){
@@ -293,7 +294,7 @@ function startDraftProduct(p){
    index=i;colors.update();paint();
    try{const u=new URL(location.href);u.searchParams.set('color',p.colors[index].name);history.replaceState(null,'',u)}catch{}
  });
- wrap.append(colors.field);choice.append(wrap);refreshSaved();
+ wrap.append(colors.field);choice.append(wrap);showProductLooks(p);refreshSaved();
  function paint(){
    const c=p.colors[index];const views=[['front','Frente'],['back','Espalda'],['texture','Textura']].filter(([k])=>draftPhoto(c,k));
    if(!views.length){media.replaceChildren(draftPlaceholder());return}

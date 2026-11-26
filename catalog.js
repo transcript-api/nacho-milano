@@ -11,9 +11,81 @@ window.NM_BUILD={
   {id:'cuello-navy',name:'Polo de manga larga',category:'Polos',line:'Cuello abierto',description:'Polo marino de manga larga en punto fino.',detail:'Cuello abierto y terminación acanalada en puños y bajo.',colors:[['Marino','cuello-navy','#171f30']],sizes:['S','M','L','XL']}
  ],
  looks:[
-  {name:'Polo y pantalón recto',label:'LOOK 01',copy:'Polo piqué marino con pantalón crudo.',photo:'look01',items:[{id:'polo',x:48,y:34},{id:'pantalon',x:57,y:60}]},
-  {name:'Chaleco y buzo',label:'LOOK 02',copy:'Chaleco negro sobre el buzo marfil, con pantalón crudo.',photo:'look02',items:[{id:'chaleco',x:43,y:36},{id:'tejido',x:61,y:45},{id:'pantalon',x:54,y:64}]},
-  {name:'Polo de manga larga',label:'LOOK 03',copy:'Polo marino de manga larga con pantalón crudo.',photo:'campana',items:[{id:'cuello-navy',x:50,y:42},{id:'pantalon',x:52,y:74}]},
-  {name:'Oxford sobre remera',label:'LOOK 04',copy:'Camisa Oxford azul claro sobre una remera grafito.',photo:'look04',items:[{id:'oxford',x:64,y:36},{id:'remera',x:47,y:29},{id:'pantalon',x:48,y:62}]}
- ]
+  {
+    "name": "Camisa Swell y pantalón de lino",
+    "label": "LOOK 01",
+    "copy": "Camisa Swell en crudo con pantalón de lino natural.",
+    "photo": "look-coleccion-01",
+    "draft": true,
+    "items": [
+      {
+        "id": "nm-camisa-swell",
+        "x": 50,
+        "y": 33
+      },
+      {
+        "id": "nm-calca-de-linho-com-elastano",
+        "x": 50,
+        "y": 63
+      }
+    ]
+  },
+  {
+    "name": "Polo de punto y short de lino",
+    "label": "LOOK 02",
+    "copy": "Polo de punto marfil con short de lino natural.",
+    "photo": "look-coleccion-02",
+    "draft": true,
+    "items": [
+      {
+        "id": "nm-polo-trico-modelo-01",
+        "x": 50,
+        "y": 33
+      },
+      {
+        "id": "nm-short-linho-ultra-premium",
+        "x": 50,
+        "y": 63
+      }
+    ]
+  },
+  {
+    "name": "Camisa Rústic y short de sarja",
+    "label": "LOOK 03",
+    "copy": "Camisa azul marino con short de sarja negro.",
+    "photo": "look-coleccion-03",
+    "draft": true,
+    "items": [
+      {
+        "id": "nm-camisa-rustic",
+        "x": 50,
+        "y": 33
+      },
+      {
+        "id": "nm-short-sarja",
+        "x": 50,
+        "y": 63
+      }
+    ]
+  },
+  {
+    "name": "Remera azul y short negro",
+    "label": "LOOK 04",
+    "copy": "Remera deportiva azul con short de entrenamiento negro.",
+    "photo": "look-coleccion-04",
+    "draft": true,
+    "items": [
+      {
+        "id": "nm-camiseta-fitness-poliester",
+        "x": 50,
+        "y": 33
+      },
+      {
+        "id": "nm-short-gym-poliamida",
+        "x": 50,
+        "y": 63
+      }
+    ]
+  }
+]
 };
