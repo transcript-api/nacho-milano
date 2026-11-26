@@ -9,10 +9,11 @@
       {
         "name": "Natural",
         "photos": {
-          "front": null,
+          "front": "assets/catalogo-ilustrativo/nm-short-linho-ultra-premium-frente-ilustrativo.webp",
           "back": null,
           "texture": null
-        }
+        },
+        "illustration": true
       },
       {
         "name": "Preto",
@@ -43,10 +44,11 @@
       {
         "name": "Natural",
         "photos": {
-          "front": null,
+          "front": "assets/catalogo-ilustrativo/nm-calca-de-linho-com-elastano-frente-ilustrativo.webp",
           "back": null,
           "texture": null
-        }
+        },
+        "illustration": true
       },
       {
         "name": "Preto",
@@ -77,10 +79,11 @@
       {
         "name": "OFF",
         "photos": {
-          "front": null,
+          "front": "assets/catalogo-ilustrativo/nm-camisa-swell-frente-ilustrativo.webp",
           "back": null,
           "texture": null
-        }
+        },
+        "illustration": true
       },
       {
         "name": "Preto",
@@ -111,10 +114,11 @@
       {
         "name": "Marinho",
         "photos": {
-          "front": null,
+          "front": "assets/catalogo-ilustrativo/nm-camisa-rustic-frente-ilustrativo.webp",
           "back": null,
           "texture": null
-        }
+        },
+        "illustration": true
       },
       {
         "name": "Chocolate",
@@ -161,10 +165,11 @@
       {
         "name": "Chocolate",
         "photos": {
-          "front": null,
+          "front": "assets/catalogo-ilustrativo/nm-camisa-lv-manga-longa-frente-ilustrativo.webp",
           "back": null,
           "texture": null
-        }
+        },
+        "illustration": true
       },
       {
         "name": "Preto",
@@ -187,10 +192,11 @@
       {
         "name": "Preto",
         "photos": {
-          "front": null,
+          "front": "assets/catalogo-ilustrativo/nm-polo-poliamida-botoes-metal-frente-ilustrativo.webp",
           "back": null,
           "texture": null
-        }
+        },
+        "illustration": true
       },
       {
         "name": "Marinho",
@@ -245,10 +251,11 @@
       {
         "name": "Off White",
         "photos": {
-          "front": null,
+          "front": "assets/catalogo-ilustrativo/nm-polo-trico-modelo-01-frente-ilustrativo.webp",
           "back": null,
           "texture": null
-        }
+        },
+        "illustration": true
       },
       {
         "name": "Marinho",
@@ -303,10 +310,11 @@
       {
         "name": "Marinho",
         "photos": {
-          "front": null,
+          "front": "assets/catalogo-ilustrativo/nm-camisa-100-linho-frente-ilustrativo.webp",
           "back": null,
           "texture": null
-        }
+        },
+        "illustration": true
       },
       {
         "name": "Branco",
@@ -345,10 +353,11 @@
       {
         "name": "Preto",
         "photos": {
-          "front": null,
+          "front": "assets/catalogo-ilustrativo/nm-camiseta-poliamida-basica-frente-ilustrativo.webp",
           "back": null,
           "texture": null
-        }
+        },
+        "illustration": true
       },
       {
         "name": "Branco",
@@ -395,10 +404,11 @@
       {
         "name": "Preto",
         "photos": {
-          "front": null,
+          "front": "assets/catalogo-ilustrativo/nm-camiseta-poliamida-modelo-068-frente-ilustrativo.webp",
           "back": null,
           "texture": null
-        }
+        },
+        "illustration": true
       },
       {
         "name": "Branco",
@@ -453,10 +463,11 @@
       {
         "name": "Preto",
         "photos": {
-          "front": null,
+          "front": "assets/catalogo-ilustrativo/nm-camiseta-algodao-modelo-000-frente-ilustrativo.webp",
           "back": null,
           "texture": null
-        }
+        },
+        "illustration": true
       },
       {
         "name": "Marinho",
@@ -511,10 +522,11 @@
       {
         "name": "Marinho",
         "photos": {
-          "front": null,
+          "front": "assets/catalogo-ilustrativo/nm-short-peletizado-geometrico-frente-ilustrativo.webp",
           "back": null,
           "texture": null
-        }
+        },
+        "illustration": true
       },
       {
         "name": "Branco",
@@ -545,10 +557,11 @@
       {
         "name": "Marinho",
         "photos": {
-          "front": null,
+          "front": "assets/catalogo-ilustrativo/nm-short-peletizado-microestampa-frente-ilustrativo.webp",
           "back": null,
           "texture": null
-        }
+        },
+        "illustration": true
       },
       {
         "name": "Branco",
@@ -579,10 +592,11 @@
       {
         "name": "Marinho",
         "photos": {
-          "front": null,
+          "front": "assets/catalogo-ilustrativo/nm-short-liso-frente-ilustrativo.webp",
           "back": null,
           "texture": null
-        }
+        },
+        "illustration": true
       },
       {
         "name": "Rosa",
@@ -621,10 +635,11 @@
       {
         "name": "Azul",
         "photos": {
-          "front": null,
+          "front": "assets/catalogo-ilustrativo/nm-camiseta-fitness-poliester-frente-ilustrativo.webp",
           "back": null,
           "texture": null
-        }
+        },
+        "illustration": true
       },
       {
         "name": "Cinza Claro",
@@ -679,10 +694,11 @@
       {
         "name": "Preto",
         "photos": {
-          "front": null,
+          "front": "assets/catalogo-ilustrativo/nm-camiseta-fitness-poliamida-frente-ilustrativo.webp",
           "back": null,
           "texture": null
-        }
+        },
+        "illustration": true
       },
       {
         "name": "Branco",
@@ -721,10 +737,11 @@
       {
         "name": "Preto",
         "photos": {
-          "front": null,
+          "front": "assets/catalogo-ilustrativo/nm-short-gym-poliamida-frente-ilustrativo.webp",
           "back": null,
           "texture": null
-        }
+        },
+        "illustration": true
       },
       {
         "name": "Marinho",
@@ -771,10 +788,11 @@
       {
         "name": "Preto",
         "photos": {
-          "front": null,
+          "front": "assets/catalogo-ilustrativo/nm-short-sarja-frente-ilustrativo.webp",
           "back": null,
           "texture": null
-        }
+        },
+        "illustration": true
       },
       {
         "name": "Marinho",

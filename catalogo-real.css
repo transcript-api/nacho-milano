@@ -8,3 +8,6 @@
 .draftThumbs button[aria-current=true]{outline:1px solid currentColor;outline-offset:-2px}
 .draftChoice{padding:.8rem 0;margin-bottom:.8rem}
 .draftChoice .statusText{margin-top:.7rem}
+.cardVisual .illustrationBadge{position:absolute;left:.55rem;bottom:.55rem;z-index:2;border-radius:100px;background:#fdfbf8;color:#34322d;padding:.26rem .5rem;font-size:.65rem;letter-spacing:.025em;pointer-events:none}
+.illustrationNotice{margin:0 0 .2rem;padding:.55rem .8rem;border-left:2px solid #a7a299}
+.illustrationMenu{display:block;font-size:.64rem;margin-top:.24rem;color:inherit;opacity:.8}

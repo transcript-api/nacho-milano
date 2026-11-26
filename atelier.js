@@ -236,7 +236,7 @@ function startCatalog(){const filters=$('#filter'),grid=$('#grid');let active='T
   const line=el('div',undefined,'cardLine'),name=el('h3');name.append(link(p.name,url(p,state.color)));line.append(name);
   if(p.price!=null)line.append(el('p','$'+new Intl.NumberFormat('es-UY').format(p.price)+' UYU','cardPrice'));
   if(p.colors.length>1)line.append(el('p',p.colors.length+' colores','colorNote'));
-  visual.prepend(pic);visual.append(save);card.append(visual,line);fragment.append(card)
+  visual.prepend(pic);if(c.illustration&&draftPhoto(c))visual.append(el('span','Imagen ilustrativa','illustrationBadge'));visual.append(save);card.append(visual,line);fragment.append(card)
  }
  grid.append(fragment);refreshSaved()}
  draw()
@@ -301,13 +301,14 @@ function startDraftProduct(p){
    track.tabIndex=0;track.setAttribute('aria-label','Fotos del producto');track.setAttribute('role','region');
    const go=i=>track.scrollTo({left:i*track.clientWidth,behavior:quiet.matches?'instant':'smooth'});
    for (const [i,[k,name]] of views.entries()){
-     const path=draftPhoto(c,k), alt=p.name+' · '+c.name+' · '+name;
+     const path=draftPhoto(c,k), alt=p.name+' · '+c.name+' · '+name+(c.illustration?' · Imagen ilustrativa':'');
      const big=btn('',()=>openZoom(path,alt),'productGallerySlide');big.append(image(path,alt,i!==0));big.setAttribute('aria-label','Ampliar: '+name);track.append(big);
      const thumb=btn('',()=>go(i),'productThumb');thumb.setAttribute('aria-label','Ver foto: '+name);thumb.setAttribute('aria-current',String(i===0));thumb.append(image(path));thumbs.append(thumb);
    }
    track.addEventListener('scroll',()=>{const cur=Math.round(track.scrollLeft/(track.clientWidth||1));[...thumbs.children].forEach((t,i)=>t.setAttribute('aria-current',String(i===cur)))},{passive:true});
    track.addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight'].includes(e.key))return;e.preventDefault();go(clamp(Math.round(track.scrollLeft/(track.clientWidth||1))+(e.key==='ArrowRight'?1:-1),0,views.length-1))});
-   group.append(track,thumbs);media.replaceChildren(group);
+   if(c.illustration)group.append(el('p','Imagen ilustrativa. No es una foto de la prenda real.','draftNotice illustrationNotice'));
+   group.append(track);if(views.length>1)group.append(thumbs);media.replaceChildren(group);
  }
  paint();
 }
