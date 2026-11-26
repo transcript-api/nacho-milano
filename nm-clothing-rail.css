@@ -97,3 +97,12 @@
 .nmRail{scroll-margin-top:64px}
 @media(max-width:850px){.nmRail{--mobile-slot:clamp(135px,45cqw,194px)}.nmRail__item,.nmRail__item[data-active]{flex-basis:var(--mobile-slot)}.nmRail__shape{width:min(100%,210px)}.nmRail__items{padding-inline:calc((100cqw - var(--mobile-slot))/2)}}
 @media(max-width:560px){.nmRail__close{min-width:74px;min-height:44px}.nmRail__controls button{min-width:40px;min-height:44px}}
+
+/* Compactación leve del perchero de la portada; las fotos conservan su tamaño. */
+#perchero.nmRail{--rail-gap:clamp(3px,.45vw,8px)}
+@media(max-width:850px){
+  #perchero.nmRail{--rail-gap:2px;--nm-mobile-pitch:calc(var(--mobile-slot) - 8px)}
+  #perchero.nmRail .nmRail__item{flex-basis:var(--nm-mobile-pitch)}
+  #perchero.nmRail .nmRail__shape{width:min(var(--mobile-slot),210px)}
+  #perchero.nmRail .nmRail__items{padding-inline:calc((100cqw - var(--nm-mobile-pitch))/2)}
+}
