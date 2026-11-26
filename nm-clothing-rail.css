@@ -106,8 +106,3 @@
   #perchero.nmRail .nmRail__shape{width:min(var(--mobile-slot),210px)}
   #perchero.nmRail .nmRail__items{padding-inline:calc((100cqw - var(--nm-mobile-pitch))/2)}
 }
-
-/* Mantener el mismo paso y deslizamiento; usar perspectiva sobre la foto de frente. */
-#perchero[data-opening-collection] .nmRail__item:not([data-active]) .nmRail__rotation{
-  transform:translate3d(var(--nm-x,0px),0,var(--nm-z,0px)) rotateY(calc(-49deg + var(--nm-yaw,0deg))) rotateZ(var(--nm-sway,0deg));
-}

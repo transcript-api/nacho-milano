@@ -1,0 +1,47 @@
+{
+  "inicial": "nm-camisa-swell",
+  "piezas": [
+    {
+      "prenda": "nm-camisa-100-linho",
+      "color": "Marinho",
+      "frente": "assets/perchero-v2/nm-camisa-100-linho-frente.webp",
+      "perfil": "assets/perchero-v2/nm-camisa-100-linho-perfil.webp"
+    },
+    {
+      "prenda": "nm-polo-trico-modelo-01",
+      "color": "Off White",
+      "frente": "assets/perchero-v2/nm-polo-trico-modelo-01-frente.webp",
+      "perfil": "assets/perchero-v2/nm-polo-trico-modelo-01-perfil.webp"
+    },
+    {
+      "prenda": "nm-camisa-lv-manga-longa",
+      "color": "Chocolate",
+      "frente": "assets/perchero-v2/nm-camisa-lv-manga-longa-frente.webp",
+      "perfil": "assets/perchero-v2/nm-camisa-lv-manga-longa-perfil.webp"
+    },
+    {
+      "prenda": "nm-camisa-swell",
+      "color": "OFF",
+      "frente": "assets/perchero-v2/nm-camisa-swell-frente.webp",
+      "perfil": "assets/perchero-v2/nm-camisa-swell-perfil.webp"
+    },
+    {
+      "prenda": "nm-polo-poliamida-botoes-metal",
+      "color": "Preto",
+      "frente": "assets/perchero-v2/nm-polo-poliamida-botoes-metal-frente.webp",
+      "perfil": "assets/perchero-v2/nm-polo-poliamida-botoes-metal-perfil.webp"
+    },
+    {
+      "prenda": "nm-camisa-rustic",
+      "color": "Marinho",
+      "frente": "assets/perchero-v2/nm-camisa-rustic-frente.webp",
+      "perfil": "assets/perchero-v2/nm-camisa-rustic-perfil.webp"
+    },
+    {
+      "prenda": "nm-camiseta-algodao-modelo-000",
+      "color": "Preto",
+      "frente": "assets/perchero-v2/nm-camiseta-algodao-modelo-000-frente.webp",
+      "perfil": "assets/perchero-v2/nm-camiseta-algodao-modelo-000-perfil.webp"
+    }
+  ]
+}
