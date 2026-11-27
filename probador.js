@@ -20,6 +20,7 @@
   const parts = ['top', 'bottom'];
   const openingPair={top:'rustic-safari',bottom:'short-natural'};
   const compactNames={'nm-calca-de-linho-com-elastano':'Pantalón de lino','nm-short-linho-ultra-premium':'Short de lino'};
+  const plateFile=key=>key.startsWith('rustic-')?key+'-abierta':key;
   const lists = {};
   for (const p of parts) {
     lists[p] = garments[p].flatMap(([id, variants]) => {
@@ -27,7 +28,7 @@
       const colors=new Map(item.colors.map(c=>[c.name,c]));
       return variants.filter(([name]) => colors.has(name))
         .map(([color,key,swatch])=>({id,name:item.name,label:item.shortName||compactNames[id]||item.name,color,key,swatch,
-          front:colors.get(color).photos?.front||null,texture:colors.get(color).photos?.texture||null,src:'assets/probador/'+key+'.webp'}));
+          front:colors.get(color).photos?.front||null,texture:colors.get(color).photos?.texture||null,src:'assets/probador/'+plateFile(key)+'.webp'}));
     });
     if (!lists[p].length) return;
   }
@@ -73,9 +74,9 @@
   add.type='button';reset.type='button';action.append(candidate,add,reset);
   const layers={}, previews={}, zones={}, widgets={}, tokens={top:0,bottom:0}, cache=new Map();
   const plateHD=new Set(["calca-bege", "calca-branco", "calca-preto", "champy-branco", "rustic-areia", "rustic-azul", "rustic-branco", "rustic-safari", "short-natural", "swell-mascavo", "swell-off", "swell-preto", "swell-verde"]);
-  const highPlate=v=>'assets/probador-hd/'+v.key+'.webp';
-  const nativePlates=new Set(['swell-off','swell-preto','rustic-safari','rustic-azul','calca-preto','calca-branco','short-natural']);
-  const nativePlate=v=>'assets/probador-native/'+v.key+'.webp';
+  const highPlate=v=>'assets/probador-hd/'+plateFile(v.key)+'.webp';
+  const nativePlates=new Set(['swell-off','swell-preto','rustic-safari','rustic-azul','rustic-areia','rustic-branco','calca-preto','calca-branco','short-natural']);
+  const nativePlate=v=>'assets/probador-native/'+plateFile(v.key)+'.webp';
   // Tighten only the portion of the trouser waistband covered by the shirt.
   // The thighs, hems, fabric and seams below this transition stay intact.
   const pantWaist=[[.35,0],[.65,0],[.65,.414],[.683,.454],[1,.483],[1,1],[0,1],[0,.483],[.317,.454],[.35,.414]];

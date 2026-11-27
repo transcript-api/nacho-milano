@@ -5,39 +5,56 @@
 }
 .runwayStage.orbitStage{
   height:clamp(410px,53vw,720px);
-  background:radial-gradient(ellipse at 51% 30%,#fbfaf6 0,#f4f1ea 47%,#ddd8ce 100%);
+  background:
+    radial-gradient(ellipse 78% 65% at 50% 19%,#fffdf7 0%,#faf7ef 36%,#eee9df00 81%),
+    linear-gradient(180deg,#eeebe2 0%,#e9e3d9 51%,#ded6ca 100%);
   cursor:grab;touch-action:pan-y pinch-zoom;overscroll-behavior-inline:contain;
 }
 .runwayStage.orbitStage::before{
-  height:56%;bottom:0;box-shadow:none;background:linear-gradient(0deg,#8d82731a,transparent);pointer-events:none;
+  top:47%;bottom:0;left:0;right:0;height:auto;pointer-events:none;
+  background:
+    radial-gradient(ellipse at 50% 46%,#fbf5e5a8 0%,#f5eee751 38%,transparent 73%),
+    linear-gradient(180deg,#a0927e0d 0%,transparent 21%,#8c817120 100%);
+  border-top:1px solid #b3a99821;box-shadow:0 -9px 24px #fff9eb40;
 }
 .orbitStage[data-orbit-drag]{cursor:grabbing}
 .orbitFloor{
   position:absolute;z-index:0;border-radius:50%;pointer-events:none;
-  box-shadow:0 21px 33px #5b514a1a,inset 0 0 35px #fffbf0bd;
-  border:1px solid #bdb5a565;
-  background:radial-gradient(ellipse at 45% 46%,#fbf9f362 30%,#cac1b245 100%);
 }
-.orbitFloor::after{
-  content:'';position:absolute;inset:6% 2.5%;border:1px solid #faf6ec8f;
+.orbitFloor::before,.orbitFloor::after{
+  content:'';position:absolute;top:0;right:0;bottom:0;left:0;
   border-radius:inherit;
 }
-.orbitShadows{position:absolute;inset:0;z-index:1;pointer-events:none}
-.orbitShadow{position:absolute;top:0;left:0;border-radius:50%;background:radial-gradient(ellipse,#4a4238b2 0,#544a4140 47%,transparent 72%)}
-.runwayStage .models.orbitModels{position:absolute;z-index:2;inset:0}
+.orbitFloor::before{
+  transform:translateY(var(--orbit-rim,9px));
+  background:linear-gradient(180deg,#c6b8a1 50%,#b0a18a 100%);
+  border:1px solid #9889727d;
+  box-shadow:0 9px 21px #332c222d,0 16px 31px #52433318;
+}
+.orbitFloor::after{
+  border:1px solid #9587738f;
+  background:radial-gradient(ellipse at 50% 19%,#fbf8ed 1%,#ece4d6 56%,#cfc2ab 100%);
+  box-shadow:inset 0 0 0 3px #fff9eaa2,inset 0 0 0 4px #b1a18a24,inset 0 7px 18px #fffdf79e,inset 0 -7px 13px #a79b833c;
+}
+.orbitShadows{position:absolute;top:0;right:0;bottom:0;left:0;z-index:1;pointer-events:none}
+.orbitShadow{
+  position:absolute;top:0;left:0;border-radius:50%;
+  background:radial-gradient(ellipse at 50% 43%,#30281f90 0%,#4f413454 23%,#53483b24 46%,#584b3d00 75%);
+}
+.runwayStage .models.orbitModels{position:absolute;z-index:2;top:0;right:0;bottom:0;left:0}
 .runwayStage .model.orbitModel{
   position:absolute;display:block;top:0;left:0;bottom:auto;margin:0;padding:0;
   transform-origin:50% 100%;transition:none;pointer-events:none;touch-action:pan-y pinch-zoom;cursor:pointer;
   background:none;border:none;overflow:visible;
 }
-.orbitModel .orbitSprite{position:absolute;inset:0;isolation:isolate;pointer-events:none}
+.orbitModel .orbitSprite{position:absolute;top:0;right:0;bottom:0;left:0;isolation:isolate;pointer-events:none}
 .runwayStage .orbitModel img{
-  display:block;position:absolute;inset:0;width:100%;height:100%;max-height:none;object-fit:contain;
+  display:block;position:absolute;top:0;right:0;bottom:0;left:0;width:100%;height:100%;max-height:none;object-fit:contain;
   object-position:center bottom;filter:none;pointer-events:none;transition:none;mix-blend-mode:plus-lighter;
 }
 .runwayStage .orbitModel .orbitFallback{mix-blend-mode:multiply}
 .runwayStage .orbitModel [hidden]{display:none}
-.orbitModel .orbitHit{position:absolute;inset:4% var(--orbit-hit,19%) 2%;pointer-events:auto;border-radius:18px}
+.orbitModel .orbitHit{position:absolute;top:4%;right:var(--orbit-hit,19%);bottom:2%;left:var(--orbit-hit,19%);pointer-events:auto;border-radius:18px}
 .orbitModel[data-orbit-inactive] .orbitHit{pointer-events:none}
 .orbitModel:focus-visible{outline:none}
 .orbitModel:focus-visible .orbitHit{outline:1.5px solid #302b24;outline-offset:3px}
@@ -62,3 +79,5 @@
   .orbitStage *{animation:none}
 }
 .orbitStage[data-orbit-drag] .orbitModel{cursor:grabbing}
+
+.orbitStage[data-orbit-drag] .orbitHit{cursor:grabbing}

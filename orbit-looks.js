@@ -2,7 +2,7 @@
    angles. The individual photographs are sprites, not rotated rectangles. */
 (() => {
 'use strict';
-const TAU=Math.PI*2,QUARTER=Math.PI/2,DOLLY=.22,ASPECT=420/880,BASELINE=.97;
+const TAU=Math.PI*2,QUARTER=Math.PI/2,ASPECT=420/880,BASELINE=.97;
 const views=['front','right','back','left']; // screen direction, not the model's anatomical side
 const mod=(x,n)=>((x%n)+n)%n;
 const clamp=(x,min,max)=>Math.min(max,Math.max(min,x));
@@ -10,35 +10,38 @@ const smooth=x=>{const s=clamp(x,0,1);return s*s*(3-2*s)};
 const fmt=n=>Number(n.toFixed(4));
 function project(slot, count, w, h, focus=0){
   const t=TAU*slot/count, x=Math.sin(t), z=Math.cos(t);
-  const perspective=(1-DOLLY)/(1-DOLLY*z);
+  const narrow=1-smooth((w-360)/370);
+  const lens=.24+.036*narrow;
+  const perspective=(1-lens)/(1-lens*z);
   const tight=clamp((w-380)/450,0,1);
-  const ringY=h*(.181-.159*focus),floorMid=h*(.669+.164*focus);
+  const ringY=h*(.202+.012*narrow-(.180+.012*narrow)*focus);
+  const floorMid=h*(.633-.01*narrow+(.199+.01*narrow)*focus);
   const figureHeight=h*(.674+.104*focus+.025*tight),figureWidth=figureHeight*ASPECT;
-  const edge=(w/2-5)/(1-DOLLY);
+  const edge=(w/2-5)/(1-lens);
   // Bound the widest projected silhouette at every angle, not only at the
   // cardinal positions. This keeps a narrow portrait screen from cropping.
-  const maxRadius=Math.sqrt(Math.max(1,(edge-figureWidth/2)**2-(edge*DOLLY)**2));
+  const maxRadius=Math.sqrt(Math.max(1,(edge-figureWidth/2)**2-(edge*lens)**2));
   const ringX=Math.min(w*(.453-.035*focus),maxRadius);
   // Camera bearing from each mark differs from its bearing at the origin.
   // The dancer at the rear has a 180° viewing angle and shows the back plate.
-  const yaw=mod(t+Math.atan2(DOLLY*x,1-DOLLY*z),TAU)/QUARTER;
+  const yaw=mod(t+Math.atan2(lens*x,1-lens*z),TAU)/QUARTER;
   const angle=Math.floor(yaw),blend=smooth((yaw-angle-.31)/.38);
   return {
     x:w/2+x*ringX*perspective, y:floorMid+z*ringY*perspective,
     scale:perspective, z, figureHeight,figureWidth,
     weights:views.map((_,i)=>i===angle?1-blend:i===(angle+1)%views.length?blend:0),
-    rx:ringX*Math.sqrt((1-DOLLY)/(1+DOLLY)),
-    ry:ringY/(1+DOLLY),
-    cy:floorMid+ringY*DOLLY/(1+DOLLY)
+    rx:ringX*Math.sqrt((1-lens)/(1+lens)),
+    ry:ringY/(1+lens),
+    cy:floorMid+ringY*lens/(1+lens)
   };
 }
 function mount(o){
-  const {stage,scene,port,pins,info,all,previous,next,counter,looks,quiet,gesture,el,btn,image,link,selectProduct,productAction,launchZoom,outfitDrawer,refresh}=o;
+  const {stage,scene,port,pins,info,all,previous,next,counter,looks,quiet,el,btn,image,link,selectProduct,productAction,launchZoom,outfitDrawer,refresh}=o;
   const n=looks.length;if(!n)return;
   const deep=Number(new URLSearchParams(location.search).get('look'));
   const chosen=Number.isInteger(deep)&&deep>0&&deep<=n;
   let ix=chosen?deep-1:0, phase=ix, aimed=phase, detailed=chosen, focusMix=Number(chosen), changePhase=null, changeFocus=null;
-  let dragFrom=null, raf=0,w=0,h=0, points=[], touchOrigin=0, clickMute=0;
+  let contact=null,dragFrom=null,raf=0,w=0,h=0,points=[],touchOrigin=0,clickMute=0;
   const pathFor=(look,angle)=>'assets/looks-orbita/'+look.photo.slice(look.photo.lastIndexOf('/')+1)+'-'+angle+'.webp';
   const original=look=>'assets/'+look.photo+'.webp';
   const native=(look,angle)=>pathFor(look,angle).replace('looks-orbita/','looks-orbita-hd/');
@@ -57,6 +60,7 @@ function mount(o){
 
   stage.classList.add('orbitStage');scene.classList.add('orbitScene');port.classList.add('orbitModels');
   stage.setAttribute('role','region');stage.setAttribute('aria-roledescription','carrusel');
+  stage.setAttribute('aria-keyshortcuts','ArrowLeft ArrowRight Home End');
   const floor=el('div',undefined,'orbitFloor');floor.setAttribute('aria-hidden','true');
   const shadows=el('div',undefined,'orbitShadows');shadows.setAttribute('aria-hidden','true');
   stage.prepend(floor,shadows);
@@ -87,6 +91,24 @@ function mount(o){
     sprite.append(fallback);node.append(sprite,hit);port.append(node);shadows.append(shadow);
     return {node,art,hd,high:native(look,'front'),fallback,shadow};
   });
+  let warmed=false, prefetch=null;
+  function warmMedia(){
+    if(warmed)return;warmed=true;prefetch?.disconnect();
+    // Absolutely positioned alpha sprites are not always considered visible
+    // by native lazy loading. Start their existing sources a beat before the
+    // stage enters view, without pulling them at the top of a slow page.
+    for(const {art} of figures)for(const frame of art)frame.loading='eager';
+  }
+  function warmIfNear(){
+    const bounds=stage.getBoundingClientRect();
+    if(bounds.top<window.innerHeight+300&&bounds.bottom>-300)warmMedia();
+  }
+  if(typeof IntersectionObserver==='function'){
+    prefetch=new IntersectionObserver(entries=>{if(entries.some(e=>e.isIntersecting))warmMedia()},{rootMargin:'300px 0px'});
+    prefetch.observe(stage);
+  }else window.addEventListener('scroll',warmIfNear,{passive:true});
+  window.addEventListener('load',warmIfNear,{once:true});
+  warmIfNear();
   function doZoom(trigger){
     if(dragFrom!==null||changePhase)return;
     const look=looks[ix],fig=figures[ix];
@@ -102,15 +124,21 @@ function mount(o){
     }
     launchZoom(src,alt,trigger,{views});
   }
-  const step=()=>clamp(w*.305,91,245);
+  const step=()=>clamp(w*.342,96,249);
   const closest=i=>i+Math.round((phase-i)/n)*n;
   const active=m=>m&&m.duration>0;
-  function tween(from,to,duration){
-    return from===to||quiet.matches?null:{from,to,duration,at:performance.now()};
+  function tween(from,to,duration,velocity=null){
+    const distance=to-from;
+    if(!distance||quiet.matches)return null;
+    const slope=velocity===null?null:clamp(velocity*duration/distance,0,2.65);
+    return {from,to,duration,slope,at:performance.now()};
   }
   function sample(t,k){
-    const x=clamp((t-k.at)/k.duration,0,1);
-    return [k.from+(k.to-k.from)*(1-(1-x)**3),x===1];
+    const x=clamp((t-k.at)/k.duration,0,1),u=1-x;
+    // Match the release's incoming speed, then settle with zero exit speed;
+    // the slope bound keeps this cubic monotonic (no elastic overshoot).
+    const progress=k.slope===null?1-u**3:x*x*(3-2*x)+k.slope*x*u*u;
+    return [k.from+(k.to-k.from)*progress,x===1];
   }
   function requestDraw(){if(!raf)raf=requestAnimationFrame(draw)}
   function dimensions(){
@@ -153,22 +181,25 @@ function mount(o){
     // rather than making a hidden model suddenly replace the selected body.
     const blend=focusMix*(1-.72*smooth(Math.abs(phase-aimed)*1.65));
     const ground=project(0,n,w,h,blend);
-    floor.style.cssText='width:'+fmt(ground.rx*2)+'px;height:'+fmt(ground.ry*2)+'px;left:'+fmt(w/2-ground.rx)+'px;top:'+fmt(ground.cy-ground.ry)+'px;opacity:'+fmt(1-blend);
+    const rx=Math.min(w/2-8,ground.rx+clamp(w*.034,10,25));
+    const ry=ground.ry+clamp(h*.012,5,9);
+    floor.style.cssText='width:'+fmt(rx*2)+'px;height:'+fmt(ry*2)+'px;left:'+fmt(w/2-rx)+'px;top:'+fmt(ground.cy-ry)+'px;opacity:'+fmt(1-blend)+';--orbit-rim:'+fmt(clamp(h*.021,7,15))+'px';
     const order=looks.map((_,i)=>[i,Math.cos(TAU*(i-phase)/n)]).sort((a,b)=>a[1]-b[1]||a[0]-b[0]);
     const rank=Array(n);order.forEach(([i],v)=>rank[i]=1+v);
     for(let i=0;i<n;i++){
       const f=figures[i],p=project(i-phase,n,w,h,blend),current=i===ix;
       points[i]=p;
       const visible=current?1:1-smooth((blend-.07)/.85);
-      const shadowSize=p.figureWidth*p.scale*(.29+.1*(1-Math.abs(p.z)));
+      const shadowSize=p.figureWidth*p.scale*(.40+.10*(1-Math.abs(p.z)));
+      const shadowDepth=Math.max(7,(14+2*(p.z+1))*p.scale);
       f.node.style.transform='translate3d('+fmt(p.x-p.figureWidth/2)+'px,'+fmt(p.y-p.figureHeight+(1-BASELINE)*p.figureHeight*p.scale)+'px,0) scale('+fmt(p.scale)+')';
       f.node.style.width=fmt(p.figureWidth)+'px';f.node.style.height=fmt(p.figureHeight)+'px';
       f.node.style.zIndex=String(rank[i]);f.node.style.opacity=String(fmt(visible));
       f.node.style.setProperty('--orbit-hit',Math.round(17+19*(p.weights[1]+p.weights[3]))+'%');
       f.node.toggleAttribute('data-orbit-inactive',visible<.24);
-      f.shadow.style.transform='translate3d('+fmt(p.x-shadowSize/2)+'px,'+fmt(p.y-4*p.scale)+'px,0)';
-      f.shadow.style.width=fmt(shadowSize)+'px';f.shadow.style.height=fmt(Math.max(7,12*p.scale))+'px';
-      f.shadow.style.opacity=String(fmt(visible*(.36+.3*p.scale)));
+      f.shadow.style.transform='translate3d('+fmt(p.x-shadowSize/2)+'px,'+fmt(p.y-shadowDepth*.39)+'px,0)';
+      f.shadow.style.width=fmt(shadowSize)+'px';f.shadow.style.height=fmt(shadowDepth)+'px';
+      f.shadow.style.opacity=String(fmt(visible*(.32+.43*p.scale)));
       paintImage(f,p,current);
     }
     if(changePhase||changeFocus)requestDraw();else if(detailed&&!busy)placePins();
@@ -220,9 +251,9 @@ function mount(o){
     changePhase=tween(phase,aimed,duration);if(!changePhase)phase=aimed;
     content();requestDraw();
   }
-  function snap(to,duration=420){
+  function snap(to,duration=410,velocity=null){
     ix=mod(to,n);aimed=to;dragFrom=null;
-    changePhase=tween(phase,to,duration);if(!changePhase)phase=to;
+    changePhase=tween(phase,to,duration,velocity);if(!changePhase)phase=to;
     content();requestDraw();
   }
   function focus(on){
@@ -231,33 +262,74 @@ function mount(o){
     content();requestDraw();
     if(on){
       const r=stage.getBoundingClientRect();
-      if(r.top<70||r.bottom>window.innerHeight)stage.scrollIntoView({block:'start',behavior:'instant'});
+      const visible=Math.min(r.bottom,window.innerHeight)-Math.max(r.top,68);
+      if(visible<Math.min(r.height*.48,225))stage.scrollIntoView({block:'nearest',behavior:'instant'});
     }
   }
-  gesture(stage,{
-    accept:e=>!e.target.closest('.orbitZoom'),enabled:()=>n>1,
-    move:dx=>{
-      if(dragFrom===null){dragFrom=phase;touchOrigin=aimed;changePhase=null}
-      const amount=clamp(-dx/step(),-3.25,3.25);
-      phase=quiet.matches?dragFrom+Math.round(amount):dragFrom+amount;
-      requestDraw();
-    },
-    release:(dir,dx,v)=>{
-      if(dragFrom===null)return;
-      const travel=(phase-dragFrom);
-      const carry=quiet.matches?0:clamp(-v*.16,-.7,.7);
-      const desired=dragFrom+travel+carry;
-      const abs=Math.abs(dx), flick=Math.abs(v)>.34&&abs>32;
-      // A quick short flick is one look; a slow partial movement settles back.
-      let target=Math.round(desired);
-      if(flick&&target===Math.round(dragFrom))target+=dir;
-      clickMute=performance.now()+400;snap(target,clamp(340+Math.abs(target-phase)*145,340,530));
-    },
-    cancel:()=>{
-      if(dragFrom===null)return;
-      clickMute=performance.now()+400;snap(touchOrigin,285);
+  const blocked='.pin,.runControls,#allLooks,.orbitZoom';
+  const contactTime=e=>Number.isFinite(e.timeStamp)&&e.timeStamp>0?e.timeStamp:performance.now();
+  const compatible=e=>contact&&e.pointerId===contact.id;
+  function samplePointer(g,e){
+    const t=contactTime(e),x=e.clientX;
+    if(!Number.isFinite(x))return;
+    g.dx=x-g.x;
+    const last=g.recent[g.recent.length-1];
+    if(!last||t>last.t){g.recent.push({x,t});while(g.recent.length>2&&g.recent[1].t<t-82)g.recent.shift();}
+  }
+  function settleContact(e,cancelled){
+    if(!compatible(e))return;
+    const g=contact;contact=null;
+    if(g.axis!=='x'){
+      if(!cancelled&&Math.hypot(e.clientX-g.x,e.clientY-g.y)>12)clickMute=performance.now()+330;
+      return; // Leave the page's scrolling under browser control.
     }
+    clickMute=performance.now()+400;
+    if(cancelled){snap(touchOrigin,255,0);return;}
+    const t=contactTime(e);
+    samplePointer(g,e);
+    const end=g.recent[g.recent.length-1],start=g.recent.find(q=>q.t>=end.t-91)||end;
+    const px=Number(t-end.t<100&&end.t-start.t>12)*(end.x-start.x)/Math.max(1,end.t-start.t);
+    const velocity=quiet.matches?0:clamp(-px/g.pitch,-.026,.026);
+    const travel=clamp(-g.dx/g.pitch,-3.25,3.25);
+    const releasePhase=dragFrom+travel;
+    if(!quiet.matches)phase=releasePhase;
+    let target=Math.round(releasePhase+clamp(velocity*105,-.56,.56));
+    // A short quick flick can advance one even before crossing midpoint.
+    const from=Math.round(dragFrom),intent=Math.sign(travel);
+    if(velocity*intent>0&&Math.abs(px)>.34&&Math.abs(g.dx)>27&&(target-from)*intent<1)target=from+intent;
+    const remaining=Math.abs(target-releasePhase);
+    snap(target,clamp(232+remaining*139,245,415),velocity);
+  }
+  stage.addEventListener('pointerdown',e=>{
+    if(contact||n<2||!e.isPrimary||(e.pointerType!=='touch'&&e.button!==0)||e.target.closest(blocked))return;
+    warmMedia();
+    contact={id:e.pointerId,kind:e.pointerType,axis:null,x:e.clientX,y:e.clientY,dx:0,pitch:step(),recent:[{x:e.clientX,t:contactTime(e)}]};
   });
+  window.addEventListener('pointermove',e=>{
+    if(!compatible(e))return;
+    const g=contact,dx=e.clientX-g.x,dy=e.clientY-g.y,ax=Math.abs(dx),ay=Math.abs(dy);
+    if(g.axis!=='x'){
+      // Let the browser handle vertical page scrolling and pinch zoom. Never
+      // steal a nearly diagonal gesture on a narrow touch viewport.
+      const touch=g.kind==='touch',slop=touch?11:7;
+      if(ay>=slop&&ay>=ax*(touch?1.04:1.14)){contact=null;clickMute=performance.now()+330;return;}
+      if(ax<slop||ax<ay*(touch?1.24:1.10))return;
+      if(changePhase)[phase]=sample(performance.now(),changePhase);
+      g.axis='x';dragFrom=phase;touchOrigin=aimed;changePhase=null;
+      if(!touch)try{stage.setPointerCapture(e.pointerId)}catch{}
+    }
+    if(g.kind!=='touch'&&e.cancelable)e.preventDefault();
+    samplePointer(g,e);
+    if(!quiet.matches)phase=dragFrom+clamp(-g.dx/g.pitch,-3.25,3.25);
+    requestDraw();
+  },{capture:true,passive:false});
+  window.addEventListener('pointerup',e=>settleContact(e,false),true);
+  window.addEventListener('pointercancel',e=>settleContact(e,true),true);
+  stage.addEventListener('lostpointercapture',e=>{if(e.target===stage)settleContact(e,true)});
+  stage.addEventListener('dragstart',e=>e.preventDefault());
+  stage.addEventListener('click',e=>{
+    if(e.detail&&performance.now()<clickMute&&!e.target.closest(blocked)){e.preventDefault();e.stopImmediatePropagation()}
+  },true);
   stage.addEventListener('keydown',e=>{
     if(e.target.closest('.runControls,.pin,#allLooks')||e.altKey||e.ctrlKey||e.metaKey||!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;
     e.preventDefault();const moveFocus=figures.some(f=>f.node===document.activeElement);
@@ -268,7 +340,7 @@ function mount(o){
   all.onclick=()=>{focus(false);figures[ix].node.focus({preventScroll:true})};
   scene.closest('#looks')?.addEventListener('keydown',e=>{if(e.key==='Escape'&&detailed){focus(false);figures[ix].node.focus({preventScroll:true})}});
   quiet.addEventListener('change',()=>{
-    if(quiet.matches){phase=aimed;focusMix=Number(detailed);dragFrom=null;changePhase=changeFocus=null;requestDraw()}
+    if(quiet.matches){phase=aimed;focusMix=Number(detailed);contact=null;dragFrom=null;changePhase=changeFocus=null;requestDraw()}
   });
   if(typeof ResizeObserver==='function')new ResizeObserver(dimensions).observe(stage);
   window.addEventListener('resize',dimensions,{passive:true});dimensions();content();
