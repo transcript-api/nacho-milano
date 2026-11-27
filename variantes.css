@@ -94,7 +94,7 @@
 /* On wider screens keep a single-color garment prominent and let its
    real macro sit alongside it rather than wasting the second column. */
 @supports selector(:has(*)){
-@media(min-width:700px){
+@media(min-width:761px){
   .variantRow[data-variant-count="1"] .variantVisual:has(.variantTexture){
     display:grid;grid-template-columns:minmax(0,1.48fr) minmax(0,1fr);align-items:stretch;gap:1px;
   }
@@ -109,4 +109,27 @@
   .variantRow[data-variant-count="1"] .variantTexture svg{margin:10px;width:28px;height:28px;padding:4px}
   .variantRow[data-variant-count="1"] .cardAdd{right:calc(40.32% + 8px)}
 }
+}
+
+/* Same mobile footprint as the original two-column catalog. Motion stays in variantes.js. */
+@media (max-width:760px){
+  .variantRow{
+    --variant-gap:8px;
+    --variant-width:calc((100vw - 2 * var(--pad, 14px) - var(--variant-gap))/2);
+  }
+  .variantRow[data-variant-count="1"] .variantGroup{grid-template-columns:minmax(0,var(--variant-width))}
+  .variantRow[data-variant-count] .variantFace{
+    aspect-ratio:1/1.02;
+    height:calc(var(--variant-width) * 1.02);
+    max-height:none;
+  }
+  .variantFace>img{padding:0 1%}
+}
+@media (max-width:650px){
+  .variantRow{--variant-width:calc((100vw - 26px - var(--variant-gap))/2)}
+}
+@supports (width:1cqw){
+  @media (max-width:760px){
+    .variantRow{--variant-width:calc((100cqw - var(--variant-gap))/2)}
+  }
 }
