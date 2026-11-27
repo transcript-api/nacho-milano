@@ -157,11 +157,11 @@
 }
 @media(max-width:760px){
   .variantPair{column-gap:8px}
-  .variantPair>.variantRow{--pair-heading:70px}
+  .variantPair>.variantRow{--pair-heading:82px}
   .variantPair .variantRowHeading{display:grid;gap:2px}
   .variantPair .variantRowHeading h3{font-size:clamp(.94rem,4.5vw,1.25rem)}
   .variantPair .variantRow[data-variant-paired] .variantFace{aspect-ratio:1/1.02;max-height:none}
 }
 @supports not (grid-template-rows:subgrid){
-  .variantPair>.variantRow{grid-template-rows:minmax(var(--pair-heading,54px),auto) minmax(0,1fr)}
+  .variantPair>.variantRow{grid-template-rows:minmax(var(--pair-heading,64px),auto) minmax(0,1fr)}
 }
