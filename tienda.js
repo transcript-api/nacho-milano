@@ -6,11 +6,11 @@
  const canon=x=>x.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
  function paint(){
   const value=q.value.trim(), terms=canon(value).split(/\s+/).filter(Boolean);
-  const found=terms.length?shopProducts.filter(p=>terms.every(t=>canon([p.name,p.category,p.line,...p.colors.map(displayColor)].join(' ')).includes(t))).slice(0,5):[];
+  const found=terms.length?shopProducts.filter(p=>terms.every(t=>canon([p.name,p.category,p.line,...p.colors.map(displayColor)].filter(Boolean).map(t=>window.NM_LANG?.aliases(t)??t).join(' ')).includes(t))).slice(0,5):[];
   results.replaceChildren();
   if(!terms.length){results.append(el('p','Probá con el nombre de una prenda o un color.'));return}
   if(!found.length){results.append(el('p','No encontramos prendas con ese nombre.'));return}
-  found.forEach(p=>{const i=p.colors.findIndex(c=>terms.some(t=>canon(displayColor(c)).includes(t))),color=Math.max(0,i);
+  found.forEach(p=>{const i=p.colors.findIndex(c=>terms.some(t=>canon(window.NM_LANG?.aliases(displayColor(c))??displayColor(c)).includes(t))),color=Math.max(0,i);
    const a=link('',url(p,color),'shopHit'), name=el('span',p.name+(i>=0?' · '+displayColor(p.colors[i]):''));const c=p.colors[color],f=p.draft?draftPhoto(c):src(c[1]);a.append(f?image(f,''):draftPlaceholder(),name);results.append(a)});
  }
  document.querySelectorAll('[data-search]').forEach(b=>b.addEventListener('click',()=>{s.showModal();paint();q.focus()}));

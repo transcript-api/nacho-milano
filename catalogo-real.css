@@ -16,3 +16,10 @@
 .runwayStage a.pin{display:grid;place-items:center;text-decoration:none;color:#fff}
 .lookIllustration{font-size:.72rem}
 .draftProduct .productLookCards img{object-fit:contain;background:#f0ede8}
+
+.garmentMeasure{margin:1rem 0 1.15rem;border-block:1px solid #cfceca;color:inherit;font:400 .875rem/1.5 NachoShop,Arial,sans-serif}
+.garmentMeasure>summary{padding:.8rem 0;cursor:pointer;font-weight:500}
+.garmentMeasure table{width:100%;max-width:28rem;margin:0 0 1rem;border-collapse:collapse;font-variant-numeric:tabular-nums;text-align:left}
+.garmentMeasure caption{text-align:left;padding:.1rem 0 .55rem}
+.garmentMeasure :is(td,th){padding:.3rem .25rem .3rem 0;border-bottom:1px solid #ddd;font-weight:400}
+.garmentMeasure thead th,.garmentMeasure tbody th{font-weight:600}

@@ -65,7 +65,7 @@
           if(buttons[i].getAttribute('aria-current')!==String(active))buttons[i].setAttribute('aria-current',String(active));
         });
         const name=items[n].dataset.name, position=number(n+1)+' / '+number(items.length);
-        if(activeText.textContent!==name)activeText.textContent=name;
+        if(activeText.textContent!==name&&activeText.textContent!==(window.NM_LANG?.t(name)??name))activeText.textContent=name;
         if(count.textContent!==position)count.textContent=position;
         return changed;
       }

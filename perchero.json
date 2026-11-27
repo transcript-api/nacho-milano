@@ -1,23 +1,26 @@
 {
-  "inicial": "nm-camisa-swell",
+  "inicial": {
+    "prenda": "nm-camisa-swell",
+    "color": "OFF"
+  },
   "piezas": [
     {
-      "prenda": "nm-camisa-100-linho",
-      "color": "Marinho",
-      "frente": "assets/perchero-v2/nm-camisa-100-linho-frente.webp",
-      "perfil": "assets/perchero-v2/nm-camisa-100-linho-perfil.webp"
+      "prenda": "nm-camisa-rustic",
+      "color": "Branco",
+      "frente": "assets/perchero-v2/rack-rustic-branco-front.webp",
+      "perfil": "assets/perchero-v2/rack-rustic-branco-side.webp"
     },
     {
-      "prenda": "nm-polo-trico-modelo-01",
-      "color": "Off White",
-      "frente": "assets/perchero-v2/nm-polo-trico-modelo-01-frente.webp",
-      "perfil": "assets/perchero-v2/nm-polo-trico-modelo-01-perfil.webp"
+      "prenda": "nm-camisa-swell",
+      "color": "Verde",
+      "frente": "assets/perchero-v2/rack-swell-verde-front.webp",
+      "perfil": "assets/perchero-v2/rack-swell-verde-side.webp"
     },
     {
-      "prenda": "nm-camisa-lv-manga-longa",
-      "color": "Chocolate",
-      "frente": "assets/perchero-v2/nm-camisa-lv-manga-longa-frente.webp",
-      "perfil": "assets/perchero-v2/nm-camisa-lv-manga-longa-perfil.webp"
+      "prenda": "nm-camisa-rustic",
+      "color": "Areia",
+      "frente": "assets/perchero-v2/rack-rustic-areia-front.webp",
+      "perfil": "assets/perchero-v2/rack-rustic-areia-side.webp"
     },
     {
       "prenda": "nm-camisa-swell",
@@ -26,10 +29,10 @@
       "perfil": "assets/perchero-v2/rack-swell-side.webp"
     },
     {
-      "prenda": "nm-polo-poliamida-botoes-metal",
+      "prenda": "nm-camisa-swell",
       "color": "Preto",
-      "frente": "assets/perchero-v2/nm-polo-poliamida-botoes-metal-frente.webp",
-      "perfil": "assets/perchero-v2/nm-polo-poliamida-botoes-metal-perfil.webp"
+      "frente": "assets/perchero-v2/rack-swell-preto-front.webp",
+      "perfil": "assets/perchero-v2/rack-swell-preto-side.webp"
     },
     {
       "prenda": "nm-camisa-rustic",
@@ -38,10 +41,16 @@
       "perfil": "assets/perchero-v2/rack-rustic-side.webp"
     },
     {
-      "prenda": "nm-camiseta-algodao-modelo-000",
-      "color": "Preto",
-      "frente": "assets/perchero-v2/nm-camiseta-algodao-modelo-000-frente.webp",
-      "perfil": "assets/perchero-v2/nm-camiseta-algodao-modelo-000-perfil.webp"
+      "prenda": "nm-camisa-rustic",
+      "color": "Azul Claro",
+      "frente": "assets/perchero-v2/rack-rustic-azul-front.webp",
+      "perfil": "assets/perchero-v2/rack-rustic-azul-side.webp"
+    },
+    {
+      "prenda": "nm-camisa-swell",
+      "color": "Mascavo",
+      "frente": "assets/perchero-v2/rack-swell-mascavo-front.webp",
+      "perfil": "assets/perchero-v2/rack-swell-mascavo-side.webp"
     }
   ]
 }

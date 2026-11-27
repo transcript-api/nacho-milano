@@ -6,8 +6,8 @@ const image=(url,alt='',lazy=true)=>{const x=el('img');x.src=url;x.alt=alt;x.dec
 const link=(txt,href,cl)=>{const x=el('a',txt,cl);x.href=href;return x};
 const {products,looks:rawLooks}=window.NM_BUILD;
 const draftProducts=window.NM_DRAFT||[];
-const shopProducts=draftProducts.length?draftProducts:products;
-const byId=new Map([...products,...draftProducts].map(p=>[p.id,p])), looks=rawLooks.filter(l=>l.items.every(i=>byId.has(i.id)));
+const shopProducts=draftProducts;
+const byId=new Map(shopProducts.map(p=>[p.id,p])), looks=rawLooks.filter(l=>l.items.every(i=>byId.get(i.id)?.colors.some(c=>c.name===i.color)));
 const src=(id,view='frente')=>'assets/'+id+'-'+view+'.webp', url=(p,c=0)=>'producto-'+p.id+'.html'+(c?'?color='+encodeURIComponent(p.colors[c].name??p.colors[c][1]):'');
 const displayColor=c=>c.name??c[0];
 const lookColor=(p,i)=>Math.max(0,p.colors.findIndex(c=>displayColor(c)===i?.color));
@@ -19,12 +19,11 @@ const money=new Intl.NumberFormat('es-UY',{style:'currency',currency:'UYU',maxim
 const variantKey=(p,c,s)=>JSON.stringify([p.id,p.colors[c][1],s]);
 const draftKey=(p,c)=>JSON.stringify([p.id,p.colors[c].name,null]);
 const valid=new Map(), choices=new Map();
-for(const p of products){p.colors.forEach((c,i)=>p.sizes.forEach(s=>valid.set(variantKey(p,i,s),{p,c,i,s})))}
 for(const p of draftProducts)p.colors.forEach((c,i)=>valid.set(draftKey(p,i),{p,c,i,s:null}));
 let saved=new Set();
-try{saved=new Set(JSON.parse(localStorage.getItem('nm-saved-v3')||'[]').filter(id=>byId.has(id)))}catch{}
-try{for(const [id,q] of JSON.parse(sessionStorage.getItem('nm-choices-v3')||'[]')){const p=byId.get(id);if(p&&p.colors[q.color]&&(q.size==null||p.sizes?.includes(q.size)))choices.set(id,{color:q.color,size:q.size,view:0})}}catch{}
-const saveChoice=(p,s)=>{choices.set(p.id,{...s});try{sessionStorage.setItem('nm-choices-v3',JSON.stringify([...choices]))}catch{}};
+try{saved=new Set(JSON.parse(localStorage.getItem('nm-saved-v3')||'[]').filter(id=>byId.has(id)));localStorage.setItem('nm-saved-v3',JSON.stringify([...saved]))}catch{}
+try{for(const [id,colorKey] of JSON.parse(sessionStorage.getItem('nm-color-choice-v1')||'[]')){const p=byId.get(id), index=p?.colors.findIndex(c=>c.name===colorKey)??-1;if(index>=0)choices.set(id,{color:index,size:null,view:0})}}catch{}
+const saveChoice=(p,s)=>{choices.set(p.id,{...s});try{sessionStorage.setItem('nm-color-choice-v1',JSON.stringify([...choices].map(([id,q])=>[id,byId.get(id)?.colors[q.color]?.name]).filter(([,color])=>color)))}catch{}};
 function toggleSaved(p){saved.has(p.id)?saved.delete(p.id):saved.add(p.id);try{localStorage.setItem('nm-saved-v3',JSON.stringify([...saved]))}catch{};refreshSaved()}
 function cardGlyph(kind){
  const ns='http://www.w3.org/2000/svg',svg=document.createElementNS(ns,'svg');svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('aria-hidden','true');svg.setAttribute('focusable','false');
@@ -53,7 +52,7 @@ function showBag(focus=null,full=false){
  if(!cart.size){target.append(el('p','La bolsa está vacía.'),actions);if(focus)actions.querySelector('a').focus();return}
  const ids=new Set(),frag=document.createDocumentFragment();let total=0;
  for(const [k,q] of cart){const {p,c,s}=valid.get(k);ids.add(p.id);if(p.price!=null)total+=p.price*q;
- const row=el('div',undefined,'lineItem'),copy=el('div');const photo=p.draft?draftPhoto(c):src(c[1],'rack');row.append(photo?image(photo,''):draftPlaceholder(),copy);copy.append(el('strong',p.name),el('p',(p.draft?c.name:c[0]+' · '+s)+' · '+q+(p.price!=null?' · '+money.format(p.price*q):'')));for(const [name,label,d] of [['−','Reducir',-1],['+','Aumentar',1],['Quitar','Quitar',-q]]){const x=btn(name,()=>{change(k,d);showBag([k,label],full)});x.dataset.k=k;x.dataset.op=label;x.setAttribute('aria-label',label+' '+p.name+' '+s);x.disabled=q>=9&&d>0;copy.append(x)}frag.append(row)}
+ const row=el('div',undefined,'lineItem'),copy=el('div');const photo=p.draft?draftPhoto(c):src(c[1],'rack');row.append(photo?image(photo,''):draftPlaceholder(),copy);copy.append(el('strong',p.name),el('p',(p.draft?c.name:c[0]+' · '+s)+' · '+q+(p.price!=null?' · '+money.format(p.price*q):'')));for(const [name,label,d] of [['−','Reducir',-1],['+','Aumentar',1],['Quitar','Quitar',-q]]){const x=btn(name,()=>{change(k,d);showBag([k,label],full)});x.dataset.k=k;x.dataset.op=label;x.setAttribute('aria-label',label+' '+p.name+(s?' '+s:''));x.disabled=q>=9&&d>0;copy.append(x)}frag.append(row)}
  target.append(frag);if(total)target.append(el('p','Subtotal: '+money.format(total),'statusText'));target.append(actions);
  const matches=[...new Set(looks.filter(l=>l.items.some(i=>ids.has(i.id))).flatMap(l=>l.items.map(i=>i.id)))].filter(id=>!ids.has(id)).slice(0,2);
  if(matches.length){const more=el('section',undefined,'bagRelated');more.append(el('h3','Completá el look'));for(const id of matches){const p=byId.get(id);if(p.draft){more.append(link(p.name,url(p),'textLink'));continue}const x=makeLookRow(p,()=>quickDrawer(p,full?()=>{drawer.close();showBag(null,true)}:()=>showBag()));more.append(x)}target.append(more)}
@@ -237,7 +236,7 @@ function startCatalog(){const filters=$('#filter'),grid=$('#grid');let active='T
  search.addEventListener('input',()=>{opened=null;persist();draw()});toggleSavedFilter.onclick=()=>{opened=null;onlySaved=!onlySaved;persist();draw()};
  sorter.onchange=()=>{sort=sorter.value;opened=null;persist();draw()};$('#resetCatalog').onclick=()=>{active='Todo';onlySaved=false;search.value='';sort='featured';sorter.value=sort;opened=null;persist();draw();search.focus()};if(!preview)persist();
  const keys=cats.map(cat=>{const b=btn(cat,()=>{active=cat;opened=null;persist();draw()},'');filters.append(b);return b});
- function draw(){toggleSavedFilter.setAttribute('aria-pressed',String(onlySaved));keys.forEach((b,i)=>b.setAttribute('aria-pressed',String(cats[i]===active)));const q=letters(search.value.trim());const featured=['tejido','polo','pantalon','chaleco'].map(id=>byId.get(id)).filter(Boolean);const result=draftProducts.length?draftProducts:preview?[...featured,...products.filter(p=>!featured.includes(p))]:products;const shown=result.filter(p=>(active==='Todo'||p.category===active)&&(!onlySaved||saved.has(p.id))&&(!q||q.split(/\s+/).every(t=>letters([p.name,p.category,p.line,...p.colors.map(displayColor)].join(' ')).includes(t))));if(sort!=='featured')shown.sort((a,b)=>a.name.localeCompare(b.name,'es')*(sort==='za'?-1:1));$('#noMatches').hidden=shown.length!==0;$('#catalogCount').textContent=shown.length+(shown.length===1?' PRENDA':' PRENDAS');grid.replaceChildren();const fragment=document.createDocumentFragment();
+ function draw(){toggleSavedFilter.setAttribute('aria-pressed',String(onlySaved));keys.forEach((b,i)=>b.setAttribute('aria-pressed',String(cats[i]===active)));const q=letters(search.value.trim());const result=shopProducts;const shown=result.filter(p=>(active==='Todo'||p.category===active)&&(!onlySaved||saved.has(p.id))&&(!q||q.split(/\s+/).every(t=>letters([p.name,p.category,p.line,...p.colors.map(displayColor)].filter(Boolean).map(t=>window.NM_LANG?.aliases(t)??t).join(' ')).includes(t))));if(sort!=='featured')shown.sort((a,b)=>(window.NM_LANG?.t(a.name)??a.name).localeCompare(window.NM_LANG?.t(b.name)??b.name,window.NM_LANG?.locale??'es-UY')*(sort==='za'?-1:1));$('#noMatches').hidden=shown.length!==0;$('#catalogCount').textContent=shown.length+(shown.length===1?' PRENDA':' PRENDAS');grid.replaceChildren();const fragment=document.createDocumentFragment();
  for(const p of shown){
   const state=readChoice(p),card=el('article',undefined,'card'),visual=el('div',undefined,'cardVisual'),pic=link('',url(p,state.color),'cardPic');
   const c=p.colors[state.color];pic.setAttribute('aria-label','Abrir ficha de '+p.name);
@@ -255,6 +254,7 @@ function startCatalog(){const filters=$('#filter'),grid=$('#grid');let active='T
   visual.prepend(pic);visual.append(save);card.append(visual,line);fragment.append(card)
  }
  grid.append(fragment);refreshSaved()}
+ document.addEventListener?.('nm:idioma',()=>{if(sort!=='featured')draw()});
  draw()
 }
 function productGallery(p,state,media){
