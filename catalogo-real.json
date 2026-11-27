@@ -9,9 +9,9 @@
       {
         "name": "Natural",
         "photos": {
-          "front": "assets/catalogo-ilustrativo/nm-short-linho-ultra-premium-frente-ilustrativo.webp",
-          "back": null,
-          "texture": null
+          "front": "assets/coleccion-detalles/short-natural-frente.webp",
+          "back": "assets/coleccion-detalles/short-natural-espalda.webp",
+          "texture": "assets/coleccion-detalles/short-natural-textura.webp"
         },
         "illustration": true
       },
@@ -42,6 +42,15 @@
     "descriptionLanguage": "pt-BR",
     "colors": [
       {
+        "name": "Preto",
+        "photos": {
+          "front": "assets/coleccion-detalles/calca-preto-frente.webp",
+          "back": null,
+          "texture": "assets/coleccion-detalles/calca-preto-textura.webp"
+        },
+        "illustration": true
+      },
+      {
         "name": "Natural",
         "photos": {
           "front": "assets/catalogo-ilustrativo/nm-calca-de-linho-com-elastano-frente-ilustrativo.webp",
@@ -51,20 +60,13 @@
         "illustration": true
       },
       {
-        "name": "Preto",
-        "photos": {
-          "front": null,
-          "back": null,
-          "texture": null
-        }
-      },
-      {
         "name": "Branco",
         "photos": {
-          "front": null,
+          "front": "assets/coleccion-detalles/calca-branco-frente.webp",
           "back": null,
-          "texture": null
-        }
+          "texture": "assets/coleccion-detalles/calca-branco-textura.webp"
+        },
+        "illustration": true
       }
     ],
     "draft": true
@@ -79,19 +81,20 @@
       {
         "name": "OFF",
         "photos": {
-          "front": "assets/catalogo-ilustrativo/nm-camisa-swell-frente-ilustrativo.webp",
+          "front": "assets/coleccion-detalles/swell-off-frente.webp",
           "back": null,
-          "texture": null
+          "texture": "assets/coleccion-detalles/swell-off-textura.webp"
         },
         "illustration": true
       },
       {
         "name": "Preto",
         "photos": {
-          "front": null,
+          "front": "assets/coleccion-detalles/swell-preto-frente.webp",
           "back": null,
-          "texture": null
-        }
+          "texture": "assets/coleccion-detalles/swell-preto-textura.webp"
+        },
+        "illustration": true
       },
       {
         "name": "Areia",
@@ -111,6 +114,15 @@
     "description": "É uma camisa 100% algodão com trama de aspecto rústico. Traz textura e personalidade para um look casual elegante.",
     "descriptionLanguage": "pt-BR",
     "colors": [
+      {
+        "name": "Safari",
+        "photos": {
+          "front": "assets/coleccion-detalles/rustic-safari-frente.webp",
+          "back": null,
+          "texture": "assets/coleccion-detalles/rustic-safari-textura.webp"
+        },
+        "illustration": true
+      },
       {
         "name": "Marinho",
         "photos": {
@@ -139,18 +151,11 @@
       {
         "name": "Azul Claro",
         "photos": {
-          "front": null,
+          "front": "assets/coleccion-detalles/rustic-azul-frente.webp",
           "back": null,
-          "texture": null
-        }
-      },
-      {
-        "name": "Safari",
-        "photos": {
-          "front": null,
-          "back": null,
-          "texture": null
-        }
+          "texture": "assets/coleccion-detalles/rustic-azul-textura.webp"
+        },
+        "illustration": true
       }
     ],
     "draft": true

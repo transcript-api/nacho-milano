@@ -10,6 +10,7 @@ const shopProducts=draftProducts.length?draftProducts:products;
 const byId=new Map([...products,...draftProducts].map(p=>[p.id,p])), looks=rawLooks.filter(l=>l.items.every(i=>byId.has(i.id)));
 const src=(id,view='frente')=>'assets/'+id+'-'+view+'.webp', url=(p,c=0)=>'producto-'+p.id+'.html'+(c?'?color='+encodeURIComponent(p.colors[c].name??p.colors[c][1]):'');
 const displayColor=c=>c.name??c[0];
+const lookColor=(p,i)=>Math.max(0,p.colors.findIndex(c=>displayColor(c)===i?.color));
 const draftPhoto=(c,view='front')=>c?.photos?.[view]||null;
 const draftPlaceholder=()=>el('div','Fotos pendientes','draftBlank');
 const num=(n)=>String(n).padStart(2,'0'), clamp=(x,a,z)=>Math.max(a,Math.min(x,z)), period=(x,n)=>((x%n)+n)%n;
@@ -218,10 +219,10 @@ function startRunway(){
  [[.56,.35],[.58,.62]],
  [[.67,.46],[.45,.31],[.53,.66]]
  ];
- function place(){if(!focus)return;const fig=buttons[ix],p=stage.getBoundingClientRect();const baseW=fig.offsetWidth*1.075, baseH=fig.offsetHeight*1.075;const left=(p.width-baseW)/2,top=p.height*.86-baseH;[...pins.children].forEach((pin,n)=>{const [x,y]=anchors[ix]?.[n]||[.5,.3+n*.16];const offset=touch.matches&&n===1&&pins.children.length>2?20:0;pin.style.left=clamp(left+baseW*x+offset,24,p.width-24)+'px';pin.style.top=clamp(top+baseH*y,24,p.height-77)+'px'})}
+ function place(){if(!focus)return;const fig=buttons[ix],p=stage.getBoundingClientRect();const baseW=fig.offsetWidth*1.075, baseH=fig.offsetHeight*1.075;const left=(p.width-baseW)/2,top=p.height*.86-baseH;[...pins.children].forEach((pin,n)=>{const item=looks[ix]?.items[n];const [x,y]=item?.x&&item?.y?[item.x/100,item.y/100]:anchors[ix]?.[n]||[.5,.3+n*.16];const offset=touch.matches&&n===1&&pins.children.length>2?20:0;pin.style.left=clamp(left+baseW*x+offset,24,p.width-24)+'px';pin.style.top=clamp(top+baseH*y,24,p.height-77)+'px'})}
  new ResizeObserver(place).observe(stage);
  function render(){const look=looks[ix];if(!look)return;scene.dataset.focus=String(focus);all.hidden=!focus;$('#lookIndex').textContent=num(ix+1)+' / '+num(looks.length);pins.replaceChildren();pins.setAttribute('aria-hidden',String(!focus));const list=el('ul');
- look.items.forEach((i,n)=>{const p=byId.get(i.id),row=el('li');if(p.draft){const a=link('',url(p),'lookItem lookItemLink');const photo=draftPhoto(p.colors[0]);a.append(photo?image(photo,''):draftPlaceholder(),el('span',p.name),el('span','↗'));row.append(a)}else row.append(makeLookRow(p,()=>quickDrawer(p)));list.append(row);if(focus){const pin=p.draft?link(String(n+1),url(p),'pin'):btn(String(n+1),()=>goTo(p),'pin');pin.setAttribute('aria-label','Ver '+p.name);pins.append(pin)}});
+ look.items.forEach((i,n)=>{const p=byId.get(i.id),row=el('li');if(p.draft){const color=lookColor(p,i),a=link('',url(p,color),'lookItem lookItemLink');const photo=draftPhoto(p.colors[color]);a.append(photo?image(photo,''):draftPlaceholder(),el('span',p.name),el('span','↗'));row.append(a)}else row.append(makeLookRow(p,()=>quickDrawer(p)));list.append(row);if(focus){const pin=p.draft?link(String(n+1),url(p,lookColor(p,i)),'pin'):btn(String(n+1),()=>goTo(p),'pin');pin.setAttribute('aria-label','Ver '+p.name);pins.append(pin)}});
  info.replaceChildren(el('span',look.label,'smallCaps'),el('h3',look.name),el('p',look.copy),list);if(!focus)info.append(btn('Ver prendas del look →',()=>{setFocus(true);buttons[ix].focus({preventScroll:true})},'textLink'));if(!look.draft)info.append(btn('Armar el look',()=>outfitDrawer(look),'buy buildLook'));requestAnimationFrame(place);refresh()}
  all.onclick=()=>{setFocus(false);buttons[ix].focus({preventScroll:true})};$('#lookPrev').onclick=()=>select(ix-1);$('#lookNext').onclick=()=>select(ix+1);$('#looks').addEventListener('keydown',e=>{if(e.key==='Escape'&&focus){setFocus(false);buttons[ix].focus({preventScroll:true})}});render();
  const requested=Number(new URLSearchParams(location.search).get('look'))-1;
@@ -284,7 +285,7 @@ function showProductLooks(p){
  const section=$('#productLooks');if(!section)return;
  const pairs=looks.map((look,i)=>[look,i]).filter(([l])=>l.items.some(it=>it.id===p.id));if(!pairs.length){section.hidden=true;return}
  const title=el('h2','Looks con esta prenda');title.id='productLooksTitle';const row=el('div',undefined,'productLookCards');
- for(const [look,i] of pairs){const a=link('','index.html?look='+(i+1)+'#looks');const info=el('div');info.append(el('span',look.name));if(p.colors.length>1)info.append(el('small','En '+displayColor(p.colors[0]).toLocaleLowerCase('es-UY')));a.append(image('assets/'+look.photo+'.webp',''),info);row.append(a)}
+ for(const [look,i] of pairs){const a=link('','index.html?look='+(i+1)+'#looks');const info=el('div');info.append(el('span',look.name));if(p.colors.length>1)info.append(el('small','En '+displayColor(p.colors[lookColor(p,look.items.find(it=>it.id===p.id))]).toLocaleLowerCase('es-UY')));a.append(image('assets/'+look.photo+'.webp',''),info);row.append(a)}
  section.replaceChildren(title,row);section.hidden=false
 }
 function showProductRelated(p){

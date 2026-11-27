@@ -12,6 +12,7 @@
       const on=(el,event,fn,options)=>el?.addEventListener(event,fn,{...options,signal});
       const reduced=matchMedia('(prefers-reduced-motion: reduce)');
       const desktop=matchMedia('(hover: hover) and (pointer: fine)');
+      const compact=matchMedia('(max-width: 850px)');
       const root=this, labels=this.dataset, buttons=items.map(el=>el.querySelector('button'));
       const activeText=$('[data-rail-active]'),count=$('[data-rail-count]'),play=$('[data-rail-play]');
       const figure=$('.nmRail__figure'),spin=$('.nmRail__spin'),front=$('[data-front-img]'),back=$('[data-back-img]');
@@ -20,6 +21,10 @@
       let index=0, visible=false, held=false, hovering=false, editor=!!window.Shopify?.designMode;
       let paused=labels.autoplay!=='true'||reduced.matches, timer=0, scrollTimer=0, ignoreScrollUntil=0;
       let drag=null, blockClick=0, opener=null, modalSwipe=null, pageOverflow=null, poseFrame=0, lastPose=0, pointerX=null, lastBrush=null,touchPress=null;
+      // On touch the native scroll position is the source of truth. Snap, arrow
+      // navigation and a slow finger drag all display the same garment.
+      let scrollFrame=0,measureFrame=0,compactMotion=false,scrollBusy=false,pendingIndex=null;
+      let centers=[],strengths=items.map(()=>null);
       const poses=items.map(()=>({x:0,dx:0,y:0,dy:0,z:0,dz:0,a:0,da:0,t:0,dt:0}));
       function stepPose(now){
         const t=lastPose?Math.min(.032,(now-lastPose)/1000):1/60;
@@ -51,10 +56,75 @@
       }
       const wrap=i=>(i+items.length)%items.length;
       const number=n=>String(n).padStart(2,'0');
+      function label(n){
+        const changed=index!==n;
+        index=n;
+        items.forEach((el,i)=>{
+          const active=i===n;
+          if(el.hasAttribute('data-active')!==active)el.toggleAttribute('data-active',active);
+          if(buttons[i].getAttribute('aria-current')!==String(active))buttons[i].setAttribute('aria-current',String(active));
+        });
+        const name=items[n].dataset.name, position=number(n+1)+' / '+number(items.length);
+        if(activeText.textContent!==name)activeText.textContent=name;
+        if(count.textContent!==position)count.textContent=position;
+        return changed;
+      }
+      function paint(){
+        scrollFrame=0;
+        if(!compactMotion||!centers.length||dialog.open)return;
+        const x=track.scrollLeft+track.clientWidth/2;
+        let nearest=0,dist=Infinity;
+        for(let i=0;i<centers.length;i++){
+          const d=Math.abs(centers[i]-x);
+          if(d<dist){nearest=i;dist=d;}
+        }
+        for(let i=0;i<items.length;i++){
+          const offset=x-centers[i];
+          const neighbor=offset<0?centers[i-1]:centers[i+1];
+          const fallback=centers[i===0?1:i-1];
+          const pitch=Math.max(1,Math.abs((neighbor??fallback??centers[i]+1)-centers[i]));
+          // Settle front just before center and stay in profile outside
+          // the nearest slot. Smoothstep avoids start/stop discontinuities.
+          let progress=Math.min(1,Math.max(0,(.87-Math.abs(offset)/pitch)/.71));
+          progress=progress*progress*(3-2*progress);
+          if(reduced.matches)progress=Number(i===nearest);
+          const v=Math.round(progress*256);
+          if(v!==strengths[i]){
+            strengths[i]=v;
+            const f=v/256,st=items[i].style;
+            st.setProperty('--rail-front-alpha',f.toFixed(3));
+            st.setProperty('--rail-side-alpha',(1-f).toFixed(3));
+            st.setProperty('--rail-front-angle',(-54*(1-f)).toFixed(2)+'deg');
+            st.setProperty('--rail-front-width',(.79+.21*f).toFixed(3));
+            st.setProperty('--rail-side-angle',(15*f).toFixed(2)+'deg');
+            st.setProperty('--rail-side-width',(1-.14*f).toFixed(3));
+          }
+        }
+        label(nearest);
+      }
+      function requestPaint(){if(!scrollFrame)scrollFrame=requestAnimationFrame(paint)}
+      function measure(){
+        measureFrame=0;
+        const was=compactMotion;
+        compactMotion=compact.matches&&items.length>1&&track.scrollWidth>track.clientWidth+1;
+        track.toggleAttribute('data-glide',compactMotion);
+        if(compactMotion){
+          const t=track.getBoundingClientRect();
+          centers=items.map(el=>{const r=el.getBoundingClientRect();return track.scrollLeft+r.left-t.left+r.width/2});
+          if(!held&&!scrollBusy)center(items[pendingIndex??index],true);
+          paint();
+        }else if(was){centers=[];strengths.fill(null);pendingIndex=null;}
+      }
+      function queueMeasure(){if(!measureFrame)measureFrame=requestAnimationFrame(measure)}
+      function settle(){
+        clearTimeout(scrollTimer);scrollBusy=false;pendingIndex=null;
+        if(compactMotion)requestPaint();else if(!dialog.open&&!held&&performance.now()>=ignoreScrollUntil)select(nearest());
+        arm();
+      }
       function arm(){
         clearTimeout(timer);
-        if(editor||paused||reduced.matches||!visible||held||hovering||dialog.open||document.hidden||(root.contains(document.activeElement)&&document.activeElement?.matches(':focus-visible'))||items.length<2)return;
-        timer=setTimeout(()=>select(index+1,true),Math.max(2000,Math.min(10000,Number(labels.interval)||4000)));
+        if(editor||paused||reduced.matches||!visible||held||hovering||scrollBusy||dialog.open||document.hidden||(root.contains(document.activeElement)&&document.activeElement?.matches(':focus-visible'))||items.length<2)return;
+        timer=setTimeout(()=>select((pendingIndex??index)+1,true),Math.max(2000,Math.min(10000,Number(labels.interval)||4000)));
       }
       function center(el,instant){
         if(track.scrollWidth<=track.clientWidth+1)return;
@@ -64,17 +134,23 @@
         track.scrollTo({left,behavior:instant||reduced.matches?'instant':'smooth'});
       }
       function select(i,scroll=false,instant=false){
-        const before=index;index=wrap(i);
-        if(before!==index&&!reduced.matches){
+        const before=index,next=wrap(i);
+        // Direct selection on a narrow rail animates its scroll; the facing
+        // photograph and label follow its physical location, not a timer.
+        if(compactMotion&&scroll){
+          pendingIndex=next;
+          center(items[next],instant||Math.abs(before-next)>1);
+          if(instant||reduced.matches)paint();else requestPaint();
+          arm();return;
+        }
+        label(next);
+        if(before!==index&&!reduced.matches&&!compactMotion){
           const delta=index>before?1:-1;
           poses[index].da+=delta*39; poses[index].dt+=delta*52;
           if(poses[index-delta])poses[index-delta].da-=delta*21;
           if(poses[index+delta])poses[index+delta].da+=delta*19;
         }
         kick();
-        items.forEach((el,n)=>{el.toggleAttribute('data-active',n===index);buttons[n].setAttribute('aria-current',n===index?'true':'false')});
-        activeText.textContent=items[index].dataset.name;
-        count.textContent=number(index+1)+' / '+number(items.length);
         if(scroll)center(items[index],instant);
         arm();
       }
@@ -115,7 +191,7 @@
       observer.observe(track);
       items.forEach((el,n)=>{
         on(buttons[n],'click',e=>{if(dialog.open||(e.detail&&performance.now()<blockClick))return;open(n)});
-        on(buttons[n],'focus',()=>{if(!dialog.open)select(n);arm()});
+        on(buttons[n],'focus',()=>{if(!dialog.open&&!held&&buttons[n].matches(':focus-visible'))select(n,compactMotion);arm()});
 
       });
       on(track,'pointerenter',e=>{if(e.pointerType==='mouse'){hovering=true;arm()}});
@@ -149,12 +225,19 @@
         return items.reduce((out,el,n)=>{const q=el.getBoundingClientRect(),d=Math.abs(q.left+q.width/2-x);return d<out.d?{d,n}:out},{d:Infinity,n:0}).n;
       }
       on(track,'scroll',()=>{
-        if(dialog.open||performance.now()<ignoreScrollUntil||drag?.on)return;
-        clearTimeout(scrollTimer);scrollTimer=setTimeout(()=>{if(!held)select(nearest())},110);
+        if(dialog.open)return;
+        if(compactMotion){
+          scrollBusy=true;clearTimeout(timer);requestPaint();clearTimeout(scrollTimer);
+          scrollTimer=setTimeout(settle,130);
+          return;
+        }
+        if(performance.now()<ignoreScrollUntil||drag?.on)return;
+        clearTimeout(scrollTimer);scrollTimer=setTimeout(()=>{if(!held)select(nearest())},90);
       },{passive:true});
+      on(track,'scrollend',()=>{if(compactMotion)settle()},{passive:true});
       on(track,'pointerdown',e=>{
         if(!e.isPrimary||e.button!==0)return;
-        held=true;clearTimeout(scrollTimer);
+        held=true;scrollBusy=false;pendingIndex=null;clearTimeout(scrollTimer);
         if(e.pointerType==='touch'){
           blockClick=0;touchPress={id:e.pointerId,x:e.clientX,y:e.clientY,at:items.indexOf(e.target.closest('.nmRail__item'))};
           if(performance.now()<ignoreScrollUntil)track.scrollTo({left:track.scrollLeft,behavior:'instant'});
@@ -189,9 +272,10 @@
       on(track,'dragstart',e=>e.preventDefault());
       on(track,'keydown',e=>{
         if(!['ArrowRight','ArrowLeft','Home','End'].includes(e.key))return;
-        e.preventDefault();select(e.key==='Home'?0:e.key==='End'?items.length-1:index+(e.key==='ArrowRight'?1:-1),true);buttons[index].focus({preventScroll:true});
+        const target=wrap(e.key==='Home'?0:e.key==='End'?items.length-1:(pendingIndex??index)+(e.key==='ArrowRight'?1:-1));
+        e.preventDefault();select(target,true);buttons[target].focus({preventScroll:true});
       });
-      on($('[data-rail-prev]'),'click',()=>select(index-1,true));on($('[data-rail-next]'),'click',()=>select(index+1,true));
+      on($('[data-rail-prev]'),'click',()=>select((pendingIndex??index)-1,true));on($('[data-rail-next]'),'click',()=>select((pendingIndex??index)+1,true));
       on(play,'click',()=>{if(reduced.matches)return;paused=!paused;updatePlay();arm()});
       on(frontView,'click',()=>face('front'));on(endView,'click',()=>face('back'));
       on(dialog,'click',e=>{if(e.target===dialog)dialog.close()});
@@ -219,15 +303,17 @@
       on(window,'pointerup',finishModalTurn);on(window,'pointercancel',finishModalTurn);
       on(this,'focusin',arm);on(this,'focusout',()=>queueMicrotask(arm));
       on(document,'visibilitychange',arm);
-      on(reduced,'change',()=>{if(reduced.matches)paused=true;if(play)play.hidden=reduced.matches||labels.autoplay!=='true';updatePlay();arm()});
+      on(reduced,'change',()=>{requestPaint();if(reduced.matches)paused=true;if(play)play.hidden=reduced.matches||labels.autoplay!=='true';updatePlay();arm()});
       on(this,'shopify:block:select',e=>{editor=true;clearTimeout(timer);const found=items.findIndex(el=>el===e.target||el.contains(e.target));if(found>=0)select(found,true,true)});
+      const sizing=typeof ResizeObserver==='function'?new ResizeObserver(queueMeasure):null;
+      sizing?.observe(track);on(window,'resize',queueMeasure,{passive:true});on(compact,'change',queueMeasure);
       this.cleanup=()=>{
-        abort.abort();observer.disconnect();clearTimeout(timer);clearTimeout(scrollTimer);cancelAnimationFrame(poseFrame);
+        abort.abort();observer.disconnect();sizing?.disconnect();clearTimeout(timer);clearTimeout(scrollTimer);cancelAnimationFrame(poseFrame);cancelAnimationFrame(scrollFrame);cancelAnimationFrame(measureFrame);track.removeAttribute('data-glide');
         if(dialog.open)dialog.close();restoreScroll();delete this.cleanup;this.removeAttribute('data-ready');
       };
       this.setAttribute('data-ready','');
       if(play)play.hidden=reduced.matches||labels.autoplay!=='true'||items.length<2;
-      updatePlay();const first=Math.max(0,Math.min(items.length-1,Number(labels.feature)||0));select(first,true,true);
+      updatePlay();const first=Math.max(0,Math.min(items.length-1,Number(labels.feature)||0));select(first,true,true);measure();
     }
     disconnectedCallback(){this.cleanup?.()}
   }

@@ -106,3 +106,22 @@
   #perchero.nmRail .nmRail__shape{width:min(var(--mobile-slot),210px)}
   #perchero.nmRail .nmRail__items{padding-inline:calc((100cqw - var(--nm-mobile-pitch))/2)}
 }
+
+/* Keep real hanger/profile pairs and their photo size. Only tighten the pitch. */
+#perchero.nmRail{--rail-gap:clamp(2px,.32vw,5px)}
+@media(min-width:851px){
+  #perchero .nmRail__item{flex-basis:clamp(81px,9.5vw,126px);transition:flex-basis .30s cubic-bezier(.22,.76,.25,1)}
+  #perchero .nmRail__item[data-active]{flex-basis:clamp(170px,21.8vw,284px)}
+  #perchero .nmRail__photo{transition:opacity .20s ease,transform .28s cubic-bezier(.2,.77,.25,1)}
+}
+@media(max-width:850px){
+  #perchero.nmRail{--rail-gap:2px;--nm-mobile-pitch:calc(var(--mobile-slot) - 20px)}
+  #perchero.nmRail .nmRail__item,#perchero.nmRail .nmRail__item[data-active]{flex-basis:var(--nm-mobile-pitch);transition:none}
+  #perchero .nmRail__track[data-glide] .nmRail__item[data-side] .nmRail__photo{transition:none}
+  #perchero .nmRail__track[data-glide] .nmRail__item[data-side] .nmRail__photo--front{
+    opacity:var(--rail-front-alpha,0);transform:rotateY(var(--rail-front-angle,-54deg)) scaleX(var(--rail-front-width,.79))
+  }
+  #perchero .nmRail__track[data-glide] .nmRail__item[data-side] .nmRail__photo--side{
+    opacity:var(--rail-side-alpha,1);transform:rotateY(var(--rail-side-angle,0deg)) scaleX(var(--rail-side-width,1))
+  }
+}

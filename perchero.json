@@ -22,8 +22,8 @@
     {
       "prenda": "nm-camisa-swell",
       "color": "OFF",
-      "frente": "assets/perchero-v2/nm-camisa-swell-frente.webp",
-      "perfil": "assets/perchero-v2/nm-camisa-swell-perfil.webp"
+      "frente": "assets/perchero-v2/rack-swell-front.webp",
+      "perfil": "assets/perchero-v2/rack-swell-side.webp"
     },
     {
       "prenda": "nm-polo-poliamida-botoes-metal",
@@ -33,9 +33,9 @@
     },
     {
       "prenda": "nm-camisa-rustic",
-      "color": "Marinho",
-      "frente": "assets/perchero-v2/nm-camisa-rustic-frente.webp",
-      "perfil": "assets/perchero-v2/nm-camisa-rustic-perfil.webp"
+      "color": "Safari",
+      "frente": "assets/perchero-v2/rack-rustic-front.webp",
+      "perfil": "assets/perchero-v2/rack-rustic-side.webp"
     },
     {
       "prenda": "nm-camiseta-algodao-modelo-000",

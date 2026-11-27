@@ -1,0 +1,30 @@
+/* Nacho Milano: photographic outfit builder; isolated to its section. */
+[data-nm-probador]{--fit-ink:#242424;--fit-line:#d3d0cb;display:block;padding:clamp(32px,6vw,80px) var(--pad,5vw) clamp(36px,6vw,80px);max-width:1460px;margin:auto;color:var(--fit-ink);scroll-margin-top:80px;}
+[data-nm-probador][hidden],.nmFitting__swatch[hidden]{display:none!important}
+.nmFitting__title{font:400 clamp(38px,4.9vw,74px)/1.06 var(--serif,Georgia,serif);letter-spacing:-.045em;color:inherit;margin:0 0 clamp(14px,2vw,28px)}
+.nmFitting__layout{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(270px,.8fr);align-items:stretch;border-block:1px solid var(--fit-line)}
+.nmFitting__stage{position:relative;isolation:isolate;display:grid;place-items:center;overflow:hidden;min-width:0;height:clamp(440px,41vw,620px);background:radial-gradient(ellipse at 46% 39%,#f5f3ee 0,#eeece7 65%,#e3e0d9 100%)}
+.nmFitting__photo{position:relative;isolation:isolate;height:94%;aspect-ratio:640/1000;max-width:100%}
+.nmFitting__photo::before{content:"";position:absolute;bottom:1.1%;height:3.2%;left:32%;right:32%;border-radius:50%;background:radial-gradient(ellipse,rgba(46,41,33,.26),rgba(57,53,48,0) 67%)}
+.nmFitting__photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;max-width:none;pointer-events:none;user-select:none;background:none;border:0}
+.nmFitting__plate--bottom{z-index:1}.nmFitting__plate--top{z-index:2}
+.nmFitting__controls{display:flex;flex-direction:column;justify-content:center;align-self:center;gap:clamp(18px,2.7vw,42px);width:100%;max-width:480px;padding:clamp(17px,4.5vw,70px);box-sizing:border-box}
+.nmFitting__part{min-width:0;border:0;margin:0;padding:0}
+.nmFitting__legend{font-family:inherit;font-size:.68rem;line-height:1.35;font-weight:550;letter-spacing:.105em;text-transform:uppercase;padding:0;margin:0 0 8px;color:#4d4c49}
+.nmFitting__choices{display:flex;flex-wrap:wrap;gap:5px 8px}
+.nmFitting__choice{appearance:none;min-height:44px;font:inherit;font-size:.86rem;line-height:1.3;letter-spacing:inherit;color:var(--fit-ink);background:transparent;border:1px solid var(--fit-line);border-radius:0;cursor:pointer;padding:8px 12px}
+.nmFitting__choice[aria-pressed=true]{background:var(--fit-ink);color:white;border-color:var(--fit-ink)}
+.nmFitting__colorRow{display:flex;align-items:center;min-width:0;gap:6px;flex-wrap:wrap;margin-top:4px;font-size:.75rem}
+.nmFitting__colors{display:flex;align-items:center;margin-left:-5px}
+.nmFitting__swatch{width:44px;min-width:44px;height:44px;display:grid;place-items:center;position:relative;margin:0;padding:0;background:none;border:0;color:inherit;cursor:pointer;border-radius:50%}
+.nmFitting__swatch span{display:block;width:20px;height:20px;border-radius:50%;background:var(--nm-fit-swatch);border:1px solid rgba(30,30,30,.2);box-sizing:border-box}
+.nmFitting__swatch[aria-pressed=true]::after{content:"";position:absolute;left:8px;top:8px;width:28px;height:28px;box-sizing:border-box;border-radius:50%;border:1px solid var(--fit-ink)}
+.nmFitting__colorName{color:#54524e}
+.nmFitting__link{color:var(--fit-ink);margin-left:auto;min-height:44px;display:inline-flex;align-items:center;gap:.28rem;text-underline-offset:.24em;text-decoration:underline;font:inherit;font-size:.75rem}
+.nmFitting__link span{font-family:Arial,sans-serif;text-decoration:none;display:inline-block}
+.nmFitting__choice:focus-visible,.nmFitting__link:focus-visible,.nmFitting__swatch:focus-visible{outline:2px solid var(--fit-ink);outline-offset:2px}
+.nmFitting__notice{font-size:.8rem;line-height:1.5;margin:0;color:var(--fit-ink)}
+.nmFitting__notice:empty{display:none}
+@media(max-width:740px){[data-nm-probador]{padding:30px 0 35px}.nmFitting__title{margin:0 max(17px,5vw) 14px}.nmFitting__layout{grid-template-columns:1fr}.nmFitting__stage{height:clamp(235px,43svh,410px);min-height:235px}.nmFitting__controls{max-width:none;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;padding:17px max(17px,5vw) 15px}.nmFitting__choices{display:grid;gap:4px}.nmFitting__choice{padding:6px 8px;font-size:.79rem}.nmFitting__colorRow{gap:1px}.nmFitting__colorName{font-size:.72rem}.nmFitting__link{flex-basis:100%;min-height:44px;margin:0}.nmFitting__notice{grid-column:1/-1}}
+@media(max-width:360px){.nmFitting__controls{gap:10px}.nmFitting__colorRow{display:block}.nmFitting__link{display:flex}.nmFitting__choice{font-size:.73rem}}
+@media(prefers-contrast:more){.nmFitting__choice{border-color:currentColor}.nmFitting__stage{border:1px solid #777}}

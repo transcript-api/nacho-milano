@@ -22,7 +22,8 @@ const markup = rack.piezas.map((piece,index) => {
   const name = p.name+' · '+c.name, url='producto-'+p.id+'.html';
   if (!exists(url)) throw Error('Falta ficha: '+url);
   const photo = (view,src,alt) => '<img class="nmRail__photo nmRail__photo--'+view+'" src="'+esc(src)+'" width="380" height="512" alt="'+esc(alt)+'" loading="'+(index<7?'eager':'lazy')+'" decoding="async" draggable="false">';
-  const attrs = {'name':name, description:p.description||'',tag:c.name,url,large:c.photos?.front||piece.frente};
+  const ficha = url+'?color='+encodeURIComponent(c.name);
+  const attrs = {'name':name, description:p.description||'',tag:c.name,url:ficha,large:c.photos?.front||piece.frente};
   if(c.photos?.back) attrs.back=c.photos.back;
   const data = Object.entries(attrs).map(([k,v])=>'data-'+k+'="'+esc(v)+'"').join(' ');
   return '<div class="nmRail__item" data-side data-hanger="none" '+data+(p.id===rack.inicial?' data-active':'')+'><button type="button" class="nmRail__piece" aria-label="'+esc(name)+'" aria-haspopup="dialog"><span class="nmRail__shape"><span class="nmRail__rotation">'+photo('front',piece.frente,name)+photo('side',piece.perfil,'')+'</span></span><span class="nmRail__tag">'+esc(c.name)+'</span></button><a class="nmRail__fallback" href="'+url+'">Ver prenda</a></div>';

@@ -12,8 +12,92 @@ window.NM_BUILD={
  ],
  looks:[
   {
+    "name": "Swell y lino",
+    "copy": "Camisa Swell negra con pantalón de lino blanco.",
+    "photo": "coleccion-detalles/look-swell",
+    "draft": true,
+    "items": [
+      {
+        "id": "nm-camisa-swell",
+        "color": "Preto",
+        "x": 50,
+        "y": 34
+      },
+      {
+        "id": "nm-calca-de-linho-com-elastano",
+        "color": "Branco",
+        "x": 50,
+        "y": 62
+      }
+    ],
+    "label": "LOOK 01"
+  },
+  {
+    "name": "Rústic y short de lino",
+    "copy": "Camisa Rústic Safari con short de lino Natural.",
+    "photo": "coleccion-detalles/look-rustic",
+    "draft": true,
+    "items": [
+      {
+        "id": "nm-camisa-rustic",
+        "color": "Safari",
+        "x": 50,
+        "y": 34
+      },
+      {
+        "id": "nm-short-linho-ultra-premium",
+        "color": "Natural",
+        "x": 50,
+        "y": 62
+      }
+    ],
+    "label": "LOOK 02"
+  },
+  {
+    "name": "Swell Off y pantalón negro",
+    "copy": "Camisa Swell Off con pantalón de lino negro.",
+    "photo": "coleccion-detalles/look-off",
+    "draft": true,
+    "items": [
+      {
+        "id": "nm-camisa-swell",
+        "color": "OFF",
+        "x": 50,
+        "y": 34
+      },
+      {
+        "id": "nm-calca-de-linho-com-elastano",
+        "color": "Preto",
+        "x": 50,
+        "y": 62
+      }
+    ],
+    "label": "LOOK 03"
+  },
+  {
+    "name": "Azul claro y lino natural",
+    "copy": "Camisa Rústic Azul Claro con short de lino Natural.",
+    "photo": "coleccion-detalles/look-azul",
+    "draft": true,
+    "items": [
+      {
+        "id": "nm-camisa-rustic",
+        "color": "Azul Claro",
+        "x": 50,
+        "y": 34
+      },
+      {
+        "id": "nm-short-linho-ultra-premium",
+        "color": "Natural",
+        "x": 50,
+        "y": 62
+      }
+    ],
+    "label": "LOOK 04"
+  },
+  {
     "name": "Camisa Swell y pantalón de lino",
-    "label": "LOOK 01",
+    "label": "LOOK 05",
     "copy": "Camisa Swell en crudo con pantalón de lino natural.",
     "photo": "look-coleccion-01",
     "draft": true,
@@ -21,18 +105,20 @@ window.NM_BUILD={
       {
         "id": "nm-camisa-swell",
         "x": 50,
-        "y": 33
+        "y": 33,
+        "color": "OFF"
       },
       {
         "id": "nm-calca-de-linho-com-elastano",
         "x": 50,
-        "y": 63
+        "y": 63,
+        "color": "Natural"
       }
     ]
   },
   {
     "name": "Polo de punto y short de lino",
-    "label": "LOOK 02",
+    "label": "LOOK 06",
     "copy": "Polo de punto marfil con short de lino natural.",
     "photo": "look-coleccion-02",
     "draft": true,
@@ -40,18 +126,20 @@ window.NM_BUILD={
       {
         "id": "nm-polo-trico-modelo-01",
         "x": 50,
-        "y": 33
+        "y": 33,
+        "color": "Off White"
       },
       {
         "id": "nm-short-linho-ultra-premium",
         "x": 50,
-        "y": 63
+        "y": 63,
+        "color": "Natural"
       }
     ]
   },
   {
     "name": "Camisa Rústic y short de sarja",
-    "label": "LOOK 03",
+    "label": "LOOK 07",
     "copy": "Camisa azul marino con short de sarja negro.",
     "photo": "look-coleccion-03",
     "draft": true,
@@ -59,18 +147,20 @@ window.NM_BUILD={
       {
         "id": "nm-camisa-rustic",
         "x": 50,
-        "y": 33
+        "y": 33,
+        "color": "Marinho"
       },
       {
         "id": "nm-short-sarja",
         "x": 50,
-        "y": 63
+        "y": 63,
+        "color": "Preto"
       }
     ]
   },
   {
     "name": "Remera azul y short negro",
-    "label": "LOOK 04",
+    "label": "LOOK 08",
     "copy": "Remera deportiva azul con short de entrenamiento negro.",
     "photo": "look-coleccion-04",
     "draft": true,
@@ -78,12 +168,14 @@ window.NM_BUILD={
       {
         "id": "nm-camiseta-fitness-poliester",
         "x": 50,
-        "y": 33
+        "y": 33,
+        "color": "Azul"
       },
       {
         "id": "nm-short-gym-poliamida",
         "x": 50,
-        "y": 63
+        "y": 63,
+        "color": "Preto"
       }
     ]
   }
