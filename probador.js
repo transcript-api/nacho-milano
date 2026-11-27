@@ -1,5 +1,6 @@
-/* Turn two independently registered photographic plates into a dressable display.
-   To add a garment/color: register a 640×1000 alpha plate and the exact catalog color below. */
+/* Photo plates share a 960×1500 coordinate space. Calibrate to the same neckline,
+   hip and floor, not their independent bounding boxes. A length correction affects
+   only the torso, and each bottom family keeps its own silhouette. */
 (() => {
   'use strict';
   const host = document.querySelector('[data-nm-probador]');
@@ -26,7 +27,7 @@
       const colors=new Map(item.colors.map(c=>[c.name,c]));
       return variants.filter(([name]) => colors.has(name))
         .map(([color,key,swatch])=>({id,name:item.name,label:item.shortName||compactNames[id]||item.name,color,key,swatch,
-          front:colors.get(color).photos?.front||null,src:'assets/probador/'+key+'.webp'}));
+          front:colors.get(color).photos?.front||null,texture:colors.get(color).photos?.texture||null,src:'assets/probador/'+key+'.webp'}));
     });
     if (!lists[p].length) return;
   }
@@ -72,18 +73,52 @@
   add.type='button';reset.type='button';action.append(candidate,add,reset);
   const layers={}, previews={}, zones={}, widgets={}, tokens={top:0,bottom:0}, cache=new Map();
   const plateHD=new Set(["calca-bege", "calca-branco", "calca-preto", "champy-branco", "rustic-areia", "rustic-azul", "rustic-branco", "rustic-safari", "short-natural", "swell-mascavo", "swell-off", "swell-preto", "swell-verde"]);
+  const highPlate=v=>'assets/probador-hd/'+v.key+'.webp';
+  const nativePlates=new Set(['swell-off','swell-preto','rustic-safari','rustic-azul','calca-preto','calca-branco','short-natural']);
+  const nativePlate=v=>'assets/probador-native/'+v.key+'.webp';
+  // Tighten only the portion of the trouser waistband covered by the shirt.
+  // The thighs, hems, fabric and seams below this transition stay intact.
+  const pantWaist=[[.35,0],[.65,0],[.65,.414],[.683,.454],[1,.483],[1,1],[0,1],[0,.483],[.317,.454],[.35,.414]];
+  const calibration={
+    rustic:[.94,.906,.5,.03],swell:[.943,.918,.5,.03],
+    calca:[1.14,1,.5,.97],short:[1.087,1,.5,.97],champy:[1.09,1,.5,.97]
+  };
+  function fitFor(v){return calibration[v.key.split('-')[0]]||[1,1,.5,.5];}
+  const boundVariants=new WeakMap();
+  function platePaths(v){
+    const rendered=(photo.clientWidth||Math.min(innerWidth*.6176,412))*(window.devicePixelRatio||1)*fitFor(v)[0];
+    const urls=[v.src];
+    if(rendered>610&&plateHD.has(v.key))urls.unshift(highPlate(v));
+    if(rendered>920&&nativePlates.has(v.key))urls.unshift(nativePlate(v));
+    return urls;
+  }
   function setPlate(img,v){
-    img.srcset=plateHD.has(v.key)?v.src+' 1x, assets/probador-hd/'+v.key+'.webp 1.5x':'';
-    img.src=v.src;
+    const [x,y,a,b]=fitFor(v);
+    if(img.classList.contains('nmFitting__plate')){
+      img.style.setProperty('--plate-origin',(a*100)+'% '+(b*100)+'%');
+      img.style.setProperty('--plate-scale',x+', '+y);
+      img.style.clipPath=v.key.startsWith('calca-')
+        ?'polygon('+pantWaist.map(([l,t])=>(l*100)+'% '+(t*100)+'%').join(',')+')':'';
+
+    }
+    boundVariants.set(img,v);
+    const urls=platePaths(v);
+    if(img.getAttribute('src')!==urls[0])img.src=urls[0];
+  }
+  function nextPlate(img,v){
+    if(!v)return false;
+    const urls=platePaths(v), i=urls.indexOf(img.getAttribute('src'));
+    if(i!==-1&&i+1<urls.length){img.src=urls[i+1];return true;}
+    return false;
   }
   function plate(p, preview){
     const im=make('img','nmFitting__plate nmFitting__plate--'+p+(preview?' nmFitting__preview':''));
     im.alt='';im.width=640;im.height=1000;im.decoding='async';im.setAttribute('draggable','false');
     if(preview)im.hidden=true;
-    else{
-      im.loading='lazy';setPlate(im,selection[p]);
-      im.addEventListener('error',()=>{ if(!im.naturalWidth) notice.textContent='No se pudo cargar la vista de esta prenda.'; });
-    }
+    else im.loading='lazy';
+    im.addEventListener('error',()=>{
+      if(!nextPlate(im,boundVariants.get(im))&&!preview)notice.textContent='No se pudo cargar la vista de esta prenda.';
+    });
     return im;
   }
   for (const p of ['bottom','top']) {
@@ -92,6 +127,89 @@
     zone.dataset.fitZone=p;zone.setAttribute('aria-hidden','true');zones[p]=zone;
   }
   photo.append(visual,zones.top,zones.bottom);stage.append(photo,guide);
+  // Pixel-faithful close-up of the selected combination, using both large masters
+  // even when the inline scene has chosen a smaller source. No separate layout.
+  const zoomButton=make('button','nmFitting__zoom');
+  zoomButton.type='button';
+  zoomButton.setAttribute('aria-label','Ampliar conjunto');
+  zoomButton.setAttribute('aria-haspopup','dialog');
+  const zoomIcon=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  zoomIcon.setAttribute('viewBox','0 0 24 24');zoomIcon.setAttribute('aria-hidden','true');
+  const zoomPath=document.createElementNS('http://www.w3.org/2000/svg','path');
+  zoomPath.setAttribute('d','M9 4H4v5m11-5h5v5m0 6v5h-5M4 15v5h5');
+  zoomIcon.append(zoomPath);zoomButton.append(zoomIcon);stage.append(zoomButton);
+  const resizePlates=()=>{
+    for(const p of parts){
+      setPlate(layers[p],selection[p]);
+      const shown=boundVariants.get(previews[p]);if(shown&&!previews[p].hidden)setPlate(previews[p],shown);
+    }
+  };
+  if(window.ResizeObserver)new ResizeObserver(resizePlates).observe(photo);
+  else window.addEventListener('resize',resizePlates,{passive:true});
+  function fullPlate(v){
+    return new Promise((resolve,reject)=>{
+      const im=new Image(), sources=[v.src];
+      if(plateHD.has(v.key))sources.unshift(highPlate(v));
+      if(nativePlates.has(v.key))sources.unshift(nativePlate(v));
+      const load=()=>{if(sources.length)im.src=sources.shift();else reject(new Error('Plate not available'));};
+      im.onload=()=>resolve(im);im.onerror=load;load();
+    });
+  }
+  let zooming=false;
+  zoomButton.addEventListener('click',async()=>{
+    if(zooming||drag?.active||pending.top||pending.bottom||!document.querySelector('#zoom'))return;
+    const pair=[selection.bottom,selection.top];
+    zooming=true;zoomButton.setAttribute('aria-busy','true');
+    try{
+      const rasters=await Promise.all(pair.map(fullPlate));
+      if(pair[0]!==selection.bottom||pair[1]!==selection.top||drag?.active)return;
+      const canvas=document.createElement('canvas'), width=Math.max(...rasters.map(im=>im.naturalWidth));
+      const height=Math.round(width*1500/960);
+      canvas.width=width;canvas.height=height;
+      const ctx=canvas.getContext('2d');if(!ctx)return;
+      ctx.imageSmoothingQuality='high';
+      const light=ctx.createRadialGradient(.473*width,.353*height,.073*width,.5*width,.497*height,.833*width);
+      light.addColorStop(0,'#faf9f6');light.addColorStop(1,'#ebe8e1');
+      ctx.fillStyle=light;ctx.fillRect(0,0,width,height);
+      ctx.save();ctx.translate(width/2,height*.965);ctx.scale(.157*width,.018*height);
+      const floor=ctx.createRadialGradient(0,0,0,0,0,1);
+      floor.addColorStop(0,'#34302c45');floor.addColorStop(1,'#34302c00');
+      ctx.fillStyle=floor;ctx.fillRect(-1,-1,2,2);ctx.restore();
+      for(let i=0;i<rasters.length;i++){
+        const [sx,sy,ax,ay]=fitFor(pair[i]);
+        if(i===1){ctx.shadowColor='rgba(44,37,30,.24)';ctx.shadowOffsetY=height*.0033;ctx.shadowBlur=height*.006;}
+        ctx.save();
+        if(pair[i].key.startsWith('calca-')){
+          ctx.beginPath();
+          pantWaist.forEach(([x,y],j)=>ctx[j?'lineTo':'moveTo'](width*(ax+(x-ax)*sx),height*(ay+(y-ay)*sy)));
+          ctx.closePath();ctx.clip();
+        }
+        ctx.drawImage(rasters[i],width*ax*(1-sx),height*ay*(1-sy),width*sx,height*sy);
+        ctx.restore();
+      }
+      const blob=await new Promise(done=>canvas.toBlob(done,'image/png'));
+      if(!blob||!zoomButton.isConnected||pair[0]!==selection.bottom||pair[1]!==selection.top||drag?.active)return;
+      const dialog=document.querySelector('#zoom');
+      if(!dialog||dialog.open)return;
+      const imageURL=URL.createObjectURL(blob);
+      const alt=visual.getAttribute('aria-label'), pt=document.documentElement.lang.toLowerCase().startsWith('pt');
+      const views=[{name:pt?'Combinação':'Conjunto',src:imageURL,alt}];
+      for(const [i,v] of [pair[1],pair[0]].entries())if(v.texture)views.push({
+        name:i===0?(pt?'Tecido da camisa':'Tela de la camisa'):(pt?'Tecido da parte de baixo':'Tela de abajo'),
+        src:v.texture,alt:v.name+' · '+v.color
+      });
+      zoomButton.focus({preventScroll:true});
+      document.dispatchEvent(new CustomEvent('nm:zoom-photo',{detail:{
+        src:imageURL,alt,opener:zoomButton,options:{views}
+      }}));
+      if(dialog.open)dialog.addEventListener('close',()=>URL.revokeObjectURL(imageURL),{once:true});
+      else URL.revokeObjectURL(imageURL);
+    }catch{
+      notice.textContent='No se pudo cargar la vista de esta prenda.';
+    }finally{
+      zooming=false;zoomButton.removeAttribute('aria-busy');
+    }
+  });
   function updateText(){
     const {top:t,bottom:b}=selection;
     visual.setAttribute('aria-label','Maniquí con '+t.name+', '+t.color+', y '+b.name+', '+b.color+'.');
@@ -114,8 +232,9 @@
     }
   }
   function prefetch(v){
-    let slot=cache.get(v.src);if(slot)return slot;
-    const im=new Image();slot={ready:false,promise:null};cache.set(v.src,slot);
+    const source=platePaths(v)[0];
+    let slot=cache.get(source);if(slot)return slot;
+    const im=new Image();slot={ready:false,promise:null};cache.set(source,slot);
     slot.promise=new Promise((resolve,reject)=>{
       const done=()=>{slot.ready=true;resolve();};
       im.onload=()=>{
@@ -126,7 +245,7 @@
         const decoded=()=>{clearTimeout(fallback);done();};
         im.decode().then(decoded,decoded);
       };
-      im.onerror=()=>{cache.delete(v.src);reject(new Error('Plate not available'));};
+      im.onerror=()=>{if(!nextPlate(im,v)){cache.delete(source);reject(new Error('Plate not available'));}};
       setPlate(im,v);
     });
     return slot;
@@ -208,7 +327,7 @@
     if(drag!==d||d.active)return;
     clearTimeout(armTimer);armTimer=0;
     d.active=true;d.button.dataset.fitLifted='';stage.dataset.fitDragging=d.part;d.over=undefined;
-    dragGhost.dataset.fitGhost=d.part;ghostPhoto.src=d.v.src;dragGhost.hidden=false;
+    dragGhost.dataset.fitGhost=d.part;ghostPhoto.src=d.v.src;dragGhost.hidden=false;resizePlates();
     position(d.x,d.y);stateAt(d);prefetch(d.v).promise.catch(()=>{});
     frame=requestAnimationFrame(autoScroll);
     if(d.kind==='pointer')try{d.button.setPointerCapture(d.id);}catch{}
@@ -376,13 +495,13 @@
   });
   updateText();paintVestuario();side.append(action,notice);block.append(widgets.top.rail,stage,widgets.bottom.rail);
   title.tabIndex=-1;
-  host.append(title,intro,block,side);document.body.append(dragGhost);host.dataset.mounted='yes';host.hidden=false;
+  host.append(title,intro,block,side);document.body.append(dragGhost);host.dataset.mounted='yes';host.hidden=false;resizePlates();
   // Warm only this fitting when it comes into view. Never compete with the homepage hero.
   if('IntersectionObserver' in window){
     const lookAhead=new IntersectionObserver(entries=>{
       if(!entries.some(e=>e.isIntersecting))return;
       lookAhead.disconnect();
-      if(window.navigator?.connection?.saveData)return;
+      if(window.navigator?.connection?.saveData||window.navigator?.connection?.effectiveType?.includes('2g'))return;
       const queue=parts.flatMap(p=>lists[p]),warm=async()=>{
         for(const v of queue){try{await prefetch(v).promise;}catch{}}
       };

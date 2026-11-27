@@ -91,7 +91,16 @@ function mount(o){
     if(dragFrom!==null||changePhase)return;
     const look=looks[ix],fig=figures[ix];
     preferFront(fig);
-    launchZoom('orbitFailed' in fig.hd.dataset?original(look):fig.high,look.name+' · Frente',trigger);
+    const pt=document.documentElement.lang.toLowerCase().startsWith('pt');
+    const src=fig.high,alt=look.name+' · Frente';
+    const views=[{src,alt,name:'Look',fallback:original(look)}];
+    for(const item of look.items){
+      const product=selectProduct(item.id), color=product?.colors.find(c=>c.name===item.color), texture=color?.photos?.texture;
+      if(!texture)continue;
+      const type=item.id.includes('camisa')?'Camisa':item.id.includes('calca')?(pt?'Calça':'Pantalón'):'Short';
+      views.push({src:texture,name:type+' · textura',alt:product.name+' · '+color.name+' · Textura'});
+    }
+    launchZoom(src,alt,trigger,{views});
   }
   const step=()=>clamp(w*.305,91,245);
   const closest=i=>i+Math.round((phase-i)/n)*n;

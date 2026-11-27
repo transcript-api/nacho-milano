@@ -10,7 +10,7 @@
         "name": "OFF",
         "photos": {
           "front": "assets/coleccion-detalles/swell-off-frente.webp",
-          "back": null,
+          "back": "assets/coleccion-detalles/swell-off-espalda.webp",
           "texture": "assets/coleccion-detalles/swell-off-textura.webp",
           "profile": "assets/perchero-detalle/rack-swell-side.webp"
         },
@@ -20,7 +20,7 @@
         "name": "Preto",
         "photos": {
           "front": "assets/coleccion-detalles/swell-preto-frente.webp",
-          "back": null,
+          "back": "assets/coleccion-detalles/swell-preto-espalda.webp",
           "texture": "assets/coleccion-detalles/swell-preto-textura.webp",
           "profile": "assets/perchero-detalle/rack-swell-preto-side.webp"
         },
@@ -30,7 +30,7 @@
         "name": "Mascavo",
         "photos": {
           "front": "assets/coleccion-detalles/swell-mascavo-frente.webp",
-          "back": null,
+          "back": "assets/coleccion-detalles/swell-mascavo-espalda.webp",
           "texture": "assets/coleccion-detalles/swell-mascavo-textura.webp",
           "profile": "assets/perchero-detalle/rack-swell-mascavo-side.webp"
         },
@@ -40,7 +40,7 @@
         "name": "Verde",
         "photos": {
           "front": "assets/coleccion-detalles/swell-verde-frente.webp",
-          "back": null,
+          "back": "assets/coleccion-detalles/swell-verde-espalda.webp",
           "texture": "assets/coleccion-detalles/swell-verde-textura.webp",
           "profile": "assets/perchero-detalle/rack-swell-verde-side.webp"
         },
@@ -60,7 +60,7 @@
         "name": "Safari",
         "photos": {
           "front": "assets/coleccion-detalles/rustic-safari-frente.webp",
-          "back": null,
+          "back": "assets/coleccion-detalles/rustic-safari-espalda.webp",
           "texture": "assets/coleccion-detalles/rustic-safari-textura.webp",
           "profile": "assets/perchero-detalle/rack-rustic-side.webp"
         },
@@ -70,7 +70,7 @@
         "name": "Azul Claro",
         "photos": {
           "front": "assets/coleccion-detalles/rustic-azul-frente.webp",
-          "back": null,
+          "back": "assets/coleccion-detalles/rustic-azul-espalda.webp",
           "texture": "assets/coleccion-detalles/rustic-azul-textura.webp",
           "profile": "assets/perchero-detalle/rack-rustic-azul-side.webp"
         },
@@ -80,7 +80,7 @@
         "name": "Areia",
         "photos": {
           "front": "assets/coleccion-detalles/rustic-areia-frente.webp",
-          "back": null,
+          "back": "assets/coleccion-detalles/rustic-areia-espalda.webp",
           "texture": "assets/coleccion-detalles/rustic-areia-textura.webp",
           "profile": "assets/perchero-detalle/rack-rustic-areia-side.webp"
         },
@@ -90,7 +90,7 @@
         "name": "Branco",
         "photos": {
           "front": "assets/coleccion-detalles/rustic-branco-frente.webp",
-          "back": null,
+          "back": "assets/coleccion-detalles/rustic-branco-espalda.webp",
           "texture": "assets/coleccion-detalles/rustic-branco-textura.webp",
           "profile": "assets/perchero-detalle/rack-rustic-branco-side.webp"
         },
@@ -111,7 +111,8 @@
         "photos": {
           "front": "assets/coleccion-detalles/short-natural-frente.webp",
           "back": "assets/coleccion-detalles/short-natural-espalda.webp",
-          "texture": "assets/coleccion-detalles/short-natural-textura.webp"
+          "texture": "assets/coleccion-detalles/short-natural-textura.webp",
+          "profile": "assets/coleccion-detalles/short-natural-perfil.webp"
         },
         "illustration": true,
         "sizes": [
@@ -135,7 +136,7 @@
         "name": "Preto",
         "photos": {
           "front": "assets/coleccion-detalles/calca-preto-frente-v2.webp",
-          "back": null,
+          "back": "assets/coleccion-detalles/calca-preto-espalda.webp",
           "texture": "assets/coleccion-detalles/calca-preto-textura.webp",
           "profile": "assets/coleccion-detalles/calca-preto-perfil-v2.webp"
         },
@@ -145,7 +146,7 @@
         "name": "Branco",
         "photos": {
           "front": "assets/coleccion-detalles/calca-branco-frente.webp",
-          "back": null,
+          "back": "assets/coleccion-detalles/calca-branco-espalda.webp",
           "texture": "assets/coleccion-detalles/calca-branco-textura.webp",
           "profile": "assets/coleccion-detalles/calca-branco-perfil-v2.webp"
         },
@@ -155,7 +156,7 @@
         "name": "Bege",
         "photos": {
           "front": "assets/coleccion-detalles/calca-bege-frente-v2.webp",
-          "back": null,
+          "back": "assets/coleccion-detalles/calca-bege-espalda.webp",
           "texture": "assets/coleccion-detalles/calca-bege-textura.webp",
           "profile": "assets/coleccion-detalles/calca-bege-perfil-v2.webp"
         },
@@ -176,8 +177,9 @@
         "name": "Branco",
         "photos": {
           "front": "assets/coleccion-detalles/champy-branco-frente.webp",
-          "back": null,
-          "texture": "assets/coleccion-detalles/champy-branco-textura.webp"
+          "back": "assets/coleccion-detalles/champy-branco-espalda.webp",
+          "texture": "assets/coleccion-detalles/champy-branco-textura.webp",
+          "profile": "assets/coleccion-detalles/champy-branco-perfil.webp"
         },
         "illustration": true
       }

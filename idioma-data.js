@@ -194,6 +194,7 @@ Pantalones y shorts|Calças e shorts
 Pantalón de lino|Calça de linho
 Short de lino|Short de linho
 Probador|Provador
+Ampliar conjunto|Ampliar combinação
 Vestuario|Guarda-roupa
 Probá cómo combinar esta prenda.|Experimente como combinar esta peça.
 Elegí con qué prenda querés armar el look.|Escolha a peça com que quer montar o look.
