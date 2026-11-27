@@ -376,10 +376,79 @@ function rail(node,buttons,{stepWidth,style,current,select,enabled=()=>true,maxJ
  node.addEventListener('keydown',e=>{if(!enabled()||e.target.closest('.runControls')||!/^(ArrowLeft|ArrowRight|Home|End)$/.test(e.key))return;e.preventDefault();const wasButton=buttons.includes(document.activeElement);select(e.key==='Home'?0:e.key==='End'?buttons.length-1:current()+(e.key==='ArrowRight'?1:-1));queue();if(wasButton)buttons[current()]?.focus({preventScroll:true})});
  queue();return queue
 }
-function startCover(){const cover=$('#cover');if(!cover)return;const skip=$('#skipCover');const editorial=cover.hasAttribute('data-nm-logo-reveal');let t,done,was;
- const show=()=>{clearTimeout(t);clearTimeout(done);was=document.activeElement;cover.hidden=false;cover.classList.remove('exiting');$('.bar').inert=true;$('main').querySelectorAll('section:not(.opening)').forEach(x=>x.inert=true);$('.hero').inert=true;$('.foot').inert=true;document.documentElement.classList.add('coverOpen');t=setTimeout(exit,editorial?1500:1000)};
- const exit=()=>{if(cover.hidden||cover.classList.contains('exiting'))return;clearTimeout(t);cover.classList.add('exiting');done=setTimeout(()=>{const used=cover.contains(document.activeElement);cover.hidden=true;$('.bar').inert=false;$('main').querySelectorAll('section:not(.opening)').forEach(x=>x.inert=false);$('.hero').inert=false;$('.foot').inert=false;document.documentElement.classList.remove('coverOpen');if(used)(was===document.body?$('.heroLink'):was)?.focus({preventScroll:true});try{sessionStorage.setItem('nm-logo-apertura-v1-seen','1')}catch{}},editorial?480:885)};
- skip.onclick=exit;$('#replay').onclick=()=>{window.scrollTo(0,0);show();skip.focus({preventScroll:true})};document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!cover.hidden)exit()});try{if(!quiet.matches&&!sessionStorage.getItem('nm-logo-apertura-v1-seen')&&!location.hash)show()}catch{}
+function startCover(){
+ const cover=$('#cover');if(!cover)return;
+ const skip=$('#skipCover'),word=cover.querySelector('.nmPenWordmark'),editorial=cover.hasAttribute('data-nm-logo-reveal');
+ const ink=word?.querySelector('[data-pen-image]'),tip=word?.querySelector('[data-pen-tip]');
+ const lastInk=word?[...word.querySelectorAll('[data-pen-finishes] rect')]:[];
+ let t,done,was,penFrame=0;
+ function finishInk(){
+  if(penFrame)cancelAnimationFrame(penFrame);penFrame=0;
+  ink?.removeAttribute('mask');tip?.setAttribute('opacity','0');
+ }
+ function writeInk(){
+  finishInk();
+  if(!ink||!tip||quiet.matches)return;
+  const entries=[];let total=0;
+  try{
+   for(const group of word.querySelectorAll('[data-pen-letter]')){
+    const strokes=[...group.querySelectorAll('path')];
+    strokes.forEach((path,i)=>{
+     const length=path.getTotalLength(),span=length+15;
+     path.style.strokeDasharray=length+' '+length;path.style.strokeDashoffset=String(length);
+     path.setAttribute('stroke-opacity','0');
+     const letter=Number(group.dataset.penLetter),last=i===strokes.length-1;
+     if(last)lastInk[letter].setAttribute('opacity','0');
+     entries.push({path,length,start:total,letter,last,done:false});total+=span;
+    });
+    total+=8;
+   }
+  }catch{return}
+  if(!entries.length||!total)return;
+  ink.setAttribute('mask','url(#nmPenInk)');
+  const start=performance.now()+48;
+  const run=now=>{
+   penFrame=0;
+   if(cover.hidden||cover.classList.contains('exiting')||quiet.matches){finishInk();return}
+   const elapsed=Math.max(0,now-start)/1290;
+   if(elapsed>=1){finishInk();return}
+   const at=elapsed*total;
+   let visible=false;
+   for(const item of entries){
+    if(item.done||at<=item.start)continue;
+    if(!item.started){item.started=true;item.path.setAttribute('stroke-opacity','1');}
+    const distance=Math.min(item.length,at-item.start);
+    item.path.style.strokeDashoffset=String(item.length-distance);
+    if(distance>=item.length){
+     if(item.last)lastInk[item.letter].setAttribute('opacity','1');
+     item.done=true;continue;
+    }
+    const pos=item.path.getPointAtLength(distance);
+    tip.setAttribute('transform','translate('+pos.x.toFixed(2)+' '+pos.y.toFixed(2)+')');visible=true;break;
+   }
+   tip.setAttribute('opacity',visible?'1':'0');penFrame=requestAnimationFrame(run);
+  };
+  penFrame=requestAnimationFrame(run);
+ }
+ const show=()=>{
+  clearTimeout(t);clearTimeout(done);was=document.activeElement;cover.hidden=false;cover.classList.remove('exiting');
+  $('.bar').inert=true;$('main').querySelectorAll('section:not(.opening)').forEach(x=>x.inert=true);$('.hero').inert=true;$('.foot').inert=true;
+  document.documentElement.classList.add('coverOpen');writeInk();t=setTimeout(exit,quiet.matches?140:editorial?1450:1000)
+ };
+ const exit=()=>{
+  if(cover.hidden||cover.classList.contains('exiting'))return;
+  clearTimeout(t);finishInk();cover.classList.add('exiting');
+  done=setTimeout(()=>{
+   const used=cover.contains(document.activeElement);cover.hidden=true;
+   $('.bar').inert=false;$('main').querySelectorAll('section:not(.opening)').forEach(x=>x.inert=false);$('.hero').inert=false;$('.foot').inert=false;document.documentElement.classList.remove('coverOpen');
+   if(used)(was===document.body?$('.heroLink'):was)?.focus({preventScroll:true});
+   try{sessionStorage.setItem('nm-logo-pluma-v1-seen','1')}catch{}
+  },quiet.matches?0:editorial?480:885)
+ };
+ skip.onclick=exit;$('#replay').onclick=()=>{window.scrollTo(0,0);show();skip.focus({preventScroll:true})};
+ quiet.addEventListener('change',()=>{if(quiet.matches&&!cover.hidden)exit()});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!cover.hidden)exit()});
+ try{if(!quiet.matches&&!sessionStorage.getItem('nm-logo-pluma-v1-seen')&&!location.hash)show()}catch{}
  let scrollTick=0;const update=()=>{scrollTick=0;const track=$('.heroTrack'),hero=$('.hero');const p=clamp(-track.getBoundingClientRect().top+$('#bar').offsetHeight,0,track.offsetHeight-hero.offsetHeight)/Math.max(1,track.offsetHeight-hero.offsetHeight);hero.style.setProperty('--hero-progress',p.toFixed(3))};const request=()=>{if(!scrollTick)scrollTick=requestAnimationFrame(update)};window.addEventListener('scroll',request,{passive:true});window.addEventListener('resize',request,{passive:true});request();
  startHeroSwipe();
 
