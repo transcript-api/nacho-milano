@@ -35,3 +35,11 @@ html.dialogOpen,html.coverOpen{overflow:hidden}.drawerPhoto{height:165px;width:1
 .nmZoomViewport{height:min(76dvh,780px);display:flex;overflow:auto;background:#e9e4da;overscroll-behavior:contain;touch-action:pan-x pan-y pinch-zoom;scrollbar-color:#918879 #e9e4da}
 .nmZoomViewport:focus-visible,.nmZoom button:focus-visible{outline:2px solid #3b392e;outline-offset:-2px}
 .nmZoom .nmZoomViewport img{width:auto;height:auto;max-width:none;max-height:none;margin:auto;flex:none;object-fit:contain;user-select:none;-webkit-user-drag:none}
+
+/* Dot-only product colour selectors. A ring distinguishes the active colour. */
+.draftColorDots{display:flex;flex-wrap:wrap;gap:0;margin:2px 0 8px;align-items:center}
+.draftColorDot{position:relative;display:grid;place-items:center;min-width:42px;min-height:44px;padding:0;background:transparent;color:#2e2c29}
+.draftColorDot::before{content:"";width:19px;height:19px;border-radius:50%;background:var(--dot);border:1px solid #25242252}
+.draftColorDot[aria-pressed=true]::after{content:"";position:absolute;top:50%;left:50%;width:29px;height:29px;border:1.4px solid currentColor;border-radius:50%;transform:translate(-50%,-50%)}
+.draftColorDot:focus-visible{outline:2px solid #282726;outline-offset:-2px}
+.draftSizePending{font-size:.77rem;color:#57534b;margin:.4rem 0 .75rem}

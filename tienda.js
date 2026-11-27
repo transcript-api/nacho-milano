@@ -1,7 +1,7 @@
 'use strict';
 (function(){
  const s=document.querySelector('#shopSearch'), guide=document.querySelector('#sizeGuide');
- if(!s||!guide)return;
+ if(!s)return;
  const q=s.querySelector('input'), results=s.querySelector('#shopResults');
  const canon=x=>x.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
  function paint(){
@@ -16,7 +16,7 @@
  document.querySelectorAll('[data-search]').forEach(b=>b.addEventListener('click',()=>{s.showModal();paint();q.focus()}));
  q.addEventListener('input',paint);
  document.addEventListener('nm:size-guide',({detail:p})=>{
-   if(!p||!Array.isArray(p.sizes))return;
+   if(!guide||!p||!Array.isArray(p.sizes))return;
    const b=guide.querySelector('#sizeGuideBody'), labels=p.category==='Pantalones'?['Cintura: medí de lado a lado a la altura de la pretina.','Largo: medí desde la cintura hasta el ruedo.']:['Ancho: medí de axila a axila.','Largo: medí desde el hombro hasta el borde inferior.'];
    const list=el('ul');labels.forEach(x=>list.append(el('li',x)));
    b.replaceChildren(el('p',p.name+' · Talles de muestra: '+p.sizes.join(', ')+'.'),el('p','Para comparar cuando estén las medidas, apoyá una prenda que te quede bien sobre una superficie plana, sin estirarla.'),list,el('p','Las medidas de esta prenda todavía no están publicadas.','quiet'));guide.showModal();

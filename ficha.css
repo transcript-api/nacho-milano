@@ -105,3 +105,10 @@
 .productThumbs.draftThumbs .productThumb{position:relative;width:max(62px,var(--thumbH));height:calc(var(--thumbH) + 17px);grid-template-rows:minmax(0,1fr) 17px}
 .productThumbLabel{height:17px;padding:2px 3px;color:#2e2c29;background:#fcfaf5;font-size:10px;line-height:13px;width:100%;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .draftGallery .productGallerySlide:focus-visible,.draftGallery .productThumb:focus-visible{outline:2px solid #2e2c29;outline-offset:-2px}
+
+/* PDP product sequence: name, tactile dots, one description, sizing and bag. */
+.manlyProduct #productColors{min-height:0}
+.manlyProduct #productColors .draftColorDots{margin:0 0 7px}
+.manlyProduct #productColors .draftColorDot:first-child{margin-left:-8px}
+.manlyProduct .draftChoice .draftSizeArea{margin:.9rem 0 .55rem}
+.manlyProduct .draftChoice .draftSizeArea legend{font-size:.76rem;text-transform:none;letter-spacing:0}

@@ -295,6 +295,8 @@ Ampliar foto|Ampliar foto
 Acercar foto|Aproximar foto
 Ajustar|Ajustar
 Ajustar foto a la pantalla|Ajustar foto à tela
+Talle por confirmar|Tamanho a confirmar
+Ya llegaste al máximo de unidades de esta variante.|Você já atingiu o limite de unidades desta variante.
 `.trim().split('\n').map(s=>s.split('|'));
 window.NM_COPY=Object.freeze(rows.map(Object.freeze));
 })();

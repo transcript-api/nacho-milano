@@ -2,6 +2,7 @@
 (() => {
 'use strict';
 const cleanups=new WeakMap();
+const pairedShorts=new Set(['nm-short-linho-ultra-premium','nm-bermuda-champy']);
 const svg=(glyph)=>{
   const ns='http://www.w3.org/2000/svg',s=document.createElementNS(ns,'svg'),p=document.createElementNS(ns,'path');
   const paths={pause:'M9 6v12m6-12v12',play:'m9 5 11 7-11 7Z',detail:'M7 11V7h4m2 10h4v-4M7 7l4 4m6 6-4-4'};
@@ -104,10 +105,10 @@ function motion(track,original,button){
 function render(host,products,api){
   (cleanups.get(host)||[]).forEach(f=>f());
   const {el,btn,image,link,glyph,photo,placeholder,quickDraft,openZoom,onSave}=api;
-  const fragment=document.createDocumentFragment(),rails=[];
+  const fragment=document.createDocumentFragment(),rails=[];let shortPair=null;
   for(const product of products){
     const {id,name,colors}=product;if(!colors?.length)continue;
-    const count=colors.length, moving=count>=3;
+    const count=colors.length,moving=count>=3,paired=count===1&&pairedShorts.has(id);
     const row=el('section',undefined,'variantRow');row.dataset.variantProduct=id;row.dataset.variantCount=String(count);
     const head=el('header',undefined,'variantRowHead'),copy=el('div',undefined,'variantRowHeading'),title=el('h3',name);
     title.id='variant-title-'+id;row.setAttribute('aria-labelledby',title.id);
@@ -155,7 +156,11 @@ function render(host,products,api){
       };
       track.append(repeat(),original,repeat());rails.push([track,original,play]);
     }else track.append(original);
-    row.append(track);fragment.append(row);
+    row.append(track);
+    if(paired){
+      if(!shortPair){shortPair=el('div',undefined,'variantPair');fragment.append(shortPair)}
+      row.dataset.variantPaired='';shortPair.append(row);
+    }else fragment.append(row);
   }
   host.dataset.variantRows='';host.replaceChildren(fragment);cleanups.set(host,rails.map(args=>motion(...args)));
 }

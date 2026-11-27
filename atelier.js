@@ -17,9 +17,28 @@ const num=(n)=>String(n).padStart(2,'0'), clamp=(x,a,z)=>Math.max(a,Math.min(x,z
 const quiet=matchMedia('(prefers-reduced-motion: reduce)'), touch=matchMedia('(max-width:650px)');
 const money=new Intl.NumberFormat('es-UY',{style:'currency',currency:'UYU',minimumFractionDigits:0,maximumFractionDigits:0});
 const variantKey=(p,c,s)=>JSON.stringify([p.id,p.colors[c][1],s]);
-const draftKey=(p,c)=>JSON.stringify([p.id,p.colors[c].name,null]);
-const valid=new Map(), choices=new Map();
-for(const p of draftProducts)p.colors.forEach((c,i)=>valid.set(draftKey(p,i),{p,c,i,s:null}));
+const draftSizes=(p,c)=>p.colors[c]?.sizes||[];
+const draftKey=(p,c,s=null)=>JSON.stringify([p.id,p.colors[c].name,s]);
+const draftVariant=(p,c,s)=>draftSizes(p,c).includes(s);
+const valid=new Map(), choices=new Map(), draftSizeChoices=new Map();
+for(const p of draftProducts)p.colors.forEach((c,i)=>{
+ // Keep old carts intact. A null size is preserved as unknown, never relabeled.
+ valid.set(draftKey(p,i),{p,c,i,s:null});
+ for(const s of draftSizes(p,i))valid.set(draftKey(p,i,s),{p,c,i,s});
+});
+try{
+ const stored=JSON.parse(sessionStorage.getItem('nm-size-choice-v1')||'[]');
+ for(const [id,color,size] of stored){
+  const p=byId.get(id), i=p?.colors.findIndex(c=>c.name===color)??-1;
+  if(i>=0&&draftVariant(p,i,size))draftSizeChoices.set(draftKey(p,i),size);
+ }
+}catch{}
+const preferredDraftSize=(p,c)=>draftSizeChoices.get(draftKey(p,c))||null;
+function rememberDraftSize(p,c,s){
+ if(!draftVariant(p,c,s))return;
+ draftSizeChoices.set(draftKey(p,c),s);
+ try{sessionStorage.setItem('nm-size-choice-v1',JSON.stringify([...draftSizeChoices].map(([key,size])=>[...JSON.parse(key).slice(0,2),size])))}catch{}
+}
 let saved=new Set();
 try{saved=new Set(JSON.parse(localStorage.getItem('nm-saved-v3')||'[]').filter(id=>byId.has(id)));localStorage.setItem('nm-saved-v3',JSON.stringify([...saved]))}catch{}
 try{for(const [id,colorKey] of JSON.parse(sessionStorage.getItem('nm-color-choice-v1')||'[]')){const p=byId.get(id), index=p?.colors.findIndex(c=>c.name===colorKey)??-1;if(index>=0)choices.set(id,{color:index,size:null,view:0})}}catch{}
@@ -51,8 +70,8 @@ function showBag(focus=null,full=false){
  if(!full&&cart.size)actions.prepend(link(document.body.classList.contains('refShop')?'Ver carrito':'Ver bolsa','bolsa.html','buy'));
  if(!cart.size){target.append(el('p','La bolsa está vacía.'),actions);if(focus)actions.querySelector('a').focus();return}
  const ids=new Set(),frag=document.createDocumentFragment();let total=0;
- for(const [k,q] of cart){const {p,c,s}=valid.get(k);ids.add(p.id);if(p.price!=null)total+=p.price*q;
- const row=el('div',undefined,'lineItem'),copy=el('div');const photo=p.draft?draftPhoto(c):src(c[1],'rack');row.append(photo?image(photo,''):draftPlaceholder(),copy);copy.append(el('strong',p.name),el('p',(p.draft?c.name:c[0]+' · '+s)+' · '+q+(p.price!=null?' · '+money.format(p.price*q):'')));for(const [name,label,d] of [['−','Reducir',-1],['+','Aumentar',1],['Quitar','Quitar',-q]]){const x=btn(name,()=>{change(k,d);showBag([k,label],full)});x.dataset.k=k;x.dataset.op=label;x.setAttribute('aria-label',label+' '+p.name+(s?' '+s:''));x.disabled=q>=9&&d>0;copy.append(x)}frag.append(row)}
+ for(const [k,q] of cart){const {p,c,i,s}=valid.get(k);ids.add(p.id);if(p.price!=null)total+=p.price*q;
+ const row=el('div',undefined,'lineItem'),copy=el('div');const photo=p.draft?draftPhoto(c):src(c[1],'rack');row.append(photo?image(photo,''):draftPlaceholder(),copy);copy.append(el('strong',p.name),el('p',(p.draft?c.name+(s?' · '+s:draftSizes(p,i).length?' · Talle por confirmar':''):c[0]+' · '+s)+' · '+q+(p.price!=null?' · '+money.format(p.price*q):'')));for(const [name,label,d] of [['−','Reducir',-1],['+','Aumentar',1],['Quitar','Quitar',-q]]){const x=btn(name,()=>{change(k,d);showBag([k,label],full)});x.dataset.k=k;x.dataset.op=label;x.setAttribute('aria-label',label+' '+p.name+(s?' '+s:''));x.disabled=q>=9&&d>0;copy.append(x)}frag.append(row)}
  target.append(frag);if(total)target.append(el('p','Subtotal: '+money.format(total),'statusText'));target.append(actions);
  const matches=[...new Set(looks.filter(l=>l.items.some(i=>ids.has(i.id))).flatMap(l=>l.items.map(i=>i.id)))].filter(id=>!ids.has(id)).slice(0,2);
  if(matches.length){const more=el('section',undefined,'bagRelated');more.append(el('h3','Completá el look'));for(const id of matches){const p=byId.get(id);if(p.draft){more.append(link(p.name,url(p),'textLink'));continue}const x=makeLookRow(p,()=>quickDrawer(p,full?()=>{drawer.close();showBag(null,true)}:()=>showBag()));more.append(x)}target.append(more)}
@@ -73,18 +92,62 @@ function formFor(p,state,changeColor=()=>{},compact=false,onAdd=null,full=false)
  update();return box
 }
 function quickDrawer(p,back,onAdd=null){const state=readChoice(p),img=image(src(p.colors[state.color][1]),p.name,false);img.className='drawerPhoto';openDrawer(p.name,'ELEGÍ EL TALLE');dialogBack=back;const form=formFor(p,state,()=>{img.src=src(p.colors[state.color][1]);detail.href=url(p,state.color)},false,onAdd);if(onAdd)form.querySelector('.buy').textContent='Agregar al carrito';body.append(img,form,el('p','Producto de muestra. No está a la venta.','quiet'));const detail=link('Ver ficha →',url(p,state.color),'textLink');body.append(detail);if(back)body.append(btn('Volver a la bolsa',()=>dialogBack?.(),'control'))}
-function addDraft(p,index){
- const key=draftKey(p,index);if(!change(key,1))return false;announce(p.name+' en el carrito');return true;
+const draftChips=Object.freeze({'OFF':'#eae4d7','Preto':'#252522','Mascavo':'#855945','Verde':'#757e69','Safari':'#c6a987','Azul Claro':'#afc6d6','Areia':'#d7c5a8','Branco':'#fff','Natural':'#ded1b9','Bege':'#bca88d'});
+function draftColorDots(p,current,choose){
+ const field=el('div',undefined,'draftColorDots');
+ field.setAttribute('role','group');field.setAttribute('aria-label','Color');
+ const options=p.colors.map((c,i)=>{
+  const x=btn('',()=>choose(i),'draftColorDot');
+  x.style.setProperty('--dot',draftChips[c.name]||'#d3d0c9');
+  x.setAttribute('aria-label',c.name);field.append(x);return x;
+ });
+ const update=()=>options.forEach((x,i)=>x.setAttribute('aria-pressed',String(i===current())));
+ update();return {field,update};
+}
+function draftSizeUI(p,state,host,onSelect){
+ const options=draftSizes(p,state.color);
+ if(!options.length){host.replaceChildren(el('p','Talle por confirmar','draftSizePending'));return}
+ const group=selector('Talle',options.map(t=>[t]),()=>options.indexOf(state.size),i=>{
+  state.size=options[i];rememberDraftSize(p,state.color,state.size);group.update();onSelect();
+ });
+ host.replaceChildren(group.field);
+}
+function draftBuy(p,state,status){
+ const options=draftSizes(p,state.color);
+ if(options.length&&!draftVariant(p,state.color,state.size)){
+  status.textContent='Elegí un talle antes de agregar';return;
+ }
+ if(addDraft(p,state.color,state.size))showBag();
+ else status.textContent='Ya llegaste al máximo de unidades de esta variante.';
+}
+function addDraft(p,index,size){
+ const options=draftSizes(p,index);
+ if(options.length&&!draftVariant(p,index,size))return false;
+ const key=draftKey(p,index,options.length?size:null);
+ if(!change(key,1))return false;
+ announce(p.name+(size?' · '+size:'')+' en el carrito');return true;
 }
 function quickDraft(p,start=null,origin=null){
- openDrawer(p.name,'ELEGÍ EL COLOR');let i=readChoice(p,start).color;if(origin)lastDialogTrigger=origin;
- const draftUrl=()=>start===null?url(p,i):'producto-'+p.id+'.html?color='+encodeURIComponent(p.colors[i].name);
+ openDrawer(p.name,'NACHO MILANO');if(origin)lastDialogTrigger=origin;
+ const state=readChoice(p,start);state.size=preferredDraftSize(p,state.color);
+ const draftUrl=()=>{
+  const q=new URLSearchParams({color:p.colors[state.color].name});
+  if(state.size)q.set('talle',state.size);
+  return 'producto-'+p.id+'.html?'+q;
+ };
  const media=el('div'),detail=link('Ver ficha →',draftUrl(),'textLink');
- const status=el('p','','statusText');status.setAttribute('role','status');
- const paint=()=>{const photo=draftPhoto(p.colors[i]),img=photo?image(photo,p.name,false):draftPlaceholder();if(photo)img.className='drawerPhoto';media.replaceChildren(img);detail.href=draftUrl();status.textContent=''};
- const colors=selector('Color',p.colors.map(c=>[c.name]),()=>i,n=>{i=n;saveChoice(p,{color:i,size:null,view:0});colors.update();paint()});
- const add=btn('Agregar al carrito',()=>{if(addDraft(p,i))showBag();else status.textContent='Ya llegaste al máximo de unidades de este color.'},'buy');
- body.append(media,colors.field,add,status,detail);paint();
+ const status=el('p','','statusText'),sizes=el('div',undefined,'draftSizeArea');status.setAttribute('role','status');
+ const sizeChanged=()=>{detail.href=draftUrl();status.textContent=''};
+ const paint=()=>{
+  const photo=draftPhoto(p.colors[state.color]),img=photo?image(photo,p.name,false):draftPlaceholder();
+  if(photo)img.className='drawerPhoto';
+  media.replaceChildren(img);draftSizeUI(p,state,sizes,sizeChanged);sizeChanged();
+ };
+ const colors=draftColorDots(p,()=>state.color,n=>{
+  state.color=n;state.size=preferredDraftSize(p,n);saveChoice(p,state);colors.update();paint();
+ });
+ const add=btn('Agregar al carrito',()=>draftBuy(p,state,status),'buy');
+ body.append(media,colors.field,sizes,add,status,detail);paint();
 }
 const zoom=$('#zoom');
 let zoomView;
@@ -362,18 +425,35 @@ function showProductRelated(p){
  root.replaceChildren(top,rail);root.hidden=false;refreshSaved()
 }
 function startDraftProduct(p){
- const params=new URLSearchParams(location.search), requested=params.get('color');
- const media=$('#productMedia'), choice=$('#productChoice'), save=$('#productSave');
+ const params=new URLSearchParams(location.search), requested=params.get('color'),requestedSize=params.get('talle');
+ const media=$('#productMedia'), colorsHost=$('#productColors'),choice=$('#productChoice'), save=$('#productSave');
  let index=Math.max(0,p.colors.findIndex(c=>c.name===requested));
+ const state={color:index,size:draftVariant(p,index,requestedSize)?requestedSize:preferredDraftSize(p,index),view:0};
+ if(requestedSize===state.size)rememberDraftSize(p,index,state.size);
  save.dataset.save=p.id;save.onclick=()=>toggleSaved(p);
- const wrap=el('div',undefined,'buyForm draftChoice');
- const colors=selector('Colores del catálogo',p.colors.map(c=>[c.name]),()=>index,i=>{
-   index=i;colors.update();paint();
-   try{const u=new URL(location.href);u.searchParams.set('color',p.colors[index].name);history.replaceState(null,'',u)}catch{}
- });
+ const wrap=el('div',undefined,'buyForm draftChoice'),sizes=el('div',undefined,'draftSizeArea');
  const status=el('p','','statusText');status.setAttribute('role','status');
- const add=btn('Agregar al carrito',()=>{if(addDraft(p,index))showBag();else status.textContent='Ya llegaste al máximo de unidades de este color.'},'buy');
- const row=el('div',undefined,'purchaseRow');row.append(add,save);wrap.append(colors.field,row,status);choice.append(wrap);showProductLooks(p);refreshSaved();
+ const syncAddress=()=>{
+  saveChoice(p,state);status.textContent='';
+  try{const u=new URL(location.href);u.searchParams.set('color',p.colors[index].name);
+   if(state.size)u.searchParams.set('talle',state.size);else u.searchParams.delete('talle');
+   history.replaceState(null,'',u);
+  }catch{}
+ };
+ const colors=draftColorDots(p,()=>index,i=>{
+  index=i;state.color=i;state.size=preferredDraftSize(p,i);
+  colors.update();draftSizeUI(p,state,sizes,syncAddress);paint();syncAddress();
+ });
+ const add=btn('Agregar al carrito',()=>draftBuy(p,state,status),'buy');
+ const row=el('div',undefined,'purchaseRow');row.append(add,save);
+ if(colorsHost)colorsHost.append(colors.field);else wrap.append(colors.field);
+ draftSizeUI(p,state,sizes,syncAddress);wrap.append(sizes,row,status);
+ choice.append(wrap);showProductLooks(p);refreshSaved();
+ // Read-only context for a future site-wide assistant. No widget, transmission or API.
+ window.NM_PRODUCT_CONTEXT=Object.freeze({current:()=>Object.freeze({
+  productId:p.id,color:p.colors[state.color].name,size:state.size,sizes:[...draftSizes(p,state.color)],
+  locale:document.documentElement.lang==='pt-BR'?'pt-BR':'es-UY'
+ })});
  function paint(){
    const c=p.colors[index];const views=[['front','Frente'],['profile','Perfil'],['back','Espalda'],['texture','Textura']].filter(([k])=>draftPhoto(c,k));
    if(!views.length){media.replaceChildren(draftPlaceholder());return}

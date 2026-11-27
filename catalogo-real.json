@@ -113,7 +113,13 @@
           "back": "assets/coleccion-detalles/short-natural-espalda.webp",
           "texture": "assets/coleccion-detalles/short-natural-textura.webp"
         },
-        "illustration": true
+        "illustration": true,
+        "sizes": [
+          "P",
+          "M",
+          "G",
+          "GG"
+        ]
       }
     ],
     "draft": true
