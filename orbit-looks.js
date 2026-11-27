@@ -36,7 +36,7 @@ function project(slot, count, w, h, focus=0){
   };
 }
 function mount(o){
-  const {stage,scene,port,pins,info,all,previous,next,counter,looks,quiet,el,btn,image,link,selectProduct,productAction,launchZoom,outfitDrawer,refresh}=o;
+  const {stage,scene,port,pins,info,all,previous,next,counter,looks,quiet,el,btn,image,link,selectProduct,productAction,launchZoom,outfitDrawer,canBagLook,refresh}=o;
   const n=looks.length;if(!n)return;
   const deep=Number(new URLSearchParams(location.search).get('look'));
   const chosen=Number.isInteger(deep)&&deep>0&&deep<=n;
@@ -242,7 +242,10 @@ function mount(o){
     else {
       const zoom=btn('Ampliar foto',()=>doZoom(zoom),'textLink orbitZoom');zoom.setAttribute('aria-haspopup','dialog');info.append(zoom);
     }
-    if(!look.draft)info.append(btn('Armar el look',()=>outfitDrawer(look),'buy buildLook'));
+    if(typeof canBagLook==='function'?canBagLook(look):!look.draft){
+      const add=btn('Agregar look al carrito',()=>outfitDrawer(look,add),'buy buildLook');
+      add.setAttribute('aria-haspopup','dialog');info.append(add);
+    }
     refresh();
   }
   function select(to,duration=450){

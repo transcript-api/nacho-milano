@@ -118,7 +118,7 @@ function recoverTexture(e){
 }
 function render(host,products,api){
   (cleanups.get(host)||[]).forEach(f=>f());
-  const {el,btn,image,link,glyph,photo,placeholder,quickDraft,openZoom,onSave}=api;
+  const {el,btn,image,link,glyph,photo,placeholder,quickDraft,openZoom,demoPrice,onSave}=api;
   const fragment=document.createDocumentFragment(),rails=[];let shortPair=null;
   for(const product of products){
     const {id,name,colors}=product;if(!colors?.length)continue;
@@ -153,7 +153,9 @@ function render(host,products,api){
       const add=btn('',()=>{},'cardAdd');add.dataset.variantAction='add';add.append(glyph('bag'));
       add.setAttribute('aria-label','Agregar al carrito: '+identity);add.setAttribute('aria-haspopup','dialog');visual.append(add);
       const caption=link(color,href,'variantCaption');caption.setAttribute('aria-label','Abrir ficha de '+identity);
-      card.append(visual,caption);original.append(card);
+      card.append(visual,caption);
+      const sample=demoPrice?.(product);if(sample)card.append(sample);
+      original.append(card);
     });
     track.addEventListener('error',recoverTexture,true); // Captures errors from cloned carousel cards, too.
     track.addEventListener('click',e=>{

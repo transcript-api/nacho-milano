@@ -142,6 +142,14 @@ Agregado a tu bolsa.|Adicionado à sua sacola.
 Agregar|Adicionar
 Agregar a la bolsa|Adicionar à sacola
 Agregar al carrito|Adicionar ao carrinho
+Agregar look al carrito|Adicionar look ao carrinho
+Agregar las dos prendas|Adicionar as duas peças
+Este look no está disponible completo.|Este look não está disponível completo.
+Elegí el talle de cada prenda que lo requiere.|Selecione o tamanho de cada peça que precisa de um.
+No pudimos guardar el look. Probá de nuevo.|Não foi possível salvar o look. Tente novamente.
+No se agregó el look: una de las prendas ya tiene 9 unidades en el carrito.|O look não foi adicionado: uma das peças já tem 9 unidades no carrinho.
+Se agregan las dos prendas en los colores de este look.|As duas peças serão adicionadas nas cores deste look.
+Agregamos las dos prendas del look.|Adicionamos as duas peças do look.
 Armar el look|Montar o look
 Aumentar cantidad|Aumentar quantidade
 Cantidad|Quantidade
@@ -312,6 +320,8 @@ Ajustar|Ajustar
 Ajustar foto a la pantalla|Ajustar foto à tela
 Talle por confirmar|Tamanho a confirmar
 Ya llegaste al máximo de unidades de esta variante.|Você já atingiu o limite de unidades desta variante.
+Precio de muestra|Preço de demonstração
+Promo de muestra|Promoção de demonstração
 `.trim().split('\n').map(s=>s.split('|'));
 window.NM_COPY=Object.freeze(rows.map(Object.freeze));
 })();

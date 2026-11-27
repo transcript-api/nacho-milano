@@ -145,3 +145,27 @@
  .manlyProduct.draftProduct .draftSizePending{margin:.25rem 0 .49rem}
  .manlyProduct.draftProduct .productCollection{margin-top:.55rem}
 }
+
+.manlyProduct .purchaseRow[data-price-preview]{
+ grid-template-columns:max-content minmax(0,1fr) 49px;
+ gap:clamp(6px,1.8vw,12px);
+ align-items:stretch;
+}
+.manlyProduct .purchaseRow[data-price-preview] .demoPrice{align-self:center;max-width:104px}
+.manlyProduct .purchaseRow[data-price-preview] .demoPrice__current strong{font-size:clamp(1rem,3.7vw,1.28rem)}
+.manlyProduct .purchaseRow[data-price-preview] .buy{min-width:0;text-align:center;padding-inline:clamp(4px,1.5vw,10px)}
+.manlyProduct .purchaseRow[data-price-preview] .buy::before{flex:none}
+@media(max-width:370px){
+ .manlyProduct .purchaseRow[data-price-preview]{grid-template-columns:max-content minmax(0,1fr) 44px;gap:5px}
+ .manlyProduct .purchaseRow[data-price-preview] .productSave{width:44px}
+ .manlyProduct .purchaseRow[data-price-preview] .buy{font-size:.81rem;gap:4px}
+ .manlyProduct .purchaseRow[data-price-preview] .buy::before{width:13px;height:13px}
+ .manlyProduct .purchaseRow[data-price-preview] .demoPrice__note{font-size:.64rem}
+}
+
+/* Give the fifth linen-trouser photo a visible place without clipping on small phones. */
+@media (max-width:650px){
+ .draftGallery .productThumbs.draftThumbs[data-ambient]{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:clamp(4px,1vw,8px)}
+ .draftGallery .productThumbs.draftThumbs[data-ambient] .productThumb{width:100%;min-width:0}
+ .draftGallery .productThumbs.draftThumbs[data-ambient] .productThumbLabel{font-size:clamp(8px,2.25vw,10px)}
+}

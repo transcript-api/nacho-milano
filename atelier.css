@@ -60,3 +60,24 @@ html.dialogOpen,html.coverOpen{overflow:hidden}.drawerPhoto{height:165px;width:1
 .bagVestuario__link:hover{border-color:currentColor}.bagVestuario__link:focus-visible{outline:2px solid currentColor;outline-offset:2px}
 .bagVestuario__variant{display:grid;min-width:0;gap:.12rem}
 .bagVestuario__variant small{font-size:.74rem;color:#57544f}
+
+/* Display-only UYU prices. The sample label remains visible in every market. */
+.demoPrice{display:grid;gap:2px;color:#282622;text-align:left}
+.demoPrice__current{display:flex;align-items:baseline;gap:.28em;margin:0;line-height:1.02;white-space:nowrap;font-variant-numeric:tabular-nums}
+.demoPrice__current strong{font-size:1rem;font-weight:630;letter-spacing:-.02em}
+.demoPrice__currency{font-size:.64rem;font-weight:620;letter-spacing:.025em}
+.demoPrice__note{margin:0;font-size:.68rem;line-height:1.23;color:#59544d}
+.demoPrice__offers{display:flex;align-items:center;gap:6px;font-size:.68rem}
+.demoPrice__offers[hidden]{display:none}
+.demoPrice__previous{color:#59544d;white-space:nowrap}
+.demoPrice__discount{background:#e9e4da;color:#312e29;border-radius:2px;padding:.1em .42em}
+.variantCard>.demoPrice{padding:0 1px 5px}
+.cardLine>.demoPrice{margin:.26rem 0 .18rem}
+
+/* Atomic outfit add: keep the two fixed-color pieces legible in the cart drawer. */
+.outfitBagRow{grid-template-columns:minmax(54px,66px) minmax(0,1fr)}
+.outfitBagRow>img{width:100%;height:82px;object-fit:contain;background:#eeeae4}
+.outfitBagRow .outfitBagRow__color{font-size:.79rem;color:#514d47;margin:0 0 .38rem}
+.outfitBagRow .draftSizeArea{margin:0}
+.outfitBagRow+.buy{margin-top:.65rem}
+.buy.buildLook{margin-top:.6rem}
