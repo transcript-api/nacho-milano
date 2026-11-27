@@ -1,0 +1,64 @@
+/* No remnants of the old linear model rail override the orbit. */
+.runwayScene.orbitScene{
+  grid-template-columns:minmax(0,1fr) minmax(260px,27%);
+  background:#f3f1eb;border-color:#dfdbd2;
+}
+.runwayStage.orbitStage{
+  height:clamp(410px,53vw,720px);
+  background:radial-gradient(ellipse at 51% 30%,#fbfaf6 0,#f4f1ea 47%,#ddd8ce 100%);
+  cursor:grab;touch-action:pan-y pinch-zoom;overscroll-behavior-inline:contain;
+}
+.runwayStage.orbitStage::before{
+  height:56%;bottom:0;box-shadow:none;background:linear-gradient(0deg,#8d82731a,transparent);pointer-events:none;
+}
+.orbitStage[data-orbit-drag]{cursor:grabbing}
+.orbitFloor{
+  position:absolute;z-index:0;border-radius:50%;pointer-events:none;
+  box-shadow:0 21px 33px #5b514a1a,inset 0 0 35px #fffbf0bd;
+  border:1px solid #bdb5a565;
+  background:radial-gradient(ellipse at 45% 46%,#fbf9f362 30%,#cac1b245 100%);
+}
+.orbitFloor::after{
+  content:'';position:absolute;inset:6% 2.5%;border:1px solid #faf6ec8f;
+  border-radius:inherit;
+}
+.orbitShadows{position:absolute;inset:0;z-index:1;pointer-events:none}
+.orbitShadow{position:absolute;top:0;left:0;border-radius:50%;background:radial-gradient(ellipse,#4a4238b2 0,#544a4140 47%,transparent 72%)}
+.runwayStage .models.orbitModels{position:absolute;z-index:2;inset:0}
+.runwayStage .model.orbitModel{
+  position:absolute;display:block;top:0;left:0;bottom:auto;margin:0;padding:0;
+  transform-origin:50% 100%;transition:none;pointer-events:none;touch-action:pan-y pinch-zoom;cursor:pointer;
+  background:none;border:none;overflow:visible;
+}
+.orbitModel .orbitSprite{position:absolute;inset:0;isolation:isolate;pointer-events:none}
+.runwayStage .orbitModel img{
+  display:block;position:absolute;inset:0;width:100%;height:100%;max-height:none;object-fit:contain;
+  object-position:center bottom;filter:none;pointer-events:none;transition:none;mix-blend-mode:plus-lighter;
+}
+.runwayStage .orbitModel .orbitFallback{mix-blend-mode:multiply}
+.runwayStage .orbitModel [hidden]{display:none}
+.orbitModel .orbitHit{position:absolute;inset:4% var(--orbit-hit,19%) 2%;pointer-events:auto;border-radius:18px}
+.orbitModel[data-orbit-inactive] .orbitHit{pointer-events:none}
+.orbitModel:focus-visible{outline:none}
+.orbitModel:focus-visible .orbitHit{outline:1.5px solid #302b24;outline-offset:3px}
+.runwayStage .runControls,.runwayStage #allLooks{
+  border:1px solid #c8bfb1;background:#f8f6efef;color:#26231f;z-index:9;
+}
+.orbitStage #lookIndex{font-variant-numeric:tabular-nums;min-width:54px;text-align:center;display:inline-block}
+.orbitStage .runControls :is(button,#lookIndex){position:relative;z-index:1}
+.orbitStage .runControls button{min-width:44px;min-height:44px}
+.orbitStage #allLooks{padding-inline:11px;min-height:44px}
+.orbitStage .pins{z-index:6}
+.orbitStage[data-orbit-busy] .pins{visibility:hidden}
+.orbitStage .pin{min-width:44px;min-height:44px}
+.orbitScene .lookInfo{background:#f6f4ee;min-width:0}
+.orbitZoom{min-height:44px}
+@media(max-width:760px){
+  .runwayScene.orbitScene{grid-template-columns:minmax(0,1fr)}
+  .runwayStage.orbitStage{height:clamp(385px,114vw,580px)}
+  .orbitStage .runControls button{padding-inline:5px}
+}
+@media(prefers-reduced-motion:reduce){
+  .orbitStage *{animation:none}
+}
+.orbitStage[data-orbit-drag] .orbitModel{cursor:grabbing}

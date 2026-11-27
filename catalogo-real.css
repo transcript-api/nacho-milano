@@ -23,3 +23,5 @@
 .garmentMeasure caption{text-align:left;padding:.1rem 0 .55rem}
 .garmentMeasure :is(td,th){padding:.3rem .25rem .3rem 0;border-bottom:1px solid #ddd;font-weight:400}
 .garmentMeasure thead th,.garmentMeasure tbody th{font-weight:600}
+
+.draftProduct .productLookCards .lookAlphaBadge{background:transparent;object-fit:contain}

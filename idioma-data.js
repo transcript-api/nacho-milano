@@ -191,6 +191,12 @@ No se pudo cargar esa variante. Probá de nuevo.|Não foi possível carregar ess
 No se pudo cargar la vista de esta prenda.|Não foi possível carregar a imagem desta peça.
 Pantalón o short|Calça ou short
 Probador|Provador
+Arrastrá una prenda al maniquí o tocala para probártela.|Arraste uma peça até o manequim ou toque nela para experimentar.
+Soltá para probar|Solte para experimentar
+Soltá la camisa en el torso.|Solte a camisa sobre o tronco.
+Soltá la prenda en las piernas.|Solte a peça sobre as pernas.
+Prenda colocada.|Peça vestida.
+Arrastre cancelado.|A ação de arrastar foi cancelada.
 No encontramos prendas con ese nombre.|Não encontramos peças com esse nome.
 Probá con el nombre de una prenda o un color.|Tente o nome de uma peça ou de uma cor.
 Enviando…|Enviando…

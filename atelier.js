@@ -15,7 +15,7 @@ const draftPhoto=(c,view='front')=>c?.photos?.[view]||null;
 const draftPlaceholder=()=>el('div','Fotos pendientes','draftBlank');
 const num=(n)=>String(n).padStart(2,'0'), clamp=(x,a,z)=>Math.max(a,Math.min(x,z)), period=(x,n)=>((x%n)+n)%n;
 const quiet=matchMedia('(prefers-reduced-motion: reduce)'), touch=matchMedia('(max-width:650px)');
-const money=new Intl.NumberFormat('es-UY',{style:'currency',currency:'UYU',maximumFractionDigits:0});
+const money=new Intl.NumberFormat('es-UY',{style:'currency',currency:'UYU',minimumFractionDigits:0,maximumFractionDigits:0});
 const variantKey=(p,c,s)=>JSON.stringify([p.id,p.colors[c][1],s]);
 const draftKey=(p,c)=>JSON.stringify([p.id,p.colors[c].name,null]);
 const valid=new Map(), choices=new Map();
@@ -255,6 +255,12 @@ function outfitDrawer(look){
 }
 function startRunway(){
  const stage=$('#runwayStage'),scene=$('#runwayScene'),port=$('#models'),pins=$('#pins'),info=$('#lookInfo'),all=$('#allLooks');let ix=0,focus=false;
+ if(window.NM_ORBIT){
+  window.NM_ORBIT.mount({stage,scene,port,pins,info,all,previous:$('#lookPrev'),next:$('#lookNext'),counter:$('#lookIndex'),looks,
+   quiet,gesture,el,btn,image,link,selectProduct:id=>byId.get(id),productAction:p=>makeLookRow(p,()=>quickDrawer(p)),
+   launchZoom:openZoom,outfitDrawer,refresh});
+  return;
+ }
  const buttons=looks.map((l,i)=>{const x=btn('',()=>{if(performance.now()<muteClick)return;if(i===ix)setFocus(!focus);else select(i)},'model');x.setAttribute('aria-label','Elegir look '+l.name);const fig=image(l.draft?'assets/'+l.photo+'.webp':'assets/runway-'+(i+1)+'.webp',l.name+(l.draft?' · Imagen ilustrativa':''),true);if(!l.draft)fig.onerror=()=>{fig.onerror=null;fig.src='assets/'+l.photo+'.webp';fig.classList.add('boxed')};x.append(fig);port.append(x);return x});
  const rr=rail(stage,buttons,{current:()=>ix,select,maxJump:1,stepWidth:w=>w*(touch.matches?.33:.23),style:(x,d,i,active,step,dragging)=>{const abs=Math.abs(d),y=focus?d*step*1.7:d*step;x.style.transform='translate3d(calc(-50% + '+y.toFixed(2)+'px),0,0) scale('+(focus&&active?1.075:clamp(1-abs*.14,.64,1)).toFixed(3)+')';x.style.opacity=focus&&!active&&!dragging?'0':String(abs>1.48?clamp((1.94-abs)*1.4,0,.65):clamp(1-abs*.22,.28,1));x.style.zIndex=String(20-Math.round(abs*7));x.style.pointerEvents=focus&&!active?'none':'';x.tabIndex=active?0:-1;x.setAttribute('aria-current',String(active));x.setAttribute('aria-pressed',String(focus&&active))}});
  function setFocus(f){focus=f;render();rr();if(f){const y=stage.getBoundingClientRect().top,bottom=stage.getBoundingClientRect().bottom;if(y<70||bottom>innerHeight)stage.scrollIntoView({block:'start',behavior:'instant'})}}
@@ -341,7 +347,7 @@ function showProductLooks(p){
  const section=$('#productLooks');if(!section)return;
  const pairs=looks.map((look,i)=>[look,i]).filter(([l])=>l.items.some(it=>it.id===p.id));if(!pairs.length){section.hidden=true;return}
  const title=el('h2','Looks con esta prenda');title.id='productLooksTitle';const row=el('div',undefined,'productLookCards');
- for(const [look,i] of pairs){const a=link('','index.html?look='+(i+1)+'#looks');const info=el('div');info.append(el('span',look.name));if(p.colors.length>1)info.append(el('small','En '+displayColor(p.colors[lookColor(p,look.items.find(it=>it.id===p.id))]).toLocaleLowerCase('es-UY')));a.append(image('assets/'+look.photo+'.webp',''),info);row.append(a)}
+ for(const [look,i] of pairs){const a=link('','index.html?look='+(i+1)+'#looks');const info=el('div');info.append(el('span',look.name));if(p.colors.length>1)info.append(el('small','En '+displayColor(p.colors[lookColor(p,look.items.find(it=>it.id===p.id))]).toLocaleLowerCase('es-UY')));const source='assets/'+look.photo+'.webp', pic=image('assets/looks-orbita/'+look.photo.split('/').at(-1)+'-front.webp','');pic.classList.add('lookAlphaBadge');pic.onerror=()=>{pic.onerror=null;pic.src=source};a.append(pic,info);row.append(a)}
  section.replaceChildren(title,row);section.hidden=false
 }
 function showProductRelated(p){
