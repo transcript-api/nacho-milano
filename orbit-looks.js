@@ -41,6 +41,20 @@ function mount(o){
   let dragFrom=null, raf=0,w=0,h=0, points=[], touchOrigin=0, clickMute=0;
   const pathFor=(look,angle)=>'assets/looks-orbita/'+look.photo.slice(look.photo.lastIndexOf('/')+1)+'-'+angle+'.webp';
   const original=look=>'assets/'+look.photo+'.webp';
+  const native=(look,angle)=>pathFor(look,angle).replace('looks-orbita/','looks-orbita-hd/');
+  const activeFronts=[];
+  function preferFront(fig){
+    if(!fig.hd.src&&!('orbitFailed' in fig.hd.dataset)){fig.hd.src=fig.high;}
+    if('orbitFailed' in fig.hd.dataset)return;
+    const at=activeFronts.indexOf(fig);if(at!==-1)activeFronts.splice(at,1);
+    activeFronts.push(fig);
+    // Only selected looks request a larger portrait. Keep the two most recent
+    // as well, so swipe and backtracking do not decode eight large portraits.
+    if(activeFronts.length>3){
+      const old=activeFronts.shift();old.hd.hidden=true;old.hd.style.opacity='0';old.hd.removeAttribute('src');
+    }
+  }
+
   stage.classList.add('orbitStage');scene.classList.add('orbitScene');port.classList.add('orbitModels');
   stage.setAttribute('role','region');stage.setAttribute('aria-roledescription','carrusel');
   const floor=el('div',undefined,'orbitFloor');floor.setAttribute('aria-hidden','true');
@@ -57,19 +71,27 @@ function mount(o){
     const sprite=el('span',undefined,'orbitSprite'),hit=el('span',undefined,'orbitHit'),shadow=el('span',undefined,'orbitShadow');
     sprite.setAttribute('aria-hidden','true');hit.setAttribute('aria-hidden','true');
     const art=views.map(key=>{
-      const im=image(pathFor(look,key),'',true);im.draggable=false;im.width=420;im.height=880;im.dataset.orbitView=key;
+      const im=image(key==='front'?pathFor(look,key):native(look,key),'',true);im.draggable=false;im.width=420;im.height=880;im.dataset.orbitView=key;
       im.style.opacity='0';im.addEventListener('load',requestDraw,{once:true});
-      im.addEventListener('error',()=>{im.dataset.orbitFailed='';requestDraw()},{once:true});
+      im.addEventListener('error',()=>{
+       if(key!=='front'&&!('orbitFallbackTried' in im.dataset)){im.dataset.orbitFallbackTried='';im.src=pathFor(look,key);return}
+       im.dataset.orbitFailed='';requestDraw();
+      });
       sprite.append(im);return im;
     });
+    const hd=el('img');hd.alt='';hd.decoding='async';hd.draggable=false;hd.hidden=true;hd.style.opacity='0';hd.dataset.orbitHigh='front';
+    hd.addEventListener('load',()=>{hd.hidden=false;requestDraw()});
+    hd.addEventListener('error',()=>{hd.dataset.orbitFailed='';hd.hidden=true;requestDraw()});
+    sprite.append(hd);
     const fallback=el('img');fallback.alt='';fallback.decoding='async';fallback.draggable=false;fallback.className='orbitFallback';fallback.hidden=true;
     sprite.append(fallback);node.append(sprite,hit);port.append(node);shadows.append(shadow);
-    return {node,art,fallback,shadow};
+    return {node,art,hd,high:native(look,'front'),fallback,shadow};
   });
   function doZoom(trigger){
     if(dragFrom!==null||changePhase)return;
-    const look=looks[ix],front=figures[ix].art[0];
-    launchZoom(front.complete&&front.naturalWidth?pathFor(look,'front'):original(look),look.name+' · Frente',trigger);
+    const look=looks[ix],fig=figures[ix];
+    preferFront(fig);
+    launchZoom('orbitFailed' in fig.hd.dataset?original(look):fig.high,look.name+' · Frente',trigger);
   }
   const step=()=>clamp(w*.305,91,245);
   const closest=i=>i+Math.round((phase-i)/n)*n;
@@ -87,7 +109,9 @@ function mount(o){
     requestDraw();
   }
   function paintImage(fig,p,isCurrent){
-    const loaded=fig.art.map(im=>im.complete&&im.naturalWidth>0&&!('orbitFailed' in im.dataset));
+    if(isCurrent&&p.weights[0]>.80&&!fig.hd.src)preferFront(fig);
+    const sharp=Boolean(fig.hd.src&&fig.hd.complete&&fig.hd.naturalWidth>0&&!('orbitFailed' in fig.hd.dataset));
+    const loaded=fig.art.map((im,i)=>(i===0&&sharp)||(im.complete&&im.naturalWidth>0&&!('orbitFailed' in im.dataset)));
     const a=p.weights.map((v,i)=>loaded[i]?v:0);let total=a.reduce((s,v)=>s+v,0);
     if(total===0&&loaded.some(Boolean)){
       const idx=p.weights.indexOf(Math.max(...p.weights));
@@ -100,8 +124,10 @@ function mount(o){
     fig.fallback.hidden=!substitute;
     if(substitute&&!fig.fallback.getAttribute('src'))fig.fallback.src=original(looks[ix]);
     fig.art.forEach((im,i)=>{
-      const opacity=String(fmt(total?a[i]/total:0));if(im.style.opacity!==opacity)im.style.opacity=opacity;
+      const opacity=String(fmt(i===0&&sharp?0:total?a[i]/total:0));if(im.style.opacity!==opacity)im.style.opacity=opacity;
     });
+    const opacity=String(fmt(sharp&&total?a[0]/total:0));
+    if(fig.hd.style.opacity!==opacity)fig.hd.style.opacity=opacity;
   }
   function draw(t=performance.now()){
     raf=0;if(!w||!h)return;

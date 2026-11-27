@@ -102,6 +102,20 @@ function motion(track,original,button){
   measure();updateButton();arm();
   return ()=>{stop();abort.abort();io?.disconnect();ro?.disconnect();clearTimeout(timer);cancelAnimationFrame(loop);hold=null};
 }
+// A small, square sample is enough in the grid; the original macro is reserved for zoom.
+const textureKeys=new Set('swell-off swell-preto swell-verde swell-mascavo rustic-safari rustic-areia rustic-branco rustic-azul calca-preto calca-bege calca-branco short-natural champy-branco'.split(' '));
+function textureImage(full,el,image){
+  const key=/^assets\/coleccion-detalles\/([a-z0-9-]+)-textura\.webp$/.exec(full)?.[1];
+  if(!textureKeys.has(key))return image(full); // Future or remote catalog photos still work.
+  const prefix='assets/mini-texturas/'+key+'-',im=el('img');
+  im.alt='';im.decoding='async';im.loading='lazy';im.width=96;im.height=96;im.dataset.fullTexture=full;
+  // All swatches are 48–80 CSS px. Density descriptors avoid selecting the 96px tier on a 3× phone.
+  im.srcset=prefix+'96.webp 1x, '+prefix+'240.webp 2x';im.src=prefix+'96.webp';return im;
+}
+function recoverTexture(e){
+  const im=e.target;if(!im.matches?.('img[data-full-texture]'))return;
+  const full=im.dataset.fullTexture;delete im.dataset.fullTexture;im.removeAttribute('srcset');im.removeAttribute('sizes');im.src=full;
+}
 function render(host,products,api){
   (cleanups.get(host)||[]).forEach(f=>f());
   const {el,btn,image,link,glyph,photo,placeholder,quickDraft,openZoom,onSave}=api;
@@ -132,7 +146,7 @@ function render(host,products,api){
       const img=fronte?image(fronte,identity):placeholder();if(fronte)img.draggable=false;face.append(img);visual.append(face);
       if(macro){
         const texture=btn('',()=>{},'variantTexture');texture.dataset.variantAction='texture';
-        const img=image(macro);img.draggable=false;
+        const img=count===1&&!paired?image(macro):textureImage(macro,el,image);img.draggable=false;
         texture.setAttribute('aria-label','Ampliar: Primer plano · '+identity);texture.setAttribute('aria-haspopup','dialog');
         texture.append(img,svg('detail'));visual.append(texture);
       }
@@ -141,6 +155,7 @@ function render(host,products,api){
       const caption=link(color,href,'variantCaption');caption.setAttribute('aria-label','Abrir ficha de '+identity);
       card.append(visual,caption);original.append(card);
     });
+    track.addEventListener('error',recoverTexture,true); // Captures errors from cloned carousel cards, too.
     track.addEventListener('click',e=>{
       const action=e.target.closest('[data-variant-action]');if(!action)return;
       const target=action.closest('.variantCard'), index=Number(target?.dataset.variantIndex);

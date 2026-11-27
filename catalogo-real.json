@@ -137,7 +137,7 @@
           "front": "assets/coleccion-detalles/calca-preto-frente-v2.webp",
           "back": null,
           "texture": "assets/coleccion-detalles/calca-preto-textura.webp",
-          "profile": "assets/coleccion-detalles/calca-preto-perfil.webp"
+          "profile": "assets/coleccion-detalles/calca-preto-perfil-v2.webp"
         },
         "illustration": true
       },
@@ -147,7 +147,7 @@
           "front": "assets/coleccion-detalles/calca-branco-frente.webp",
           "back": null,
           "texture": "assets/coleccion-detalles/calca-branco-textura.webp",
-          "profile": "assets/coleccion-detalles/calca-branco-perfil.webp"
+          "profile": "assets/coleccion-detalles/calca-branco-perfil-v2.webp"
         },
         "illustration": true
       },
@@ -157,7 +157,7 @@
           "front": "assets/coleccion-detalles/calca-bege-frente-v2.webp",
           "back": null,
           "texture": "assets/coleccion-detalles/calca-bege-textura.webp",
-          "profile": "assets/coleccion-detalles/calca-bege-perfil.webp"
+          "profile": "assets/coleccion-detalles/calca-bege-perfil-v2.webp"
         },
         "illustration": true
       }

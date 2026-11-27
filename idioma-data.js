@@ -190,6 +190,9 @@ Ver otras prendas|Ver outras peças
 No se pudo cargar esa variante. Probá de nuevo.|Não foi possível carregar essa variação. Tente novamente.
 No se pudo cargar la vista de esta prenda.|Não foi possível carregar a imagem desta peça.
 Pantalón o short|Calça ou short
+Pantalones y shorts|Calças e shorts
+Pantalón de lino|Calça de linho
+Short de lino|Short de linho
 Probador|Provador
 Vestuario|Guarda-roupa
 Probá cómo combinar esta prenda.|Experimente como combinar esta peça.

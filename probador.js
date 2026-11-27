@@ -11,25 +11,29 @@
       ['nm-camisa-swell', [['OFF', 'swell-off', '#eae5d8'], ['Preto', 'swell-preto', '#282629'], ['Mascavo', 'swell-mascavo', '#93593f'], ['Verde', 'swell-verde', '#6b7866']]]
     ],
     bottom: [
-      ['nm-short-linho-ultra-premium', [['Natural', 'short-natural', '#dacebc']]],
       ['nm-calca-de-linho-com-elastano', [['Preto', 'calca-preto', '#252527'], ['Branco', 'calca-branco', '#f6f4ef'], ['Bege', 'calca-bege', '#cabba4']]],
+      ['nm-short-linho-ultra-premium', [['Natural', 'short-natural', '#dacebc']]],
       ['nm-bermuda-champy', [['Branco', 'champy-branco', '#f6f4ee']]]
     ]
   };
   const parts = ['top', 'bottom'];
+  const openingPair={top:'rustic-safari',bottom:'short-natural'};
+  const compactNames={'nm-calca-de-linho-com-elastano':'Pantalón de lino','nm-short-linho-ultra-premium':'Short de lino'};
   const lists = {};
   for (const p of parts) {
     lists[p] = garments[p].flatMap(([id, variants]) => {
       const item = catalog.get(id); if (!item) return [];
-      return variants.filter(([c]) => item.colors.some(color => color.name === c))
-        .map(([color, key, swatch]) => ({id,name:item.name,color,key,swatch,src:'assets/probador/'+key+'.webp'}));
+      const colors=new Map(item.colors.map(c=>[c.name,c]));
+      return variants.filter(([name]) => colors.has(name))
+        .map(([color,key,swatch])=>({id,name:item.name,label:item.shortName||compactNames[id]||item.name,color,key,swatch,
+          front:colors.get(color).photos?.front||null,src:'assets/probador/'+key+'.webp'}));
     });
     if (!lists[p].length) return;
   }
   const memoryKey = 'nm-probador-v1';
   let saved = {};
   try { saved = JSON.parse(sessionStorage.getItem(memoryKey) || '{}') || {}; } catch {}
-  const selection = Object.fromEntries(parts.map(p => [p, lists[p].find(v => v.key === saved[p]) || lists[p][0]]));
+  const selection = Object.fromEntries(parts.map(p => [p, lists[p].find(v => v.key === saved[p]) || lists[p].find(v=>v.key===openingPair[p]) || lists[p][0]]));
   const normalSelection={...selection}, pending={top:false,bottom:false};
   const seedKey=window.location?new URLSearchParams(window.location.search).get('vestuario'):null;
   const firstSeed=seedKey?window.NM_VESTUARIO?.resolve(seedKey):null;
@@ -38,7 +42,7 @@
   const otherPart=()=>seed?.part==='top'?'bottom':'top';
   if(seed){
     selection[seed.part]=seedPlate;
-    selection[otherPart()]=lists[otherPart()][0];
+    selection[otherPart()]=lists[otherPart()].find(v=>v.key===openingPair[otherPart()])||lists[otherPart()][0];
   }
   function removeSeedQuery(){
     try {
@@ -60,18 +64,24 @@
   notice.setAttribute('role','status');notice.setAttribute('aria-live','polite');notice.setAttribute('aria-atomic','true');
   const baseCard=make('div','nmFitting__base'),baseTag=make('span','nmFitting__baseTag','Ya está en tu carrito');
   const baseName=make('strong','nmFitting__baseName'),baseVariant=make('span','nmFitting__baseVariant');
-  baseCard.append(baseTag,baseName,baseVariant);side.append(baseCard);
+  const basePhoto=make('img','nmFitting__basePhoto');basePhoto.alt='';basePhoto.decoding='async';
+  baseCard.append(baseTag,basePhoto,baseName,baseVariant);
   const action=make('div','nmFitting__wardrobeActions'),candidate=make('p','nmFitting__candidate');
   const add=make('button','buy nmFitting__add','Sumar esta prenda al carrito');
   const reset=make('button','textLink nmFitting__reset','Probar sin prenda base');
   add.type='button';reset.type='button';action.append(candidate,add,reset);
   const layers={}, previews={}, zones={}, widgets={}, tokens={top:0,bottom:0}, cache=new Map();
+  const plateHD=new Set(["calca-bege", "calca-branco", "calca-preto", "champy-branco", "rustic-areia", "rustic-azul", "rustic-branco", "rustic-safari", "short-natural", "swell-mascavo", "swell-off", "swell-preto", "swell-verde"]);
+  function setPlate(img,v){
+    img.srcset=plateHD.has(v.key)?v.src+' 1x, assets/probador-hd/'+v.key+'.webp 1.5x':'';
+    img.src=v.src;
+  }
   function plate(p, preview){
     const im=make('img','nmFitting__plate nmFitting__plate--'+p+(preview?' nmFitting__preview':''));
     im.alt='';im.width=640;im.height=1000;im.decoding='async';im.setAttribute('draggable','false');
     if(preview)im.hidden=true;
     else{
-      im.loading='lazy';im.src=selection[p].src;
+      im.loading='lazy';setPlate(im,selection[p]);
       im.addEventListener('error',()=>{ if(!im.naturalWidth) notice.textContent='No se pudo cargar la vista de esta prenda.'; });
     }
     return im;
@@ -92,6 +102,8 @@
       host.dataset.fitWardrobe=seed.part;
       title.textContent='Vestuario';intro.textContent='Combiná tu prenda con otra y agregá solo la nueva.';
       const base=selection[seed.part], next=selection[otherPart()];
+      if(baseCard.parentElement!==widgets[seed.part].rail)widgets[seed.part].rail.append(baseCard);
+      basePhoto.hidden=!base.front;if(base.front)basePhoto.src=base.front;
       baseName.textContent=base.name;baseVariant.textContent=base.color+(seed.size?' · '+seed.size:'');
       candidate.textContent=next.name+' · '+next.color;
       add.disabled=pending[otherPart()];
@@ -106,9 +118,16 @@
     const im=new Image();slot={ready:false,promise:null};cache.set(v.src,slot);
     slot.promise=new Promise((resolve,reject)=>{
       const done=()=>{slot.ready=true;resolve();};
-      im.onload=()=>{ if(im.decode)im.decode().then(done,done); else done(); };
+      im.onload=()=>{
+        if(!im.decode){done();return;}
+        // Some low-power/embedded webviews hold decode() until the next paint. The bytes are
+        // already loaded; never leave a fitting or the cart CTA waiting indefinitely on paint.
+        const fallback=setTimeout(done,240);
+        const decoded=()=>{clearTimeout(fallback);done();};
+        im.decode().then(decoded,decoded);
+      };
       im.onerror=()=>{cache.delete(v.src);reject(new Error('Plate not available'));};
-      im.src=v.src;
+      setPlate(im,v);
     });
     return slot;
   }
@@ -118,7 +137,7 @@
     const token=++tokens[p];
     const done=()=>{
       if(tokens[p]!==token)return;
-      pending[p]=false;selection[p]=v;layers[p].src=v.src;widgets[p].update();updateText();
+      pending[p]=false;selection[p]=v;setPlate(layers[p],v);widgets[p].update();updateText();
       if(seed)paintVestuario();
       notice.textContent=byDrop?'Prenda colocada.':'';
       if(!seed)try{sessionStorage.setItem(memoryKey,JSON.stringify({top:selection.top.key,bottom:selection.bottom.key}));}catch{}
@@ -171,7 +190,7 @@
     if(next!==d.part||d.v===selection[d.part])return;
     const show=()=>{
       if(drag!==d||d.over!==d.part)return;
-      const layer=previews[d.part];layer.src=d.v.src;layer.hidden=false;layers[d.part].hidden=true;
+      const layer=previews[d.part];setPlate(layer,d.v);layer.hidden=false;layers[d.part].hidden=true;
     };
     const slot=prefetch(d.v);
     if(slot.ready)show();else slot.promise.then(show,()=>{});
@@ -239,7 +258,7 @@
   const touch=(list,id)=>Array.from(list||[]).find(t=>t.identifier===id);
   host.addEventListener('pointerdown',e=>{
     const b=fitOption(e);if(!b||!e.isPrimary||e.button!==0)return;
-    if(e.pointerType==='touch'&&!e.target.closest('.nmFitting__grip'))return;
+    if(e.pointerType==='touch'&&!e.target.closest('.nmFitting__grip')&&!b.className.includes('nmFitting__swatch'))return;
     arm(b,'pointer',e.pointerId,...xy(e),false);
   });
   window.addEventListener('pointermove',e=>{
@@ -288,33 +307,55 @@
 
   function addOption(b,part,get){
     b.dataset.fitOption='';options.set(b,{part,get});b.addEventListener('click',()=>select(part,get()));
+    const prime=()=>{if(part!==seed?.part)prefetch(get()).promise.catch(()=>{});};
+    b.addEventListener('pointerenter',prime,{passive:true});b.addEventListener('focus',prime);
   }
-  for (const part of parts) {
-    const area=make('fieldset','nmFitting__part'),legend=make('legend','nmFitting__legend',part==='top'?'Camisa':'Pantalón o short');
-    const choices=make('div','nmFitting__choices'), names=[];
-    const colorRow=make('div','nmFitting__colorRow'),colors=make('div','nmFitting__colors');
-    colors.setAttribute('role','group');colors.setAttribute('aria-label','Color de '+legend.textContent);
-    const colorName=make('span','nmFitting__colorName'),link=make('a','nmFitting__link','Ver prenda'),linkArrow=make('span',null,'↗');
-    linkArrow.setAttribute('aria-hidden','true');link.append(linkArrow);colorRow.append(colors,colorName,link);
-    for (const id of [...new Set(lists[part].map(v=>v.id))]) {
-      const variants=lists[part].filter(v=>v.id===id),first=variants[0],b=make('button','nmFitting__choice');
-      const label=make('span','nmFitting__choiceName',first.name),grip=make('span','nmFitting__grip');
-      grip.setAttribute('aria-hidden','true');grip.append(make('span'));b.append(label,grip);b.type='button';b.dataset.fitProduct=id;
-      addOption(b,part,()=>selection[part].id===id?selection[part]:variants.find(v=>v.color===selection[part].color)||first);
-      names.push([b,id]);choices.append(b);
+  for(const part of parts){
+    const rail=make('div','nmFitting__rail nmFitting__rail--'+part),area=make('fieldset','nmFitting__part');
+    const legend=make('legend','nmFitting__legend',part==='top'?'Camisas':'Pantalones y shorts');
+    const choices=make('div','nmFitting__choices'),cards=[],remember=new Map();
+    const link=make('a','nmFitting__link','Ver prenda'),arrow=make('span',null,'↗');arrow.setAttribute('aria-hidden','true');link.append(arrow);
+    const groups=new Map();
+    for(const v of lists[part]){if(!groups.has(v.id))groups.set(v.id,[]);groups.get(v.id).push(v);}
+    for(const [id,variants] of groups){
+      const first=variants[0], card=make('div','nmFitting__card'),b=make('button','nmFitting__choice');
+      const thumb=make('img','nmFitting__thumb'),grip=make('span','nmFitting__grip'),badge=make('span');
+      const caption=make('span','nmFitting__caption'),name=make('span','nmFitting__choiceName',first.label),color=make('span','nmFitting__colorName');
+      thumb.alt='';thumb.decoding='async';thumb.loading='lazy';thumb.setAttribute('draggable','false');
+      badge.setAttribute('aria-hidden','true');grip.append(badge);grip.setAttribute('aria-hidden','true');
+      caption.append(name,color);b.append(thumb,grip,caption);b.type='button';b.dataset.fitProduct=id;
+      const get=()=>remember.get(id)||first;
+      addOption(b,part,get);
+      card.dataset.fitCard=id;card.append(b);
+      const swatches=new Map();
+      if(variants.length===1){b.dataset.fitColor=first.key;}
+      else{
+        card.dataset.fitMulti='';
+        const colors=make('div','nmFitting__colors');colors.dataset.fitCount=String(variants.length);
+        colors.setAttribute('role','group');colors.setAttribute('aria-label','Color de '+first.name);
+        for(const v of variants){
+          const dotButton=make('button','nmFitting__swatch');dotButton.type='button';dotButton.dataset.fitColor=v.key;
+          dotButton.title=v.color;dotButton.setAttribute('aria-label',v.name+', '+v.color);
+          const dot=make('span');dot.style.setProperty('--nm-fit-swatch',v.swatch);dot.setAttribute('aria-hidden','true');dotButton.append(dot);
+          swatches.set(v,dotButton);colors.append(dotButton);addOption(dotButton,part,()=>v);
+        }
+        card.append(colors);
+      }
+      cards.push({id,card,b,thumb,color,get,swatches});choices.append(card);
     }
-    const swatches=new Map();
-    for(const v of lists[part]){
-      const b=make('button','nmFitting__swatch');b.type='button';
-      b.dataset.fitColor=v.key;b.title=v.color;b.setAttribute('aria-label',v.color);
-      const dot=make('span');dot.style.setProperty('--nm-fit-swatch',v.swatch);dot.setAttribute('aria-hidden','true');b.append(dot);
-      addOption(b,part,()=>v);colors.append(b);swatches.set(v,b);
-    }
-    area.append(legend,choices,colorRow);side.append(area);
-    widgets[part]={area,update(){
-      const cur=selection[part];for(const [b,id] of names)b.setAttribute('aria-pressed',String(id===cur.id));
-      for(const [v,b] of swatches){b.hidden=v.id!==cur.id;b.setAttribute('aria-pressed',String(v===cur));}
-      colorName.textContent=cur.color;
+    area.append(legend,choices,link);rail.append(area);
+    widgets[part]={area,rail,update(){
+      const cur=selection[part];remember.set(cur.id,cur);
+      for(const {id,card,b,thumb,color,get,swatches} of cards){
+        const shown=get(),active=id===cur.id;
+        card.dataset.fitActive=String(active);b.setAttribute('aria-pressed',String(active));b.setAttribute('aria-label',shown.name+', '+shown.color);
+        // Reuse the *same* source nodes across interactions: do not break capture or keyboard focus.
+        if(card.dataset.fitVariant!==shown.key){
+          card.dataset.fitVariant=shown.key;color.textContent=shown.color;
+          thumb.hidden=!shown.front;if(shown.front)thumb.src=shown.front;
+        }
+        for(const [v,button] of swatches){button.setAttribute('aria-pressed',String(v===cur));button.dataset.fitShown=String(v===shown);}
+      }
       link.href='producto-'+cur.id+'.html?color='+encodeURIComponent(cur.color)+(seed?.part===part&&seed.size?'&talle='+encodeURIComponent(seed.size):'');
       link.setAttribute('aria-label','Ver '+cur.name+', '+cur.color);
     }};widgets[part].update();
@@ -329,13 +370,26 @@
     finish(false);seed=null;removeSeedQuery();notice.textContent='';
     for(const p of parts){
       ++tokens[p];pending[p]=false;
-      selection[p]=normalSelection[p];layers[p].src=selection[p].src;widgets[p].update();
+      selection[p]=normalSelection[p];setPlate(layers[p],selection[p]);widgets[p].update();
     }
     updateText();paintVestuario();title.focus({preventScroll:true});
   });
-  updateText();paintVestuario();side.append(action,notice);block.append(stage,side);
+  updateText();paintVestuario();side.append(action,notice);block.append(widgets.top.rail,stage,widgets.bottom.rail);
   title.tabIndex=-1;
-  host.append(title,intro,block);document.body.append(dragGhost);host.dataset.mounted='yes';host.hidden=false;
+  host.append(title,intro,block,side);document.body.append(dragGhost);host.dataset.mounted='yes';host.hidden=false;
+  // Warm only this fitting when it comes into view. Never compete with the homepage hero.
+  if('IntersectionObserver' in window){
+    const lookAhead=new IntersectionObserver(entries=>{
+      if(!entries.some(e=>e.isIntersecting))return;
+      lookAhead.disconnect();
+      if(window.navigator?.connection?.saveData)return;
+      const queue=parts.flatMap(p=>lists[p]),warm=async()=>{
+        for(const v of queue){try{await prefetch(v).promise;}catch{}}
+      };
+      if(window.requestIdleCallback)window.requestIdleCallback(warm,{timeout:900});else setTimeout(warm,100);
+    },{rootMargin:'180px 0px'});
+    lookAhead.observe(host);
+  }
   if(seed&&window.location?.hash==='#probador')requestAnimationFrame(()=>{
     host.scrollIntoView({block:'start',behavior:'instant'});title.focus({preventScroll:true});
   });
