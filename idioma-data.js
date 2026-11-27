@@ -144,6 +144,7 @@ Agregar a la bolsa|Adicionar à sacola
 Agregar al carrito|Adicionar ao carrinho
 Agregar look al carrito|Adicionar look ao carrinho
 Agregar las dos prendas|Adicionar as duas peças
+Tu look|Seu look
 Este look no está disponible completo.|Este look não está disponível completo.
 Elegí el talle de cada prenda que lo requiere.|Selecione o tamanho de cada peça que precisa de um.
 No pudimos guardar el look. Probá de nuevo.|Não foi possível salvar o look. Tente novamente.
@@ -258,7 +259,7 @@ Azul claro|Azul-claro|Azul Claro
 Blanco roto|Off-white|OFF
 Natural|Natural
 Safari|Safari
-Camisa de gasa doble de puro algodón. Liviana, con la textura natural de la tela.|Camisa em gaze dupla de algodão, leve e com a textura natural do tecido.|É uma camisa em gaze dupla 100% algodão, leve, com textura natural e um visual sofisticado sem ficar formal demais.
+Camisa de gasa doble, 100% algodón. Liviana y respirable, con textura natural. Cómoda sin perder elegancia.|Camisa em gaze dupla, 100% algodão. Leve e respirável, com textura natural. Confortável sem perder a elegância.
 Camisa de puro algodón con trama rústica y textura marcada.|Camisa de algodão com trama rústica e textura marcante.|É uma camisa 100% algodão com trama de aspecto rústico. Traz textura e personalidade para um look casual elegante.
 Short de lino y viscosa, suave y liviano, con cintura ajustable.|Short de linho com viscose, toque macio, caimento leve e cintura ajustável.|É um short de linho com viscose, com toque macio, caimento leve e cintura ajustável. Ideal para um visual de verão mais elegante.
 Pantalón de lino con elastano, de caída suave y cómodo para moverse.|Calça de linho com elastano, com caimento leve e liberdade de movimento.|É uma calça de linho com elastano, que combina uma aparência arrumada com liberdade de movimento.

@@ -500,6 +500,14 @@ function outfitDrawer(look,opener){
  }
  body.append(confirm,status);update();
 }
+// Probador and the Shopify theme share the same exact-variant bridge.
+window.NM_LOOK_CART=Object.freeze({
+ can:canBagLook,
+ open(look,opener){
+  if(drawer.open||!canBagLook(look))return false;
+  outfitDrawer(look,opener);return true;
+ }
+});
 function lookBagButton(look){
  const action=btn('Agregar look al carrito',()=>outfitDrawer(look,action),'buy buildLook');
  action.setAttribute('aria-haspopup','dialog');return action;

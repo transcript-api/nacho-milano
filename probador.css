@@ -110,3 +110,11 @@
 @media(max-width:380px){
  .nmFitting__colors[data-fit-count="4"]{grid-template-columns:repeat(2,minmax(24px,30px))}
 }
+
+/* Below the center stage; never overlays the zoom or drop zones. */
+.nmFitting__center{min-width:0;display:grid;gap:clamp(7px,1.15vw,14px)}
+.nmFitting__pair{justify-self:center;max-width:310px;min-height:44px;min-width:0;margin:0;line-height:1.24;text-align:center}
+.nmFitting__pair[hidden]{display:none!important}
+.nmFitting__pair:disabled{opacity:.55;cursor:wait}
+.nmFitting__pair:focus-visible{outline:2px solid var(--fit-ink);outline-offset:2px}
+@media(max-width:620px){.nmFitting__pair{font-size:clamp(.69rem,2.65vw,.8rem);padding-inline:4px}}

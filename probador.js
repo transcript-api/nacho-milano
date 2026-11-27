@@ -60,6 +60,16 @@
   host.setAttribute('aria-labelledby',title.id);
   host.setAttribute('aria-describedby',intro.id);
   const stage=make('div','nmFitting__stage'), photo=make('div','nmFitting__photo');
+  const center=make('div','nmFitting__center');
+  const pairButton=make('button','buy nmFitting__pair','Agregar las dos prendas');
+  pairButton.type='button';pairButton.setAttribute('aria-haspopup','dialog');pairButton.hidden=true;
+  center.append(stage,pairButton);
+  const pairLook=()=>({name:'Tu look',label:'NACHO MILANO',items:parts.map(p=>({id:selection[p].id,color:selection[p].color}))});
+  function paintPair(){
+    const api=window.NM_LOOK_CART;
+    pairButton.hidden=Boolean(seed)||typeof api?.open!=='function'||!api.can?.(pairLook());
+    pairButton.disabled=pending.top||pending.bottom;
+  }
   const guide=make('p','nmFitting__guide'); guide.setAttribute('aria-hidden','true');
   const visual=make('div','nmFitting__render');visual.setAttribute('role','img');
   const side=make('div','nmFitting__controls'), notice=make('p','nmFitting__notice');
@@ -231,6 +241,7 @@
       delete host.dataset.fitWardrobe;title.textContent='Probador';intro.textContent='Arrastrá una prenda al maniquí o tocala para probártela.';
       for(const p of parts)widgets[p].area.hidden=false;
     }
+    paintPair();
   }
   function prefetch(v){
     const source=platePaths(v)[0];
@@ -258,17 +269,17 @@
     const done=()=>{
       if(tokens[p]!==token)return;
       pending[p]=false;selection[p]=v;setPlate(layers[p],v);widgets[p].update();updateText();
-      if(seed)paintVestuario();
+      if(seed)paintVestuario();else paintPair();
       notice.textContent=byDrop?'Prenda colocada.':'';
       if(!seed)try{sessionStorage.setItem(memoryKey,JSON.stringify({top:selection.top.key,bottom:selection.bottom.key}));}catch{}
     };
     if(v===selection[p]){done();return;}
     const slot=prefetch(v);
     if(slot.ready)done();else{
-      pending[p]=true;if(seed)paintVestuario();
+      pending[p]=true;if(seed)paintVestuario();else paintPair();
       slot.promise.then(done,()=>{
         if(tokens[p]!==token)return;
-        pending[p]=false;if(seed)paintVestuario();
+        pending[p]=false;if(seed)paintVestuario();else paintPair();
         notice.textContent='No se pudo cargar esa variante. Probá de nuevo.';
       });
     }
@@ -480,6 +491,12 @@
       link.setAttribute('aria-label','Ver '+cur.name+', '+cur.color);
     }};widgets[part].update();
   }
+  pairButton.addEventListener('click',()=>{
+    if(seed||pairButton.hidden||pending.top||pending.bottom||drag?.active||zooming)return;
+    const api=window.NM_LOOK_CART,look=pairLook();
+    if(api?.can?.(look))api.open(look,pairButton);
+  });
+  document.addEventListener('nm:look-cart-ready',paintPair);
   add.addEventListener('click',()=>{
     if(!seed||pending[otherPart()])return;
     const next=selection[otherPart()];
@@ -494,7 +511,7 @@
     }
     updateText();paintVestuario();title.focus({preventScroll:true});
   });
-  updateText();paintVestuario();side.append(action,notice);block.append(widgets.top.rail,stage,widgets.bottom.rail);
+  updateText();paintVestuario();side.append(action,notice);block.append(widgets.top.rail,center,widgets.bottom.rail);
   title.tabIndex=-1;
   host.append(title,intro,block,side);document.body.append(dragGhost);host.dataset.mounted='yes';host.hidden=false;resizePlates();
   // Warm only this fitting when it comes into view. Never compete with the homepage hero.
