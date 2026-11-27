@@ -20,7 +20,7 @@
   const parts = ['top', 'bottom'];
   const openingPair={top:'rustic-safari',bottom:'short-natural'};
   const compactNames={'nm-calca-de-linho-com-elastano':'Pantalón de lino','nm-short-linho-ultra-premium':'Short de lino'};
-  const plateFile=key=>key.startsWith('rustic-')?key+'-abierta':key;
+  const plateFile=key=>key.startsWith('calca-')?key+'-lino-cordon':key.startsWith('rustic-')?key+'-trama':key;
   const lists = {};
   for (const p of parts) {
     lists[p] = garments[p].flatMap(([id, variants]) => {

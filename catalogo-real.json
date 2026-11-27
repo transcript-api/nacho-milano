@@ -159,33 +159,33 @@
       {
         "name": "Preto",
         "photos": {
-          "front": "assets/coleccion-detalles/calca-preto-frente-v2.webp",
+          "front": "assets/coleccion-detalles/calca-preto-frente-cordon.webp",
           "back": "assets/coleccion-detalles/calca-preto-espalda.webp",
           "texture": "assets/coleccion-detalles/calca-preto-textura.webp",
           "profile": "assets/coleccion-detalles/calca-preto-perfil-v2.webp",
-          "ambient": "assets/coleccion-detalles/calca-preto-ambientada.webp"
+          "ambient": "assets/coleccion-detalles/calca-preto-ambientada-cordon.webp"
         },
         "illustration": true
       },
       {
         "name": "Branco",
         "photos": {
-          "front": "assets/coleccion-detalles/calca-branco-frente.webp",
+          "front": "assets/coleccion-detalles/calca-branco-frente-cordon.webp",
           "back": "assets/coleccion-detalles/calca-branco-espalda.webp",
           "texture": "assets/coleccion-detalles/calca-branco-textura.webp",
           "profile": "assets/coleccion-detalles/calca-branco-perfil-v2.webp",
-          "ambient": "assets/coleccion-detalles/calca-branco-ambientada.webp"
+          "ambient": "assets/coleccion-detalles/calca-branco-ambientada-cordon.webp"
         },
         "illustration": true
       },
       {
         "name": "Bege",
         "photos": {
-          "front": "assets/coleccion-detalles/calca-bege-frente-v2.webp",
+          "front": "assets/coleccion-detalles/calca-bege-frente-cordon.webp",
           "back": "assets/coleccion-detalles/calca-bege-espalda.webp",
           "texture": "assets/coleccion-detalles/calca-bege-textura.webp",
           "profile": "assets/coleccion-detalles/calca-bege-perfil-v2.webp",
-          "ambient": "assets/coleccion-detalles/calca-bege-ambientada.webp"
+          "ambient": "assets/coleccion-detalles/calca-bege-ambientada-cordon.webp"
         },
         "illustration": true
       }
