@@ -1,6 +1,8 @@
+.nmHome #bar .brandMark{position:relative}
 .nmHome #bar .brandMark img{display:block}
+.nmHome #bar .brandMark::after{content:"";position:absolute;top:50%;left:50%;width:clamp(133px,13vw,185px);height:100%;transform:translate(-50%,-50%);background:url("assets/marca-horizontal.svg") center / contain no-repeat;opacity:var(--logo-intro,0);pointer-events:none}
+@media(max-width:650px){.nmHome #bar .brandMark::after{width:clamp(102px,34vw,143px)}}
 .nmHome[data-logo-stage] #bar .brandMark img{opacity:var(--logo-dock,1)}
-.nmHome #bar .brandMark:focus-visible img{opacity:1}
 .nmHome[data-logo-stage="voyage"] .campaignWordmark,
 .nmHome[data-logo-stage="header"] .campaignWordmark{opacity:0}
 .nmHome .nmLogoTransit{display:block;position:fixed;inset:0 auto auto 0;pointer-events:none;z-index:17;overflow:visible;visibility:hidden;transform-origin:0 0;will-change:transform,opacity}

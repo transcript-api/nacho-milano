@@ -40,11 +40,18 @@
     tick=0;
     if(measured||!measures)measure();
     const m=measures;
-    if(quiet.matches||!m){
+    if(!m){
       setStage('');destination.style.removeProperty('--logo-dock');
       media.style.removeProperty('transform');previousGoal=null;frameTime=0;return;
     }
     const y=Math.max(0,scrollY),goal=clamp(y,0,m.limit);
+    if(quiet.matches){
+      const atHeader=y>=m.limit;
+      setStage(atHeader?'header':'hero');
+      destination.style.setProperty('--logo-dock',atHeader?'1':'0');
+      bar.style.setProperty('--logo-intro',atHeader?'0':'1');
+      media.style.removeProperty('transform');previousGoal=null;frameTime=0;return;
+    }
     const dt=frameTime?Math.min(33,Math.max(0,now-frameTime)):16;
     frameTime=now;
     if(previousGoal===null||goal===0||goal===m.limit||Math.abs(goal-previousGoal)>112)position=goal;
@@ -56,6 +63,7 @@
     previousGoal=goal;
     const p=clamp(position/m.limit), stage=p===0?'hero':p===1?'header':'voyage';
     setStage(stage);
+    bar.style.setProperty('--logo-intro',(1-smooth((p-.875)/.05)).toFixed(4));
     const ease=smooth(p);
     media.style.transform=p===0?'':'scale('+(1+ease*.034).toFixed(4)+')';
     if(stage==='voyage'){

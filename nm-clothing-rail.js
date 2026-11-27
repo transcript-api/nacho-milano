@@ -28,7 +28,82 @@
       // On touch the native scroll position is the source of truth. Snap, arrow
       // navigation and a slow finger drag all display the same garment.
       let scrollFrame=0,measureFrame=0,compactMotion=false,scrollBusy=false,pendingIndex=null;
-      let centers=[],strengths=items.map(()=>null);
+      const row=track.querySelector('.nmRail__items');
+      const originals=items.map((node,i)=>({node,i,replica:false}));
+      const byNode=new WeakMap(originals.map(slot=>[slot.node,slot]));
+      const copiesByProduct=items.map(()=>[]);
+      let slots=originals, centers=[], strengths=[], physicalActive=null;
+      let loop=false, pendingSlot=null, physical=0, rebasedLeft=null, mirrors=null;
+      const copies=2; // Two runs each way preserve native flick momentum across the seam.
+      const master=i=>i+(loop?copies*items.length:0);
+      function mirror(slot){
+        // The replicas never own links, buttons, identity or cart state.
+        const source=items[slot.i],shadow=slot.node;
+        for(const name of ['data-rail-front-lost','data-rail-side-lost']){
+          shadow.toggleAttribute(name,source.hasAttribute(name));
+        }
+        const tag=source.querySelector('.nmRail__tag'),copyTag=shadow.querySelector('.nmRail__tag');
+        if(tag&&copyTag&&tag.textContent!==copyTag.textContent)copyTag.textContent=tag.textContent;
+        const imgs=source.querySelectorAll('.nmRail__photo'),cloneImgs=shadow.querySelectorAll('.nmRail__photo');
+        imgs.forEach((im,n)=>{
+          for(const attr of ['src','srcset','data-rail-unavailable']){
+            const value=im.getAttribute(attr),dest=cloneImgs[n];
+            if(value===dest.getAttribute(attr))continue;
+            if(value===null)dest.removeAttribute(attr);else dest.setAttribute(attr,value);
+          }
+        });
+      }
+      function buildRun(){
+        const fragment=document.createDocumentFragment(),run=[];
+        for(const {node:source,i} of originals){
+          const node=document.createElement('div');
+          node.className=source.className;
+          node.setAttribute('aria-hidden','true');
+          node.setAttribute('data-rail-replica','');
+          for(const key of ['data-side','data-hanger']){
+            if(source.hasAttribute(key))node.setAttribute(key,source.getAttribute(key));
+          }
+          const surface=document.createElement('span');
+          surface.className=buttons[i].className;
+          surface.append(...Array.from(buttons[i].childNodes,child=>child.cloneNode(true)));
+          surface.querySelectorAll('[id]').forEach(el=>el.removeAttribute('id'));
+          surface.querySelectorAll('.nmRail__photo').forEach(im=>{
+            im.loading='lazy';im.setAttribute('fetchpriority','low');
+          });
+          node.append(surface);fragment.append(node);
+          const slot={node,i,replica:true};
+          byNode.set(node,slot);copiesByProduct[i].push(slot);run.push(slot);
+        }
+        return {run,fragment};
+      }
+      function setLoop(enabled){
+        if(enabled===loop)return;
+        loop=enabled;pendingSlot=null;rebasedLeft=null;physicalActive=null;
+        if(loop){
+          const before=[],after=[];
+          for(let n=0;n<copies;n++){
+            const left=buildRun(),right=buildRun();
+            row.insertBefore(left.fragment,items[0]);row.append(right.fragment);
+            before.push(...left.run);after.push(...right.run);
+          }
+          slots=[...before,...originals,...after];
+          mirrors=new MutationObserver(records=>{
+            const changed=new Set(records.map(entry=>{
+              const target=entry.target.nodeType===1?entry.target:entry.target.parentElement;
+              return byNode.get(target?.closest('.nmRail__item'))?.i;
+            }));
+            for(const n of changed)if(n!==undefined)copiesByProduct[n].forEach(mirror);
+          });
+          items.forEach(node=>mirrors.observe(node,{subtree:true,childList:true,characterData:true,attributes:true,
+            attributeFilter:['src','srcset','data-rail-unavailable','data-rail-front-lost','data-rail-side-lost']}));
+        }else{
+          mirrors?.disconnect();mirrors=null;
+          for(const list of copiesByProduct)for(const slot of list.splice(0))slot.node.remove();
+          slots=originals;
+        }
+        track.style.setProperty('--nm-rack-count',String(slots.length));
+        strengths=slots.map(()=>null);
+      }
       const poses=items.map(()=>({x:0,dx:0,y:0,dy:0,z:0,dz:0,a:0,da:0,t:0,dt:0}));
       function monitorFrames(){
         // A failed selected density is not a failed garment. Prefer the other
@@ -108,13 +183,15 @@
       function paint(){
         scrollFrame=0;
         if(!compactMotion||!centers.length||dialog.open)return;
-        const x=track.scrollLeft+track.clientWidth/2;
-        let nearest=0,dist=Infinity;
-        for(let i=0;i<centers.length;i++){
-          const d=Math.abs(centers[i]-x);
-          if(d<dist){nearest=i;dist=d;}
+        let x=track.scrollLeft+track.clientWidth/2;
+        let nearest=closestSlot(x);
+        // Normally recenter only after native momentum/snap. The outer guard
+        // is for an unusually long trackpad drag or a multi-page fling.
+        if(loop&&(nearest<=1||nearest>=slots.length-2)){
+          nearest=rebase(nearest);x=track.scrollLeft+track.clientWidth/2;
         }
-        for(let i=0;i<items.length;i++){
+        physical=nearest;
+        for(let i=0;i<slots.length;i++){
           const offset=x-centers[i];
           const neighbor=offset<0?centers[i-1]:centers[i+1];
           const fallback=centers[i===0?1:i-1];
@@ -127,7 +204,7 @@
           const v=Math.round(progress*256);
           if(v!==strengths[i]){
             strengths[i]=v;
-            const f=v/256,st=items[i].style;
+            const f=v/256,st=slots[i].node.style;
             st.setProperty('--rail-front-alpha',f.toFixed(3));
             st.setProperty('--rail-side-alpha',(1-f).toFixed(3));
             st.setProperty('--rail-front-angle',(-54*(1-f)).toFixed(2)+'deg');
@@ -137,31 +214,86 @@
             st.setProperty('--rail-garment-scale',(.87+.13*f).toFixed(3));
           }
         }
-        label(nearest);
+        if(physicalActive?.replica&&physicalActive!==slots[nearest])physicalActive.node.removeAttribute('data-active');
+        physicalActive=slots[nearest];
+        if(physicalActive.replica)physicalActive.node.setAttribute('data-active','');
+        label(physicalActive.i);
+      }
+      function closestSlot(x=track.scrollLeft+track.clientWidth/2){
+        let chosen=0,dist=Infinity;
+        for(let i=0;i<centers.length;i++){
+          const delta=Math.abs(centers[i]-x);
+          if(delta<dist){chosen=i;dist=delta;}
+        }
+        return chosen;
+      }
+      function rebase(at){
+        const canonical=master(slots[at].i);
+        if(canonical===at)return at;
+        const previous=track.scrollLeft;
+        const snap=track.style.scrollSnapType;
+        track.style.scrollSnapType='none';
+        track.scrollTo({left:previous+centers[canonical]-centers[at],behavior:'instant'});
+        rebasedLeft=track.scrollLeft;
+        track.style.scrollSnapType=snap;
+        if(drag?.on)drag.origin+=rebasedLeft-previous;
+        return canonical;
+      }
+      function moveSlot(at,instant=false){
+        if(!slots[at])return;
+        pendingSlot=at;pendingIndex=slots[at].i;
+        const target=centers[at]-track.clientWidth/2;
+        // Very fast repeated clicks may otherwise reset the timer while the
+        // browser is still starting each successive smooth scroll.
+        scrollBusy=true;clearTimeout(scrollTimer);
+        center(slots[at].node,instant);
+        scrollTimer=setTimeout(settle,Math.abs(track.scrollLeft-target)<=1?0:210);
+        if(instant||reduced.matches)paint();else requestPaint();
+        arm();
+      }
+      function advance(direction){
+        if(!loop||!compactMotion){select((pendingIndex??index)+direction,true);return;}
+        let at=pendingSlot??closestSlot();
+        if(at+direction<=1||at+direction>=slots.length-2){
+          const current=closestSlot();
+          const wanted=slots[at].i;
+          rebase(current);at=master(wanted);
+        }
+        moveSlot(at+direction);
       }
       function requestPaint(){if(!scrollFrame)scrollFrame=requestAnimationFrame(paint)}
       function measure(){
         measureFrame=0;
-        const was=compactMotion;
+        const was=compactMotion,oldLoop=loop;
         compactMotion=compact.matches&&items.length>1&&track.scrollWidth>track.clientWidth+1;
+        setLoop(compactMotion&&!editor&&root.id==='perchero'&&!!row);
         track.toggleAttribute('data-glide',compactMotion);
         if(compactMotion){
           const t=track.getBoundingClientRect();
-          centers=items.map(el=>{const r=el.getBoundingClientRect();return track.scrollLeft+r.left-t.left+r.width/2});
-          if(!held&&!scrollBusy)center(items[pendingIndex??index],true);
+          centers=slots.map(({node})=>{const r=node.getBoundingClientRect();return track.scrollLeft+r.left-t.left+r.width/2});
+          if(oldLoop!==loop){
+            scrollBusy=false;pendingIndex=null;pendingSlot=null;
+            center(items[index],true);
+          }else if(!held&&!scrollBusy)center(items[pendingIndex??index],true);
           paint();
-        }else if(was){centers=[];strengths.fill(null);pendingIndex=null;}
+        }else if(was){
+          centers=[];strengths=[];pendingIndex=null;pendingSlot=null;
+          scrollBusy=false;clearTimeout(scrollTimer);label(index);
+        }
       }
       function queueMeasure(){if(!measureFrame)measureFrame=requestAnimationFrame(measure)}
       function settle(){
-        clearTimeout(scrollTimer);scrollBusy=false;pendingIndex=null;
-        if(compactMotion)requestPaint();else if(!dialog.open&&!held&&performance.now()>=ignoreScrollUntil)select(nearest());
+        clearTimeout(scrollTimer);scrollBusy=false;pendingIndex=null;pendingSlot=null;
+        if(compactMotion){
+          if(loop&&!held&&!dialog.open)rebase(closestSlot());
+          paint();
+        }else if(!dialog.open&&!held&&performance.now()>=ignoreScrollUntil)select(nearest());
         arm();
       }
       function arm(){
         clearTimeout(timer);
         if(editor||paused||reduced.matches||!visible||held||hovering||scrollBusy||dialog.open||document.querySelector('dialog[open]')||document.hidden||(root.contains(document.activeElement)&&document.activeElement?.matches(':focus-visible'))||items.length<2)return;
-        timer=setTimeout(()=>select((pendingIndex??index)+1,true),Math.max(2000,Math.min(10000,Number(labels.interval)||4000)));
+        timer=setTimeout(()=>advance(1),Math.max(2000,Math.min(10000,Number(labels.interval)||4000)));
       }
       function center(el,instant){
         if(track.scrollWidth<=track.clientWidth+1)return;
@@ -175,6 +307,7 @@
         // Direct selection on a narrow rail animates its scroll; the facing
         // photograph and label follow its physical location, not a timer.
         if(compactMotion&&scroll){
+          if(loop){moveSlot(master(next),true);return;}
           pendingIndex=next;
           center(items[next],instant||Math.abs(before-next)>1);
           if(instant||reduced.matches)paint();else requestPaint();
@@ -195,7 +328,7 @@
         if(!play)return;
         play.setAttribute('aria-label',paused?labels.playLabel:labels.pauseLabel);
         play.setAttribute('aria-pressed',paused?'true':'false');
-        play.textContent=paused?'▷':'Ⅱ';
+        play.textContent=paused?labels.playLabel:labels.pauseLabel;
       }
       function face(view){
         if(!detailPaths[view]||!detailImage||!detailZoom)return;
@@ -253,7 +386,7 @@
       on(track,'pointerenter',e=>{if(e.pointerType==='mouse'){hovering=true;arm()}});
       on(track,'pointerleave',()=>{hovering=false;pointerX=null;lastBrush=null;kick();arm()});
       on(track,'pointermove',e=>{
-        if(e.pointerType!=='mouse'||!desktop.matches||held||dialog.open)return;
+        if(e.pointerType!=='mouse'||!desktop.matches||held||dialog.open||loop)return;
         const now=performance.now();
         const distance=lastBrush?e.clientX-lastBrush.x:0;
         if(lastBrush&&Math.abs(distance)<2)return;
@@ -283,6 +416,10 @@
       on(track,'scroll',()=>{
         if(dialog.open)return;
         if(compactMotion){
+          if(rebasedLeft!==null){
+            const own=Math.abs(track.scrollLeft-rebasedLeft)<1;
+            rebasedLeft=null;if(own){requestPaint();return;}
+          }
           scrollBusy=true;clearTimeout(timer);requestPaint();clearTimeout(scrollTimer);
           scrollTimer=setTimeout(settle,130);
           return;
@@ -290,16 +427,21 @@
         if(performance.now()<ignoreScrollUntil||drag?.on)return;
         clearTimeout(scrollTimer);scrollTimer=setTimeout(()=>{if(!held)select(nearest())},90);
       },{passive:true});
-      on(track,'scrollend',()=>{if(compactMotion)settle()},{passive:true});
+      on(track,'scrollend',()=>{if(compactMotion&&!dialog.open)settle()},{passive:true});
+      on(track,'click',e=>{
+        const slot=byNode.get(e.target.closest('.nmRail__item[data-rail-replica]'));
+        if(slot&&!dialog.open&&performance.now()>=blockClick)open(slot.i);
+      });
       on(track,'pointerdown',e=>{
         if(!e.isPrimary||e.button!==0)return;
-        held=true;scrollBusy=false;pendingIndex=null;clearTimeout(scrollTimer);
+        held=true;scrollBusy=false;pendingIndex=null;pendingSlot=null;clearTimeout(scrollTimer);
         if(e.pointerType==='touch'){
-          blockClick=0;touchPress={id:e.pointerId,x:e.clientX,y:e.clientY,at:items.indexOf(e.target.closest('.nmRail__item'))};
+          const slot=byNode.get(e.target.closest('.nmRail__item'));
+          blockClick=0;touchPress={id:e.pointerId,x:e.clientX,y:e.clientY,at:slot?.i??-1};
           if(performance.now()<ignoreScrollUntil)track.scrollTo({left:track.scrollLeft,behavior:'instant'});
         }
         ignoreScrollUntil=0;arm();
-        if(e.pointerType==='mouse')drag={id:e.pointerId,x:e.clientX,y:e.clientY,on:false,origin:track.scrollLeft,index};
+        if(e.pointerType==='mouse')drag={id:e.pointerId,x:e.clientX,y:e.clientY,on:false,origin:track.scrollLeft,index,physical};
       });
       on(window,'pointermove',e=>{
         if(touchPress?.id===e.pointerId){const dx=e.clientX-touchPress.x,dy=e.clientY-touchPress.y;if(Math.hypot(dx,dy)>13)touchPress.moved=true;}
@@ -321,7 +463,12 @@
 
         }
         track.removeAttribute('data-drag');kick();
-        if(d?.on){blockClick=performance.now()+420;const dx=e.clientX-d.x;select(d.index+(e.type==='pointerup'&&Math.abs(dx)>20?(dx<0?1:-1):0),true)}
+        if(d?.on){
+          blockClick=performance.now()+420;const dx=e.clientX-d.x;
+          const direction=e.type==='pointerup'&&Math.abs(dx)>20?(dx<0?1:-1):0;
+          if(loop)moveSlot(Math.max(0,Math.min(slots.length-1,d.physical+direction)));
+          else select(d.index+direction,true);
+        }
         arm();
       }
       on(window,'pointerup',release);on(window,'pointercancel',release);
@@ -331,7 +478,7 @@
         const target=wrap(e.key==='Home'?0:e.key==='End'?items.length-1:(pendingIndex??index)+(e.key==='ArrowRight'?1:-1));
         e.preventDefault();select(target,true);buttons[target].focus({preventScroll:true});
       });
-      on($('[data-rail-prev]'),'click',()=>select((pendingIndex??index)-1,true));on($('[data-rail-next]'),'click',()=>select((pendingIndex??index)+1,true));
+      on($('[data-rail-prev]'),'click',()=>advance(-1));on($('[data-rail-next]'),'click',()=>advance(1));
       on(play,'click',()=>{if(reduced.matches)return;paused=!paused;updatePlay();arm()});
       faceButtons.forEach((button,i)=>on(button,'click',()=>face(faceKeys[i])));
       on(detailZoom,'click',e=>{
@@ -398,11 +545,16 @@
       on(document,'visibilitychange',arm);
       on(document,'close',()=>queueMicrotask(arm),{capture:true});
       on(reduced,'change',()=>{requestPaint();if(reduced.matches)paused=true;if(play)play.hidden=reduced.matches||labels.autoplay!=='true';updatePlay();arm()});
-      on(this,'shopify:block:select',e=>{editor=true;clearTimeout(timer);const found=items.findIndex(el=>el===e.target||el.contains(e.target));if(found>=0)select(found,true,true)});
+      on(this,'shopify:block:select',e=>{
+        editor=true;clearTimeout(timer);
+        if(loop)measure();
+        const found=items.findIndex(el=>el===e.target||el.contains(e.target));if(found>=0)select(found,true,true);
+      });
       const sizing=typeof ResizeObserver==='function'?new ResizeObserver(queueMeasure):null;
       sizing?.observe(track);on(window,'resize',queueMeasure,{passive:true});on(window,'load',queueMeasure,{once:true});on(compact,'change',queueMeasure);
       this.cleanup=()=>{
         abort.abort();observer.disconnect();sizing?.disconnect();clearTimeout(timer);clearTimeout(scrollTimer);cancelAnimationFrame(poseFrame);cancelAnimationFrame(scrollFrame);cancelAnimationFrame(measureFrame);track.removeAttribute('data-glide');
+        setLoop(false);
         if(dialog.open)dialog.close();restoreScroll();delete this.cleanup;this.removeAttribute('data-ready');
       };
       this.setAttribute('data-ready','');

@@ -229,3 +229,8 @@
 #perchero .nmRail__item[data-rail-side-lost] .nmRail__photo--front{
   opacity:1!important;transform:none!important;
 }
+
+/* No playback glyph in the storefront. Preserve the text control for keyboard access. */
+.nmRail__controls{position:relative}
+.nmRail__controls [data-rail-play]{position:absolute;z-index:6;right:0;bottom:calc(100% + 6px);width:max-content;max-width:70vw;padding:0 12px;border:1px solid currentColor;background:var(--rail-bg,#fffefa);white-space:normal}
+.nmRail__controls [data-rail-play]:not(:focus){width:1px;height:1px;min-width:0;min-height:0;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);clip-path:inset(50%);border:0;white-space:nowrap}
