@@ -12,3 +12,43 @@
 .nmHome .heroMedia{transform-origin:66% 46%;will-change:transform}
 @media(max-width:650px){.nmHome .heroMedia{transform-origin:59% 43%}}
 @media(prefers-reduced-motion:reduce){.nmHome .heroMedia{transform:none!important}}
+
+/* Opening uses the same exact horizontal SVG as the stationary header mark. */
+.cover[data-nm-logo-reveal]{top:0;right:0;bottom:0;left:0}
+.cover[data-nm-logo-reveal] .coverLeaf{
+  background:#1e1e20;
+  transition-duration:.46s;
+}
+.cover[data-nm-logo-reveal] .coverCenter img{
+  width:clamp(236px,47vw,516px);
+  height:auto;
+  margin:0;
+  filter:brightness(0) invert(.97);
+  mix-blend-mode:normal;
+  animation:nmRevealEdge 1.28s cubic-bezier(.28,.04,.2,1) .10s both;
+}
+.cover[data-nm-logo-reveal].exiting .coverCenter{transform:none}
+@keyframes nmRevealEdge{
+  from{clip-path:inset(0 100% 0 0)}
+  to{clip-path:inset(0)}
+}
+@supports ((mask-image:linear-gradient(90deg,#000,transparent)) or (-webkit-mask-image:linear-gradient(90deg,#000,transparent))){
+  .cover[data-nm-logo-reveal] .coverCenter img{
+    -webkit-mask-image:linear-gradient(90deg,#000 43%,transparent 51%);
+    mask-image:linear-gradient(90deg,#000 43%,transparent 51%);
+    -webkit-mask-size:250% 100%;
+    mask-size:250% 100%;
+    -webkit-mask-repeat:no-repeat;
+    mask-repeat:no-repeat;
+    animation-name:nmRevealShadow;
+  }
+  @keyframes nmRevealShadow{
+    from{-webkit-mask-position:right center;mask-position:right center}
+    to{-webkit-mask-position:left center;mask-position:left center}
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .cover[data-nm-logo-reveal] .coverCenter img{
+    animation:none;-webkit-mask-image:none;mask-image:none;clip-path:none;
+  }
+}

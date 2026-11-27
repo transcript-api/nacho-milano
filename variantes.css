@@ -165,3 +165,13 @@
 @supports not (grid-template-rows:subgrid){
   .variantPair>.variantRow{grid-template-rows:minmax(var(--pair-heading,64px),auto) minmax(0,1fr)}
 }
+
+/* The product-row star stays visible; playback is text available on keyboard focus. */
+.variantRowActions .variantPlay{
+  position:absolute;z-index:5;right:48px;top:2px;width:max-content;max-width:66vw;height:auto;min-height:44px;
+  padding:0 12px;border:1px solid currentColor;border-radius:2px;background:#fffefa;
+}
+.variantRowActions .variantPlay:not(:focus){
+  width:1px;height:1px;min-height:0;margin:-1px;padding:0;overflow:hidden;
+  clip:rect(0,0,0,0);clip-path:inset(50%);border:0;white-space:nowrap;
+}

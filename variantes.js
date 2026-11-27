@@ -3,10 +3,9 @@
 'use strict';
 const cleanups=new WeakMap();
 const pairedShorts=new Set(['nm-short-linho-ultra-premium','nm-bermuda-champy']);
-const svg=(glyph)=>{
+const detailGlyph=()=>{
   const ns='http://www.w3.org/2000/svg',s=document.createElementNS(ns,'svg'),p=document.createElementNS(ns,'path');
-  const paths={pause:'M9 6v12m6-12v12',play:'m9 5 11 7-11 7Z',detail:'M7 11V7h4m2 10h4v-4M7 7l4 4m6 6-4-4'};
-  s.setAttribute('viewBox','0 0 24 24');s.setAttribute('aria-hidden','true');s.setAttribute('focusable','false');p.setAttribute('d',paths[glyph]);s.append(p);return s;
+  s.setAttribute('viewBox','0 0 24 24');s.setAttribute('aria-hidden','true');s.setAttribute('focusable','false');p.setAttribute('d','M7 11V7h4m2 10h4v-4M7 7l4 4m6 6-4-4');s.append(p);return s;
 };
 function motion(track,original,button){
   const abort=new AbortController(),l=(node,type,fn,opts={})=>node.addEventListener(type,fn,{signal:abort.signal,...opts});
@@ -48,8 +47,8 @@ function motion(track,original,button){
   }
   function updateButton(){
     button.hidden=reduce.matches;
-    button.setAttribute('aria-label',explicitPause?'Activar avance automático':'Pausar avance automático');
-    button.replaceChildren(svg(explicitPause?'play':'pause'));
+    const label=explicitPause?'Activar avance automático':'Pausar avance automático';
+    button.textContent=window.NM_LANG?.t(label)??label;
   }
   l(button,'click',()=>{
     explicitPause=!explicitPause;until=0;updateButton();arm();
@@ -148,7 +147,7 @@ function render(host,products,api){
         const texture=btn('',()=>{},'variantTexture');texture.dataset.variantAction='texture';
         const img=count===1&&!paired?image(macro):textureImage(macro,el,image);img.draggable=false;
         texture.setAttribute('aria-label','Ampliar: Primer plano · '+identity);texture.setAttribute('aria-haspopup','dialog');
-        texture.append(img,svg('detail'));visual.append(texture);
+        texture.append(img,detailGlyph());visual.append(texture);
       }
       const add=btn('',()=>{},'cardAdd');add.dataset.variantAction='add';add.append(glyph('bag'));
       add.setAttribute('aria-label','Agregar al carrito: '+identity);add.setAttribute('aria-haspopup','dialog');visual.append(add);
