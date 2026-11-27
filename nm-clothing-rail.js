@@ -30,6 +30,38 @@
       let scrollFrame=0,measureFrame=0,compactMotion=false,scrollBusy=false,pendingIndex=null;
       let centers=[],strengths=items.map(()=>null);
       const poses=items.map(()=>({x:0,dx:0,y:0,dy:0,z:0,dz:0,a:0,da:0,t:0,dt:0}));
+      function monitorFrames(){
+        // A failed selected density is not a failed garment. Prefer the other
+        // copy of that exact view, then one separately cached retry on 1x.
+        for(const [n,item] of items.entries())for(const view of ['front','side']){
+          const im=buttons[n].querySelector('.nmRail__photo--'+view);
+          if(!im?.getAttribute('src'))continue;
+          const normal=new URL(im.getAttribute('src'),document.baseURI);
+          const hd=im.dataset.railHd?new URL(im.dataset.railHd,document.baseURI):null;
+          const retry=new URL(normal);retry.searchParams.set('rail-fallback','1');
+          const offers=[normal.href,hd?.href,retry.href].filter(Boolean),seen=new Set();
+          let queued=false;
+          const attr='data-rail-'+view+'-lost';
+          const fail=()=>{
+            if(queued)return;
+            queued=true;
+            im.setAttribute('data-rail-unavailable','');
+            seen.add(im.currentSrc||im.src);
+            const next=offers.find(src=>!seen.has(src));
+            if(next){
+              im.removeAttribute('srcset');
+              im.src=next;
+            }else item.setAttribute(attr,'');
+            // A source replacement can emit another error; don't coalesce a
+            // genuine new network error, only a duplicate of the same turn.
+            queueMicrotask(()=>{queued=false});
+          };
+          on(im,'load',()=>{im.removeAttribute('data-rail-unavailable');item.removeAttribute(attr);});
+          on(im,'error',fail);
+          if(im.complete&&im.naturalWidth===0)fail();
+        }
+      }
+      if(root.id==='perchero')monitorFrames();
       function stepPose(now){
         const t=lastPose?Math.min(.032,(now-lastPose)/1000):1/60;
         lastPose=now;poseFrame=0;

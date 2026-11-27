@@ -24,10 +24,12 @@ const markup = rack.piezas.map((piece,index) => {
   for (const media of [c.photos?.front, c.photos?.back, c.photos?.texture, c.photos?.profile].filter(Boolean)) if (!exists(media)) throw Error('Falta foto de la ficha: '+media);
   const name = p.name+' · '+c.name, url='producto-'+p.id+'.html';
   if (!exists(url)) throw Error('Falta ficha: '+url);
-  const photo = (view,src,alt) => {
+  const photo = (view,src) => {
     const hd='assets/perchero-hd/'+src.split('/').pop();
-    const density=exists(hd)?' srcset="'+esc(src)+' 1x, '+esc(hd)+' 2x"':'';
-    return '<img class="nmRail__photo nmRail__photo--'+view+'" src="'+esc(src)+'"'+density+' width="380" height="512" alt="'+esc(alt)+'" loading="'+(index<7?'eager':'lazy')+'" decoding="async" draggable="false">';
+    const density=exists(hd)?' srcset="'+esc(src)+' 1x, '+esc(hd)+' 2x" data-rail-hd="'+esc(hd)+'"':'';
+    const priority=index===start&&view==='front'?'auto':'low';
+    return '<img class="nmRail__photo nmRail__photo--'+view+'" src="'+esc(src)+'"'+density+
+      ' width="380" height="512" alt="" aria-hidden="true" loading="eager" fetchpriority="'+priority+'" decoding="async" draggable="false">';
   };
   const ficha = url+'?color='+encodeURIComponent(c.name);
   const attrs = {'product-id':p.id,color:c.name,name,description:p.description||'',tag:c.name,url:ficha,large:c.photos?.front||piece.frente};
@@ -35,7 +37,7 @@ const markup = rack.piezas.map((piece,index) => {
   attrs.profile=c.photos?.profile||(exists(hdProfile)?hdProfile:piece.perfil);
   if(c.photos?.texture) attrs.texture=c.photos.texture;
   const data = Object.entries(attrs).map(([k,v])=>'data-'+k+'="'+esc(v)+'"').join(' ');
-  return '<div class="nmRail__item" data-side data-hanger="none" '+data+(index===start?' data-active':'')+'><button type="button" class="nmRail__piece" aria-label="'+esc(name)+'" aria-haspopup="dialog"><span class="nmRail__shape"><span class="nmRail__rotation">'+photo('front',piece.frente,name)+photo('side',piece.perfil,'')+'</span></span><span class="nmRail__tag">'+esc(c.name)+'</span></button><a class="nmRail__fallback" href="'+esc(ficha)+'">Ver prenda</a></div>';
+  return '<div class="nmRail__item" data-side data-hanger="none" '+data+(index===start?' data-active':'')+'><button type="button" class="nmRail__piece" aria-label="'+esc(name)+'" aria-haspopup="dialog"><span class="nmRail__shape"><span class="nmRail__rotation">'+photo('front',piece.frente)+photo('side',piece.perfil)+'</span></span><span class="nmRail__tag">'+esc(c.name)+'</span></button><a class="nmRail__fallback" href="'+esc(ficha)+'">Ver prenda</a></div>';
 });
 const existing=read('index.html');
 const identity='<!-- nm-rail:start -->';

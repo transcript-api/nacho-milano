@@ -175,3 +175,46 @@
   /* Keep transparent sprite gutters from creating phantom desktop scroll. */
   #perchero .nmRail__items{overflow:hidden;overflow:clip}
 }
+
+/* The transparent plates share the hook's crown at x=190, y=16 of 380×512.
+   Locate the rod from that registration, and rotate/scale on the same point. */
+#perchero.nmRail{
+  --nm-hook-ratio:.0421052632;
+  --nm-frame-width:calc((var(--rail-height) - 3px) * .7421875);
+  --nm-hook-offset:calc(var(--nm-frame-width) * var(--nm-hook-ratio));
+  --nm-rod-top:calc(13px + 3px + var(--nm-hook-offset) + .85px);
+}
+#perchero .nmRail__shape{
+  width:var(--nm-frame-width);
+  perspective-origin:50% var(--nm-hook-offset);
+}
+#perchero .nmRail__rotation,#perchero .nmRail__photo{
+  transform-origin:50% var(--nm-hook-offset);
+}
+#perchero .nmRail__items::before{
+  top:var(--nm-rod-top);left:5px;right:5px;height:10px;
+  border-radius:6px;
+  background:
+    linear-gradient(180deg,#fff8, #ffe1bd34 27%,#472d1517 65%,#4c311e79),
+    linear-gradient(92deg,#a9784a 0%,#bf986f 18%,#b98d61 40%,#caa37a 60%,#bc946c 84%,#ab7d50 100%);
+  box-shadow:0 4px 7px #35251726,inset 0 1px 0 #fff2d457;
+}
+#perchero .nmRail__items::after{
+  top:calc(var(--nm-rod-top) - 5.5px);height:21px;border:0;border-radius:4px;
+  background:
+    radial-gradient(circle at 5.5px 4px,#ab9b85 0 .85px,#463a30 1.1px,transparent 1.85px),
+    radial-gradient(circle at 5.5px 17px,#ab9b85 0 .85px,#463a30 1.1px,transparent 1.85px),
+    radial-gradient(circle at calc(100% - 5.5px) 4px,#ab9b85 0 .85px,#463a30 1.1px,transparent 1.85px),
+    radial-gradient(circle at calc(100% - 5.5px) 17px,#ab9b85 0 .85px,#463a30 1.1px,transparent 1.85px),
+    linear-gradient(90deg,#6e5c49,#58493c 11px,transparent 11px,transparent calc(100% - 11px),#58493c calc(100% - 11px),#6e5c49);
+  filter:drop-shadow(0 2px 2px #34291836);
+}
+@media(max-width:850px){
+  #perchero.nmRail{--nm-frame-width:var(--nm-center-width)}
+  #perchero.nmRail .nmRail__shape{width:var(--nm-frame-width)}
+}
+#perchero .nmRail__photo[data-rail-unavailable]{visibility:hidden}
+#perchero .nmRail__item[data-rail-front-lost] .nmRail__photo--side,
+#perchero .nmRail__item[data-rail-side-lost] .nmRail__photo--front{
+  opacity:1!important;transform:none!important;
+}
