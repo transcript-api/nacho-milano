@@ -42,7 +42,7 @@
 .nmFitting__choice[data-fit-lifted],.nmFitting__choice[data-fit-lifted] .nmFitting__grip,.nmFitting__swatch[data-fit-lifted]{cursor:grabbing}
 .nmFitting__choice[data-fit-lifted],.nmFitting__swatch[data-fit-lifted]{outline:1px dashed currentColor;outline-offset:2px}
 .nmFitting__zone{position:absolute;box-sizing:border-box;z-index:3;pointer-events:none;visibility:hidden;border:1px dashed #534f467d;border-radius:12px;background:#fffefa14}
-.nmFitting__zone--top{top:1%;right:15%;bottom:53%;left:15%}
+.nmFitting__zone--top{top:1%;right:15%;bottom:53.5%;left:15%}
 .nmFitting__zone--bottom{top:47%;right:19%;bottom:1%;left:19%}
 .nmFitting__stage[data-fit-dragging] .nmFitting__zone,.nmFitting__zone[data-fit-placed]{visibility:visible}
 .nmFitting__stage[data-fit-dragging="top"] .nmFitting__zone--bottom,.nmFitting__stage[data-fit-dragging="bottom"] .nmFitting__zone--top{border-color:#534f4650;background:transparent}

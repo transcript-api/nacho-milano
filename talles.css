@@ -1,0 +1,28 @@
+.nmSize{margin:1rem 0 1.15rem;padding:1rem 0 .13rem;border-top:1px solid #d4d1c9;color:#262521;font:400 .875rem/1.5 NachoShop,Arial,sans-serif;scroll-margin-top:88px}
+.nmSize h2{margin:0 0 .35rem;font:600 .98rem/1.4 NachoShop,Arial,sans-serif;letter-spacing:-.01em;color:#262521}
+.nmSize__instruction{max-width:39ch;margin:0 -.05rem .65rem}
+.nmSize__form label{display:block;font-size:.78rem;font-weight:630;margin:0 0 5px}
+.nmSize__action{display:grid;grid-template-columns:minmax(5.05rem,9rem) minmax(0,auto);justify-content:start;gap:.48rem}
+.nmSize__action input,.nmSize__action button{min-height:44px;border:1px solid #a5a197;border-radius:2px;padding:.4rem .65rem}
+.nmSize__action input{width:100%;background:#fff;color:#221f1d;font-size:16px}
+.nmSize__action button{font:550 .78rem/1.16 NachoShop,Arial,sans-serif;background:#272623;color:white;border-color:#272623;text-align:center}
+.nmSize__action button:hover{background:#494742}
+.nmSize :is(input,button,a,summary):focus-visible{outline:2px solid #272623;outline-offset:2px}
+.nmSize__hint{font-size:.75rem;color:#56524a;margin:.32rem 0 .18rem}
+.nmSize__answer{margin:.68rem 0 0;font-weight:580;max-width:42ch}
+.nmSize__answer:empty{display:none}
+.nmSize__answer[data-result="outside"],.nmSize__answer[data-result="body_outside"],.nmSize__answer[data-result="invalid"]{color:#703522}
+.nmSize__chart.garmentMeasure{margin:.6rem 0 0;border-block:0}
+.nmSize__chart > summary{padding:.6rem 0;min-height:44px;text-underline-offset:.16em;text-decoration:underline}
+.nmSize__contact{font-weight:570;text-decoration:underline;text-underline-offset:.16em;display:inline-flex;align-items:center;min-height:44px}
+.nmSize__answer:empty{display:block;margin:0}
+.nmSize__product{margin:.45rem 0 .65rem}
+.nmSize__color{font-size:.77rem;color:#56524a;margin:.25rem 0}
+.nmSize__extras{display:flex;flex-wrap:wrap;column-gap:17px}
+.nmSize__extras button{font:inherit;font-size:.78rem;font-weight:570;min-height:44px;padding:0;text-align:left;text-decoration:underline;text-underline-offset:.16em;color:#262521}
+.nmSize__extras button[aria-expanded=true]{color:#55504a}
+.nmSize__detail{max-width:44ch;font-size:.82rem;margin:.1rem 0 .7rem}
+
+.nmSize__modes{display:flex;gap:.25rem;margin:0 0 .55rem}
+.nmSize__modes button{min-height:44px;padding:.35rem .52rem;font:600 .76rem/1.15 NachoShop,Arial,sans-serif;color:#383530;border:1px solid #b3aea3;border-radius:2px}
+.nmSize__modes button[aria-pressed=true]{background:#eae5da;border-color:#71695d}
