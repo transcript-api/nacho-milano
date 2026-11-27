@@ -150,6 +150,7 @@ Cerrar detalle|Fechar detalhe
 Color|Cor
 Color seleccionado|Cor selecionada
 Colores del catálogo|Cores do catálogo
+1 color|1 cor
 Completá el look|Complete o look
 Detalle|Detalhe
 ELEGÍ EL COLOR|ESCOLHA A COR
@@ -279,6 +280,15 @@ Swell verde y lino|Swell verde e linho
 Camisa Swell verde con short de lino Natural.|Camisa Swell verde com short de linho natural.
 Arena y negro|Areia e preto
 Camisa Rústic Arena con pantalón de lino negro.|Camisa Rústic areia com calça de linho preta.
+Perfil|Perfil
+Textura|Textura
+Vistas de la prenda|Vistas da peça
+Cerrar vista de la prenda|Fechar visualização da peça
+Foto ampliable|Foto com ampliação
+Ampliar foto|Ampliar foto
+Acercar foto|Aproximar foto
+Ajustar|Ajustar
+Ajustar foto a la pantalla|Ajustar foto à tela
 `.trim().split('\n').map(s=>s.split('|'));
 window.NM_COPY=Object.freeze(rows.map(Object.freeze));
 })();

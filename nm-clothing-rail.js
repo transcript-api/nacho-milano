@@ -15,9 +15,12 @@
       const compact=matchMedia('(max-width: 850px)');
       const root=this, labels=this.dataset, buttons=items.map(el=>el.querySelector('button'));
       const activeText=$('[data-rail-active]'),count=$('[data-rail-count]'),play=$('[data-rail-play]');
-      const figure=$('.nmRail__figure'),spin=$('.nmRail__spin'),front=$('[data-front-img]'),back=$('[data-back-img]');
-      const link=$('.nmRail__link'),title=$('[data-rail-title]'),desc=$('[data-rail-desc]'),tag=$('[data-modal-tag]');
-      const endView=$('[data-face=back]'),frontView=$('[data-face=front]');
+      const figure=$('.nmRail__figure'), detailImage=$('[data-detail-image]'), detailZoom=$('[data-rail-zoom]');
+      const link=$('.nmRail__link'),title=$('[data-rail-title]'),desc=$('[data-rail-desc]'), viewStatus=$('[data-view-status]');
+      const faceKeys=['front','profile','texture'];
+      const faceNames={front:'Frente',profile:'Perfil',texture:'Textura'};
+      const faceButtons=faceKeys.map(key=>$('[data-face='+key+']'));
+      let detailPaths={}, detailName='', detailView='front', detailZoomName='', modalMute=0;
       let index=0, visible=false, held=false, hovering=false, editor=!!window.Shopify?.designMode;
       let paused=labels.autoplay!=='true'||reduced.matches, timer=0, scrollTimer=0, ignoreScrollUntil=0;
       let drag=null, blockClick=0, opener=null, modalSwipe=null, pageOverflow=null, poseFrame=0, lastPose=0, pointerX=null, lastBrush=null,touchPress=null;
@@ -161,23 +164,40 @@
         play.textContent=paused?'▷':'Ⅱ';
       }
       function face(view){
-        const useBack=view==='back'&&!endView.hidden;
-        spin.style.removeProperty('--nm-turn');spin.dataset.view=useBack?'back':'front';
-        front.setAttribute('aria-hidden',String(useBack));
-        back.setAttribute('aria-hidden',String(!useBack));
-        endView.setAttribute('aria-pressed',String(useBack));
-        frontView.setAttribute('aria-pressed',String(!useBack));
+        if(!detailPaths[view]||!detailImage||!detailZoom)return;
+        detailView=view;
+        const name=faceNames[view];
+        figure.dataset.view=view;
+        detailZoomName=detailName+' · '+name;
+        detailImage.alt=detailZoomName;
+        detailImage.src=detailPaths[view];
+        detailZoom.setAttribute('aria-label','Ampliar: '+name);
+        detailZoom.setAttribute('aria-haspopup','dialog');
+        for(const [i,key] of faceKeys.entries()){
+          faceButtons[i].hidden=!detailPaths[key];
+          faceButtons[i].setAttribute('aria-pressed',String(key===view));
+        }
+        viewStatus.textContent=name;
+        if(!reduced.matches&&detailImage.animate)detailImage.animate([{opacity:.48},{opacity:1}],{duration:170,easing:'ease-out'});
+      }
+      function stepView(direction){
+        const available=faceKeys.filter(key=>detailPaths[key]);
+        if(available.length<2)return;
+        const index=available.indexOf(detailView);
+        face(available[(index+direction+available.length)%available.length]);
       }
       function open(n){
         select(n);const d=items[n].dataset;
         const source=buttons[n].querySelector('.nmRail__photo--front');
+        const profile=buttons[n].querySelector('.nmRail__photo--side');
         opener=buttons[n];title.textContent=d.name;desc.textContent=d.description||'';desc.hidden=!d.description;
-        tag.textContent=d.tag||'';tag.hidden=!d.tag||labels.tags==='false';
         link.hidden=!d.url;if(d.url)link.setAttribute('href',d.url);else link.removeAttribute('href');
-        front.alt=d.name;front.src=d.large||source?.currentSrc||source?.src||'';
-        endView.hidden=!d.back;frontView.hidden=!d.back;back.hidden=!d.back;back.alt=d.name+' · '+endView.textContent.trim();
-        if(d.back)back.src=d.back;else back.removeAttribute('src');
+        detailName=d.name;
+        detailPaths={front:d.large||source?.currentSrc||source?.src,profile:d.profile||profile?.currentSrc||profile?.src,texture:d.texture};
+        detailZoom.hidden=!detailPaths.front;
+        dialog.scrollTop=0;
         face('front');
+        modalMute=0;
         if(!dialog.open){dialog.showModal();pageOverflow=document.documentElement.style.overflow;document.documentElement.style.overflow='hidden';}
         const target=$('.nmRail__close');target?.focus({preventScroll:true});
         if(!reduced.matches&&figure.animate){
@@ -277,30 +297,41 @@
       });
       on($('[data-rail-prev]'),'click',()=>select((pendingIndex??index)-1,true));on($('[data-rail-next]'),'click',()=>select((pendingIndex??index)+1,true));
       on(play,'click',()=>{if(reduced.matches)return;paused=!paused;updatePlay();arm()});
-      on(frontView,'click',()=>face('front'));on(endView,'click',()=>face('back'));
-      on(dialog,'click',e=>{if(e.target===dialog)dialog.close()});
-      on(dialog,'close',()=>{restoreScroll();opener?.focus({preventScroll:true});arm()});
-      on(dialog,'keydown',e=>{if((e.key==='ArrowLeft'||e.key==='ArrowRight')&&!endView.hidden){e.preventDefault();face(spin.dataset.view==='front'?'back':'front')}});
-      on(figure,'pointerdown',e=>{if(e.isPrimary&&e.button===0&&!endView.hidden)modalSwipe={id:e.pointerId,x:e.clientX,y:e.clientY,on:false,start:spin.dataset.view==='back'?180:0}});
-      on(window,'pointermove',e=>{
-        if(modalSwipe?.id!==e.pointerId||reduced.matches)return;
-        const dx=e.clientX-modalSwipe.x,dy=e.clientY-modalSwipe.y;
-        if(!modalSwipe.on){
-          if(Math.abs(dy)>10&&Math.abs(dy)>Math.abs(dx)){modalSwipe=null;return}
-          if(Math.abs(dx)<8)return;
-          modalSwipe.on=true;figure.setAttribute('data-turning','');
-          if(e.pointerType==='mouse')try{figure.setPointerCapture(e.pointerId)}catch{}
-        }
-        spin.style.setProperty('--nm-turn',(modalSwipe.start+Math.max(-178,Math.min(178,dx*1.06)))+'deg');
+      faceButtons.forEach((button,i)=>on(button,'click',()=>face(faceKeys[i])));
+      on(detailZoom,'click',e=>{
+        if(e.detail&&performance.now()<modalMute)return;
+        document.dispatchEvent(new CustomEvent('nm:zoom-photo',{detail:{src:detailPaths[detailView],alt:detailZoomName,opener:detailZoom}}));
       });
-      function finishModalTurn(e){
+      on(dialog,'click',e=>{
+        if(e.target!==dialog)return;
+        const r=dialog.getBoundingClientRect();
+        if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dialog.close();
+      });
+      on(dialog,'close',()=>{modalSwipe=null;restoreScroll();opener?.focus({preventScroll:true});arm()});
+      on(dialog,'keydown',e=>{
+        if(e.altKey||e.ctrlKey||e.metaKey)return;
+        const available=faceKeys.filter(key=>detailPaths[key]);
+        if(available.length<2)return;
+        if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();stepView(e.key==='ArrowRight'?1:-1)}
+        else if(e.key==='Home'||e.key==='End'){e.preventDefault();face(e.key==='Home'?available[0]:available.at(-1))}
+      });
+      on(figure,'pointerdown',e=>{if(e.isPrimary&&e.button===0)modalSwipe={id:e.pointerId,x:e.clientX,y:e.clientY,dragging:false}});
+      on(window,'pointermove',e=>{
         if(modalSwipe?.id!==e.pointerId)return;
-        const d=modalSwipe;modalSwipe=null;figure.removeAttribute('data-turning');
+        const dx=e.clientX-modalSwipe.x,dy=e.clientY-modalSwipe.y;
+        if(modalSwipe.dragging)return;
+        if(Math.abs(dy)>12&&Math.abs(dy)>Math.abs(dx)){modalSwipe=null;modalMute=performance.now()+400;return}
+        if(Math.abs(dx)<12||Math.abs(dx)<Math.abs(dy)*1.15)return;
+        modalSwipe.dragging=true;
+      },{passive:true});
+      on(window,'pointercancel',e=>{if(modalSwipe?.id===e.pointerId){modalSwipe=null;modalMute=performance.now()+400}});
+      on(window,'pointerup',e=>{
+        if(modalSwipe?.id!==e.pointerId)return;
+        const d=modalSwipe;modalSwipe=null;
         const dx=e.clientX-d.x,dy=e.clientY-d.y;
-        if(e.type==='pointerup'&&Math.abs(dx)>65&&Math.abs(dx)>Math.abs(dy)*1.3&&!endView.hidden)face(d.start?'front':'back');
-        else face(d.start?'back':'front');
-      }
-      on(window,'pointerup',finishModalTurn);on(window,'pointercancel',finishModalTurn);
+        if(d.dragging||Math.hypot(dx,dy)>14)modalMute=performance.now()+400;
+        if(Math.abs(dx)>=42&&Math.abs(dx)>Math.abs(dy)*1.25)stepView(dx<0?1:-1);
+      });
       on(this,'focusin',arm);on(this,'focusout',()=>queueMicrotask(arm));
       on(document,'visibilitychange',arm);
       on(reduced,'change',()=>{requestPaint();if(reduced.matches)paused=true;if(play)play.hidden=reduced.matches||labels.autoplay!=='true';updatePlay();arm()});

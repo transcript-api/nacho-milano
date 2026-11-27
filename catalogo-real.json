@@ -11,7 +11,8 @@
         "photos": {
           "front": "assets/coleccion-detalles/swell-off-frente.webp",
           "back": null,
-          "texture": "assets/coleccion-detalles/swell-off-textura.webp"
+          "texture": "assets/coleccion-detalles/swell-off-textura.webp",
+          "profile": "assets/perchero-detalle/rack-swell-side.webp"
         },
         "illustration": true
       },
@@ -20,7 +21,8 @@
         "photos": {
           "front": "assets/coleccion-detalles/swell-preto-frente.webp",
           "back": null,
-          "texture": "assets/coleccion-detalles/swell-preto-textura.webp"
+          "texture": "assets/coleccion-detalles/swell-preto-textura.webp",
+          "profile": "assets/perchero-detalle/rack-swell-preto-side.webp"
         },
         "illustration": true
       },
@@ -29,7 +31,8 @@
         "photos": {
           "front": "assets/coleccion-detalles/swell-mascavo-frente.webp",
           "back": null,
-          "texture": "assets/coleccion-detalles/swell-mascavo-textura.webp"
+          "texture": "assets/coleccion-detalles/swell-mascavo-textura.webp",
+          "profile": "assets/perchero-detalle/rack-swell-mascavo-side.webp"
         },
         "illustration": true
       },
@@ -38,7 +41,8 @@
         "photos": {
           "front": "assets/coleccion-detalles/swell-verde-frente.webp",
           "back": null,
-          "texture": "assets/coleccion-detalles/swell-verde-textura.webp"
+          "texture": "assets/coleccion-detalles/swell-verde-textura.webp",
+          "profile": "assets/perchero-detalle/rack-swell-verde-side.webp"
         },
         "illustration": true
       }
@@ -57,7 +61,8 @@
         "photos": {
           "front": "assets/coleccion-detalles/rustic-safari-frente.webp",
           "back": null,
-          "texture": "assets/coleccion-detalles/rustic-safari-textura.webp"
+          "texture": "assets/coleccion-detalles/rustic-safari-textura.webp",
+          "profile": "assets/perchero-detalle/rack-rustic-side.webp"
         },
         "illustration": true
       },
@@ -66,7 +71,8 @@
         "photos": {
           "front": "assets/coleccion-detalles/rustic-azul-frente.webp",
           "back": null,
-          "texture": "assets/coleccion-detalles/rustic-azul-textura.webp"
+          "texture": "assets/coleccion-detalles/rustic-azul-textura.webp",
+          "profile": "assets/perchero-detalle/rack-rustic-azul-side.webp"
         },
         "illustration": true
       },
@@ -75,7 +81,8 @@
         "photos": {
           "front": "assets/coleccion-detalles/rustic-areia-frente.webp",
           "back": null,
-          "texture": "assets/coleccion-detalles/rustic-areia-textura.webp"
+          "texture": "assets/coleccion-detalles/rustic-areia-textura.webp",
+          "profile": "assets/perchero-detalle/rack-rustic-areia-side.webp"
         },
         "illustration": true
       },
@@ -84,7 +91,8 @@
         "photos": {
           "front": "assets/coleccion-detalles/rustic-branco-frente.webp",
           "back": null,
-          "texture": "assets/coleccion-detalles/rustic-branco-textura.webp"
+          "texture": "assets/coleccion-detalles/rustic-branco-textura.webp",
+          "profile": "assets/perchero-detalle/rack-rustic-branco-side.webp"
         },
         "illustration": true
       }

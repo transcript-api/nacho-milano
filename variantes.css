@@ -1,0 +1,112 @@
+/* Catalog only; nothing in the hero, hanger rail or product sheet inherits this. */
+#catalogo #grid[data-variant-rows]{
+  display:grid;grid-template-columns:minmax(0,1fr);gap:clamp(27px,5.5vw,62px);
+}
+.variantRow{
+  --variant-gap:clamp(8px,1.4vw,18px);
+  --variant-width:clamp(200px,65vw,740px);
+  position:relative;min-width:0;container-type:inline-size;
+}
+.variantRowHead{
+  display:flex;justify-content:space-between;align-items:center;gap:8px;
+  margin-bottom:clamp(7px,1.7vw,16px);border-top:1px solid #ddd8cf;
+  padding-top:clamp(3px,1vw,10px);
+}
+.variantRowHeading{display:flex;min-width:0;flex-wrap:wrap;align-items:baseline;gap:4px clamp(9px,1.5vw,18px)}
+.variantRowHeading h3{
+  margin:0;font:400 clamp(1.32rem,3.1vw,2.65rem)/1.03 Milano,Georgia,serif;letter-spacing:-.043em;color:#242321;
+}
+.variantCount,.variantCaption{font:500 .78rem/1.45 NachoShop,Arial,sans-serif;color:#53504a}
+.variantCount{white-space:nowrap}
+.variantRowActions{display:flex;align-items:center;gap:0;flex-shrink:0}
+.variantRowActions :is(button,.variantSave){
+  position:static;display:grid;place-items:center;width:44px;height:44px;padding:0;border:0;background:transparent;border-radius:50%;color:#292823;cursor:pointer;
+}
+.variantRowActions [hidden]{display:none}
+.variantRowActions button:hover{background:#efede7}
+.variantRowActions svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.55;stroke-linecap:round;stroke-linejoin:round}
+.variantRowActions .variantSave[aria-pressed=true] svg{fill:currentColor}
+.variantTrack{min-width:0}
+.variantGroup{display:grid;min-width:0;gap:var(--variant-gap);grid-template-columns:repeat(2,minmax(0,1fr))}
+.variantRow[data-variant-count="1"] .variantGroup{grid-template-columns:minmax(0,1fr)}
+.variantTrack[tabindex]{
+  display:flex;overflow:auto hidden;scrollbar-width:none;overscroll-behavior-x:contain;overscroll-behavior-inline:contain;
+  touch-action:pan-x pan-y pinch-zoom;direction:ltr;
+}
+.variantTrack[tabindex]::-webkit-scrollbar{display:none}
+.variantTrack[tabindex]>.variantGroup{
+  flex:none;grid-template-columns:none;grid-auto-columns:var(--variant-width);grid-auto-flow:column;
+  padding-inline-end:var(--variant-gap);
+}
+.variantTrack[data-variant-dragging]{cursor:grabbing;user-select:none}
+.variantTrack[data-variant-dragging] :is(button,a){cursor:grabbing}
+.variantCard{min-width:0}
+.variantVisual{overflow:hidden;background:#edeae4}
+.variantFace{
+  display:block;position:relative;overflow:hidden;isolation:isolate;
+  aspect-ratio:4/4.65;background:linear-gradient(160deg,#f5f2ec,#e9e5dd);
+}
+.variantFace>img{
+  display:block;width:100%;height:100%;object-fit:contain;object-position:center;mix-blend-mode:multiply;
+  padding:clamp(0px,1vw,10px);transition:transform .3s ease;
+}
+.variantRow[data-variant-count="1"] .variantFace{aspect-ratio:1.11;max-height:clamp(330px,53vw,620px)}
+.variantRow[data-variant-count="2"] .variantFace{
+  aspect-ratio:4/5;max-height:clamp(260px,49vw,540px);
+}
+.variantCaption{display:block;text-decoration:none;width:fit-content;padding:8px 1px 1px;min-height:33px;font-size:.875rem;color:#33312d}
+.variantCaption:hover{text-decoration:underline;text-underline-offset:3px}
+.variantTexture{
+  position:absolute;z-index:3;bottom:9px;left:9px;display:grid;place-items:center;
+  width:clamp(48px,9.5vw,80px);aspect-ratio:1;border:2px solid #fffefa;padding:0;
+  background:#e8e4dc;box-shadow:0 2px 8px #201b192c;color:#fffefa;cursor:zoom-in;
+}
+.variantTexture img{display:block;width:100%;height:100%;min-height:0;object-fit:cover;grid-area:1/1}
+.variantTexture svg{
+  align-self:end;justify-self:end;grid-area:1/1;width:19px;height:19px;overflow:visible;padding:2px;
+  background:#23211dd9;fill:none;stroke:currentColor;stroke-width:2;pointer-events:none;
+}
+.variantRow :is(button,a):focus-visible,.variantTrack:focus-visible{
+  outline:2px solid #22211f;outline-offset:-3px;
+}
+@media (hover:hover) and (pointer:fine){
+  .variantFace:hover>img{transform:scale(1.027)}
+}
+@media (min-width:700px){.variantRow{--variant-width:clamp(230px,43vw,680px)}}
+@media (min-width:1050px){.variantRow{--variant-width:clamp(270px,35vw,650px)}}
+@supports (width:1cqw){
+  .variantRow{--variant-width:70cqw}
+  @media (min-width:700px){.variantRow{--variant-width:42cqw}}
+  @media (min-width:1050px){.variantRow{--variant-width:35cqw}}
+}
+@media (max-width:450px){
+  .variantRowHead{min-height:50px}
+  .variantRowHeading{display:grid;gap:2px}
+  .variantRowHeading h3{font-size:1.31rem}
+  .variantTexture{bottom:6px;left:6px}
+  .variantRow[data-variant-count="1"] .variantFace{aspect-ratio:1/.98}
+}
+@media (prefers-reduced-motion:reduce){
+  .variantFace>img{transition:none}
+  .variantFace:hover>img{transform:none}
+}
+
+/* On wider screens keep a single-color garment prominent and let its
+   real macro sit alongside it rather than wasting the second column. */
+@supports selector(:has(*)){
+@media(min-width:700px){
+  .variantRow[data-variant-count="1"] .variantVisual:has(.variantTexture){
+    display:grid;grid-template-columns:minmax(0,1.48fr) minmax(0,1fr);align-items:stretch;gap:1px;
+  }
+  .variantRow[data-variant-count="1"] .variantVisual:has(.variantTexture) .variantFace{
+    aspect-ratio:1.12;max-height:clamp(350px,46vw,570px);
+  }
+  .variantRow[data-variant-count="1"] .variantTexture{
+    position:relative;inset:auto;width:100%;height:100%;min-height:0;aspect-ratio:auto;
+    border:0;box-shadow:none;overflow:hidden;
+  }
+  .variantRow[data-variant-count="1"] .variantTexture img{position:absolute;inset:0}
+  .variantRow[data-variant-count="1"] .variantTexture svg{margin:10px;width:28px;height:28px;padding:4px}
+  .variantRow[data-variant-count="1"] .cardAdd{right:calc(40.32% + 8px)}
+}
+}

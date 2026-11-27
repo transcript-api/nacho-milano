@@ -97,3 +97,11 @@
 @media(max-width:650px){.manlyProduct .productMedia{--thumbH:58px}.productGalleryTrack{aspect-ratio:1/1.06}}
 .productThumb[data-texture]{position:relative}
 .productThumb[data-texture]::after{content:"Textura";position:absolute;inset:auto 2px 2px;padding:3px 1px 2px;background:#fdfbf5;color:#242423;font:560 clamp(9px,1vw,11px)/1 NachoShop,Arial,sans-serif;text-align:center;pointer-events:none}
+
+.draftGallery .productGalleryTrack,.draftGallery .productThumb{background:#e9e4da}
+.draftGallery .productGallerySlide{position:relative}
+.draftGallery .productGallerySlide img,.draftGallery .productThumb img{mix-blend-mode:normal}
+.draftGallery .productGallerySlide[data-view="profile"] img{padding:12px}
+.productThumbs.draftThumbs .productThumb{position:relative;width:max(62px,var(--thumbH));height:calc(var(--thumbH) + 17px);grid-template-rows:minmax(0,1fr) 17px}
+.productThumbLabel{height:17px;padding:2px 3px;color:#2e2c29;background:#fcfaf5;font-size:10px;line-height:13px;width:100%;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.draftGallery .productGallerySlide:focus-visible,.draftGallery .productThumb:focus-visible{outline:2px solid #2e2c29;outline-offset:-2px}
