@@ -15,13 +15,13 @@
 
 
 /* The point traces the actual wordmark; the two masks moving apart are the opening panels. */
-.cover[data-nm-pen-intro]{top:0;right:0;bottom:0;left:0;background:none;--nm-pen-width:clamp(244px,62vw,590px)}
+.cover[data-nm-pen-intro]{top:0;right:0;bottom:0;left:0;background:none;--nm-pen-width:clamp(252px,57vw,515px)}
 .cover[data-nm-pen-intro] .coverLeaf{background:#1e1e20;transition-duration:.46s;overflow:hidden}
 .cover[data-nm-pen-intro] .coverCenter{width:var(--nm-pen-width);pointer-events:none}
 .cover[data-nm-pen-intro] .nmPenWordmark{display:block;overflow:visible;width:100%;height:auto}
 .cover[data-nm-pen-intro] .nmPenPanelMark{
  position:absolute;top:50%;width:var(--nm-pen-width);max-width:none;height:auto;
- transform:translate(-50%,-50%);filter:brightness(0) invert(.97);visibility:hidden;
+ transform:translate(-50%,-50%);visibility:hidden;
 }
 .cover[data-nm-pen-intro] .one .nmPenPanelMark{left:100%}
 .cover[data-nm-pen-intro] .two .nmPenPanelMark{left:0}
