@@ -67,3 +67,24 @@
 @media(forced-colors:active){.nmFitting__zone{border-color:CanvasText}.nmFitting__guide,.nmFitting__ghost{border-color:CanvasText}}
 
 @supports(height:100svh){@media(max-width:740px){.nmFitting__stage{--fit-stage-height:clamp(235px,43svh,410px)}}}
+
+/* The anchor is a read-only cart line; all available actions apply to the opposite part. */
+.nmFitting__base[hidden],.nmFitting__wardrobeActions[hidden],.nmFitting__part[hidden]{display:none!important}
+[data-fit-wardrobe] .nmFitting__controls{gap:clamp(15px,2vw,28px)}
+.nmFitting__base{display:grid;gap:.25rem;padding:.74rem .82rem;background:#f4f1eb;border:1px solid var(--fit-line);line-height:1.3}
+.nmFitting__baseTag{font-size:.65rem;color:#57534d;text-transform:uppercase;letter-spacing:.08em}
+.nmFitting__baseName{font-size:.91rem;font-weight:565}
+.nmFitting__baseVariant{font-size:.79rem;color:#57534d}
+.nmFitting__wardrobeActions{display:grid;gap:.36rem}
+.nmFitting__candidate{font-size:.81rem;margin:0;line-height:1.4;color:#40403d}
+.nmFitting__add{margin:0}.nmFitting__add:disabled{opacity:.55;cursor:wait}
+.nmFitting__reset{display:inline-flex;align-items:center;min-height:44px;justify-self:start;padding:0;color:var(--fit-ink);font:inherit;font-size:.75rem;text-decoration:underline;text-underline-offset:.25em}
+.nmFitting__reset:focus-visible,.nmFitting__add:focus-visible{outline:2px solid var(--fit-ink);outline-offset:2px}
+[data-fit-wardrobe] .nmFitting__title:focus-visible{outline-offset:2px}
+@media(max-width:740px){
+ [data-fit-wardrobe] .nmFitting__controls{grid-template-columns:minmax(0,1fr)}
+ [data-fit-wardrobe] .nmFitting__choices{display:flex;gap:6px}
+ [data-fit-wardrobe] .nmFitting__choice{flex:1 1 115px}
+ [data-fit-wardrobe] .nmFitting__colorRow{display:flex;gap:.3rem}
+ [data-fit-wardrobe] .nmFitting__link{flex-basis:auto;margin-left:auto}
+}

@@ -24,9 +24,13 @@ const markup = rack.piezas.map((piece,index) => {
   for (const media of [c.photos?.front, c.photos?.back, c.photos?.texture, c.photos?.profile].filter(Boolean)) if (!exists(media)) throw Error('Falta foto de la ficha: '+media);
   const name = p.name+' · '+c.name, url='producto-'+p.id+'.html';
   if (!exists(url)) throw Error('Falta ficha: '+url);
-  const photo = (view,src,alt) => '<img class="nmRail__photo nmRail__photo--'+view+'" src="'+esc(src)+'" width="380" height="512" alt="'+esc(alt)+'" loading="'+(index<7?'eager':'lazy')+'" decoding="async" draggable="false">';
+  const photo = (view,src,alt) => {
+    const hd='assets/perchero-hd/'+src.split('/').pop();
+    const density=exists(hd)?' srcset="'+esc(src)+' 1x, '+esc(hd)+' 2x"':'';
+    return '<img class="nmRail__photo nmRail__photo--'+view+'" src="'+esc(src)+'"'+density+' width="380" height="512" alt="'+esc(alt)+'" loading="'+(index<7?'eager':'lazy')+'" decoding="async" draggable="false">';
+  };
   const ficha = url+'?color='+encodeURIComponent(c.name);
-  const attrs = {'name':name, description:p.description||'',tag:c.name,url:ficha,large:c.photos?.front||piece.frente};
+  const attrs = {'product-id':p.id,color:c.name,name,description:p.description||'',tag:c.name,url:ficha,large:c.photos?.front||piece.frente};
   const hdProfile='assets/perchero-detalle/'+piece.perfil.split('/').pop();
   attrs.profile=c.photos?.profile||(exists(hdProfile)?hdProfile:piece.perfil);
   if(c.photos?.texture) attrs.texture=c.photos.texture;

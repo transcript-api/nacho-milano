@@ -191,6 +191,17 @@ No se pudo cargar esa variante. Probá de nuevo.|Não foi possível carregar ess
 No se pudo cargar la vista de esta prenda.|Não foi possível carregar a imagem desta peça.
 Pantalón o short|Calça ou short
 Probador|Provador
+Vestuario|Guarda-roupa
+Probá cómo combinar esta prenda.|Experimente como combinar esta peça.
+Elegí con qué prenda querés armar el look.|Escolha a peça com que quer montar o look.
+Combiná tu prenda con otra y agregá solo la nueva.|Combine sua peça com outra e adicione apenas a nova.
+Ya está en tu carrito|Já está no seu carrinho
+Sumar esta prenda al carrito|Adicionar esta peça ao carrinho
+Probar sin prenda base|Experimentar sem peça de base
+La prenda base ya no está en el carrito.|A peça de base não está mais no carrinho.
+Esa variante ya está en tu carrito.|Essa variação já está no seu carrinho.
+La prenda elegida no está disponible en el vestuario.|A peça escolhida não está disponível no guarda-roupa.
+Color elegido:|Cor escolhida:
 Arrastrá una prenda al maniquí o tocala para probártela.|Arraste uma peça até o manequim ou toque nela para experimentar.
 Soltá para probar|Solte para experimentar
 Soltá la camisa en el torso.|Solte a camisa sobre o tronco.

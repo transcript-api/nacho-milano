@@ -112,3 +112,36 @@
 .manlyProduct #productColors .draftColorDot:first-child{margin-left:-8px}
 .manlyProduct .draftChoice .draftSizeArea{margin:.9rem 0 .55rem}
 .manlyProduct .draftChoice .draftSizeArea legend{font-size:.76rem;text-transform:none;letter-spacing:0}
+
+/* Macro texture fills its canvas; keep complete garment silhouettes in frame. */
+.draftGallery .productGallerySlide[data-view="texture"] img,
+.draftGallery .draftThumbs .productThumb[data-view="texture"] img{
+ object-fit:cover;
+ object-position:center;
+}
+.draftGallery .draftThumbs .productThumb[data-view="texture"]{grid-template-rows:minmax(0,1fr)}
+.draftGallery .draftThumbs .productThumb[data-view="texture"] .productThumbLabel{
+ position:absolute;inset:auto 0 0;
+ background:#fcfaf5e8;
+}
+.manlyProduct .productCollection{margin-top:.64rem}
+
+/* Give the purchase choices room on a phone without another floating bar. */
+@media(max-width:650px){
+ .manlyProduct.draftProduct{padding-top:clamp(8px,2.6vw,13px)}
+ .manlyProduct.draftProduct .productLayout{gap:9px}
+ .manlyProduct.draftProduct .productMedia{--thumbH:49px}
+ .draftProduct .draftGallery .productGalleryTrack{height:min(calc(106vw - 2.12 * var(--pad)),clamp(210px,38svh,342px))}
+ .draftProduct .draftGallery .productThumbs{padding-top:6px}
+ .manlyProduct.draftProduct .productInfo{padding-top:0}
+ .manlyProduct.draftProduct .productInfo h1{margin:.16rem 0 .16rem}
+ .manlyProduct.draftProduct #productColors .draftColorDots{margin-bottom:.09rem}
+ .manlyProduct.draftProduct .productInfo .productDesc{line-height:1.44}
+ .manlyProduct.draftProduct .draftChoice{margin-top:.42rem}
+ .manlyProduct.draftProduct .draftSizeArea{margin:.42rem 0 .38rem}
+ .manlyProduct.draftProduct .draftSizeArea fieldset{margin-bottom:.42rem}
+ .manlyProduct.draftProduct .draftSizeArea fieldset button{height:42px}
+ .manlyProduct.draftProduct .draftSizeArea legend{margin-bottom:.23rem}
+ .manlyProduct.draftProduct .draftSizePending{margin:.25rem 0 .49rem}
+ .manlyProduct.draftProduct .productCollection{margin-top:.55rem}
+}

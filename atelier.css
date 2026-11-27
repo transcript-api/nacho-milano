@@ -43,3 +43,13 @@ html.dialogOpen,html.coverOpen{overflow:hidden}.drawerPhoto{height:165px;width:1
 .draftColorDot[aria-pressed=true]::after{content:"";position:absolute;top:50%;left:50%;width:29px;height:29px;border:1.4px solid currentColor;border-radius:50%;transform:translate(-50%,-50%)}
 .draftColorDot:focus-visible{outline:2px solid #282726;outline-offset:-2px}
 .draftSizePending{font-size:.77rem;color:#57534b;margin:.4rem 0 .75rem}
+
+/* Cart → Vestuario: a distinct seed link for every exact color and size line. */
+.bagVestuario{margin-top:1.3rem;padding:1rem 0;border-top:1px solid var(--line,#d3d0cb)}
+.bagVestuario h3{color:var(--ink,#242424);font:400 1.55rem/1.15 var(--serif,Georgia,serif);margin-bottom:.3rem}
+.bagVestuario__hint{color:#57544f;margin:.25rem 0 .55rem;font-size:.82rem;line-height:1.45}
+.bagVestuario__lines{list-style:none;margin:0;padding:0;display:grid;gap:.36rem}
+.bagVestuario__link{min-height:44px;padding:.48rem .7rem;display:flex;align-items:center;justify-content:space-between;gap:.5rem;border:1px solid var(--line,#d3d0cb);color:var(--ink,#242424);background:transparent;text-decoration:none;font-size:.82rem}
+.bagVestuario__link:hover{border-color:currentColor}.bagVestuario__link:focus-visible{outline:2px solid currentColor;outline-offset:2px}
+.bagVestuario__variant{display:grid;min-width:0;gap:.12rem}
+.bagVestuario__variant small{font-size:.74rem;color:#57544f}

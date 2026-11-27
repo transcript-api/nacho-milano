@@ -126,3 +126,52 @@
 .nmRail__close{min-height:44px}
 .nmRail__sr{position:absolute;width:1px;height:1px;clip-path:inset(50%);overflow:hidden;white-space:nowrap}
 @media(max-width:560px){.nmRail__zoom>span{left:9px;bottom:9px}.nmRail__close{box-shadow:0 0 0 1px #b6aea1}}
+
+/* A larger front plane over tighter spacing, keeping the hanger hook aligned. */
+#perchero.nmRail{--rail-height:clamp(424px,32vw,496px)}
+#perchero .nmRail__shape{top:3px;right:auto;bottom:0;left:50%}
+#perchero .nmRail__rotation,#perchero .nmRail__item[data-hanger="none"] .nmRail__photo{top:0;right:0;bottom:0;left:0}
+#perchero .nmRail__items::before{top:19px;right:4px;bottom:auto;left:4px}
+#perchero .nmRail__items::after{top:12px;right:0;bottom:auto;left:0}
+@media(min-width:851px){
+  #perchero .nmRail__item{flex-basis:clamp(76px,8.25vw,118px)}
+  #perchero .nmRail__item[data-active]{flex-basis:clamp(176px,21.8vw,286px)}
+}
+@media(max-width:850px){
+  #perchero.nmRail{
+    --nm-rack-frame:calc(100vw - 2 * clamp(13px,4vw,65px));
+    --nm-mobile-pitch:clamp(102px,calc(var(--nm-rack-frame) * .33),156px);
+    --nm-center-width:clamp(175px,calc(var(--nm-rack-frame) * .58),244px);
+    --rail-height:clamp(300px,74vw,386px);
+  }
+  #perchero.nmRail .nmRail__items{
+    --nm-rack-gutter:calc((var(--nm-rack-frame) - var(--nm-mobile-pitch))/2);
+    flex:none;min-width:100%;gap:0;
+    width:calc(var(--nm-rack-frame) + (var(--nm-mobile-pitch) + var(--rail-gap)) * (var(--nm-rack-count,8) - 1));
+    padding-left:var(--nm-rack-gutter);padding-right:var(--nm-rack-gutter);
+  }
+  #perchero.nmRail .nmRail__item:not(:last-child){margin-right:var(--rail-gap)}
+  #perchero.nmRail .nmRail__shape{width:var(--nm-center-width)}
+  #perchero .nmRail__piece{height:var(--rail-height)}
+  #perchero .nmRail__item[data-active] .nmRail__piece::after{
+    content:"";position:absolute;top:7%;bottom:12%;left:50%;width:calc(var(--nm-center-width) * .81);
+    transform:translateX(-50%);pointer-events:auto;
+  }
+  #perchero .nmRail__track[data-glide] .nmRail__item[data-side] .nmRail__rotation{
+    transform:translate3d(var(--nm-x,0px),0,var(--nm-z,0px)) rotateY(var(--nm-yaw,0deg)) rotateZ(var(--nm-sway,0deg)) scale(var(--rail-garment-scale,.87));
+  }
+}
+@supports (width:1cqw){
+  @media(max-width:850px){#perchero.nmRail{--nm-rack-frame:100cqw}}
+}
+.nmRail__actions{display:flex;align-items:center;gap:7px 13px;flex-wrap:wrap}
+.nmRail__add{
+  min-height:44px;padding:0 13px;border:1px solid #242320;background:#242320;color:#fff;
+  font:inherit;font-size:13px;font-weight:650;cursor:pointer;
+}
+.nmRail__add:hover{background:#43403b;border-color:#43403b}
+.nmRail__add:focus-visible{outline-color:#fff}
+@media(min-width:1200px){
+  /* Keep transparent sprite gutters from creating phantom desktop scroll. */
+  #perchero .nmRail__items{overflow:hidden;overflow:clip}
+}

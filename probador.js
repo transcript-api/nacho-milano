@@ -30,6 +30,23 @@
   let saved = {};
   try { saved = JSON.parse(sessionStorage.getItem(memoryKey) || '{}') || {}; } catch {}
   const selection = Object.fromEntries(parts.map(p => [p, lists[p].find(v => v.key === saved[p]) || lists[p][0]]));
+  const normalSelection={...selection}, pending={top:false,bottom:false};
+  const seedKey=window.location?new URLSearchParams(window.location.search).get('vestuario'):null;
+  const firstSeed=seedKey?window.NM_VESTUARIO?.resolve(seedKey):null;
+  const seedPlate=firstSeed&&lists[firstSeed.part]?.find(v=>v.id===firstSeed.id&&v.color===firstSeed.color);
+  let seed=seedPlate?firstSeed:null;
+  const otherPart=()=>seed?.part==='top'?'bottom':'top';
+  if(seed){
+    selection[seed.part]=seedPlate;
+    selection[otherPart()]=lists[otherPart()][0];
+  }
+  function removeSeedQuery(){
+    try {
+      const u=new URL(window.location.href);if(!u.searchParams.has('vestuario'))return;
+      u.searchParams.delete('vestuario');window.history.replaceState(window.history.state,'',u);
+    } catch {}
+  }
+  if(seedKey!==null&&!seed)removeSeedQuery();
   const make = (tag, cl, txt) => { const e = document.createElement(tag); if (cl) e.className = cl; if (txt != null) e.textContent = txt; return e; };
   const block=make('div','nmFitting__layout'), title=make('h2','nmFitting__title','Probador');
   const intro=make('p','nmFitting__intro','Arrastrá una prenda al maniquí o tocala para probártela.');
@@ -41,6 +58,13 @@
   const visual=make('div','nmFitting__render');visual.setAttribute('role','img');
   const side=make('div','nmFitting__controls'), notice=make('p','nmFitting__notice');
   notice.setAttribute('role','status');notice.setAttribute('aria-live','polite');notice.setAttribute('aria-atomic','true');
+  const baseCard=make('div','nmFitting__base'),baseTag=make('span','nmFitting__baseTag','Ya está en tu carrito');
+  const baseName=make('strong','nmFitting__baseName'),baseVariant=make('span','nmFitting__baseVariant');
+  baseCard.append(baseTag,baseName,baseVariant);side.append(baseCard);
+  const action=make('div','nmFitting__wardrobeActions'),candidate=make('p','nmFitting__candidate');
+  const add=make('button','buy nmFitting__add','Sumar esta prenda al carrito');
+  const reset=make('button','textLink nmFitting__reset','Probar sin prenda base');
+  add.type='button';reset.type='button';action.append(candidate,add,reset);
   const layers={}, previews={}, zones={}, widgets={}, tokens={top:0,bottom:0}, cache=new Map();
   function plate(p, preview){
     const im=make('img','nmFitting__plate nmFitting__plate--'+p+(preview?' nmFitting__preview':''));
@@ -62,6 +86,21 @@
     const {top:t,bottom:b}=selection;
     visual.setAttribute('aria-label','Maniquí con '+t.name+', '+t.color+', y '+b.name+', '+b.color+'.');
   }
+  function paintVestuario(){
+    baseCard.hidden=action.hidden=!seed;
+    if(seed){
+      host.dataset.fitWardrobe=seed.part;
+      title.textContent='Vestuario';intro.textContent='Combiná tu prenda con otra y agregá solo la nueva.';
+      const base=selection[seed.part], next=selection[otherPart()];
+      baseName.textContent=base.name;baseVariant.textContent=base.color+(seed.size?' · '+seed.size:'');
+      candidate.textContent=next.name+' · '+next.color;
+      add.disabled=pending[otherPart()];
+      for(const p of parts)widgets[p].area.hidden=p===seed.part;
+    }else{
+      delete host.dataset.fitWardrobe;title.textContent='Probador';intro.textContent='Arrastrá una prenda al maniquí o tocala para probártela.';
+      for(const p of parts)widgets[p].area.hidden=false;
+    }
+  }
   function prefetch(v){
     let slot=cache.get(v.src);if(slot)return slot;
     const im=new Image();slot={ready:false,promise:null};cache.set(v.src,slot);
@@ -75,19 +114,25 @@
   }
   // Only swap a visible plate once the next has decoded; ignore stale taps/drops.
   function select(p,v,byDrop=false){
-    if(!v)return;
+    if(!v||p===seed?.part)return;
     const token=++tokens[p];
     const done=()=>{
       if(tokens[p]!==token)return;
-      selection[p]=v;layers[p].src=v.src;widgets[p].update();updateText();
+      pending[p]=false;selection[p]=v;layers[p].src=v.src;widgets[p].update();updateText();
+      if(seed)paintVestuario();
       notice.textContent=byDrop?'Prenda colocada.':'';
-      try{sessionStorage.setItem(memoryKey,JSON.stringify({top:selection.top.key,bottom:selection.bottom.key}));}catch{}
+      if(!seed)try{sessionStorage.setItem(memoryKey,JSON.stringify({top:selection.top.key,bottom:selection.bottom.key}));}catch{}
     };
     if(v===selection[p]){done();return;}
     const slot=prefetch(v);
-    if(slot.ready)done();else slot.promise.then(done,()=>{
-      if(tokens[p]===token)notice.textContent='No se pudo cargar esa variante. Probá de nuevo.';
-    });
+    if(slot.ready)done();else{
+      pending[p]=true;if(seed)paintVestuario();
+      slot.promise.then(done,()=>{
+        if(tokens[p]!==token)return;
+        pending[p]=false;if(seed)paintVestuario();
+        notice.textContent='No se pudo cargar esa variante. Probá de nuevo.';
+      });
+    }
   }
 
   // Pointer Events handle mouse, pen and the touch-safe grip. Touch Events add
@@ -151,7 +196,7 @@
   }
   function arm(button,kind,id,x,y,immediate){
     const option=options.get(button);
-    if(!option||button.hidden||drag)return;
+    if(!option||option.part===seed?.part||button.hidden||drag)return;
     skip=null;
     const {part,get}=option, d={button,kind,id,part,v:get(),x0:x,y0:y,x,y,active:false,over:undefined};
     if(!d.v)return;
@@ -266,14 +311,33 @@
       addOption(b,part,()=>v);colors.append(b);swatches.set(v,b);
     }
     area.append(legend,choices,colorRow);side.append(area);
-    widgets[part]={update(){
+    widgets[part]={area,update(){
       const cur=selection[part];for(const [b,id] of names)b.setAttribute('aria-pressed',String(id===cur.id));
       for(const [v,b] of swatches){b.hidden=v.id!==cur.id;b.setAttribute('aria-pressed',String(v===cur));}
       colorName.textContent=cur.color;
-      link.href='producto-'+cur.id+'.html?color='+encodeURIComponent(cur.color);
+      link.href='producto-'+cur.id+'.html?color='+encodeURIComponent(cur.color)+(seed?.part===part&&seed.size?'&talle='+encodeURIComponent(seed.size):'');
       link.setAttribute('aria-label','Ver '+cur.name+', '+cur.color);
     }};widgets[part].update();
   }
-  updateText();side.append(notice);block.append(stage,side);
+  add.addEventListener('click',()=>{
+    if(!seed||pending[otherPart()])return;
+    const next=selection[otherPart()];
+    if(!window.NM_VESTUARIO?.open(seed.key,next.id,next.color,add))notice.textContent='La prenda base ya no está en el carrito.';
+  });
+  reset.addEventListener('click',()=>{
+    if(!seed)return;
+    finish(false);seed=null;removeSeedQuery();notice.textContent='';
+    for(const p of parts){
+      ++tokens[p];pending[p]=false;
+      selection[p]=normalSelection[p];layers[p].src=selection[p].src;widgets[p].update();
+    }
+    updateText();paintVestuario();title.focus({preventScroll:true});
+  });
+  updateText();paintVestuario();side.append(action,notice);block.append(stage,side);
+  title.tabIndex=-1;
   host.append(title,intro,block);document.body.append(dragGhost);host.dataset.mounted='yes';host.hidden=false;
+  if(seed&&window.location?.hash==='#probador')requestAnimationFrame(()=>{
+    host.scrollIntoView({block:'start',behavior:'instant'});title.focus({preventScroll:true});
+  });
+  if(seedKey&&!seed)notice.textContent='La prenda elegida no está disponible en el vestuario.';
 })();
