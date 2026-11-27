@@ -9,7 +9,7 @@
 }
 .variantRowHead{
   display:flex;justify-content:space-between;align-items:center;gap:8px;
-  margin-bottom:clamp(7px,1.7vw,16px);border-top:1px solid #ddd8cf;
+  margin-bottom:clamp(7px,1.7vw,16px);border-top:1px solid transparent;
   padding-top:clamp(3px,1vw,10px);
 }
 .variantRowHeading{display:flex;min-width:0;flex-wrap:wrap;align-items:baseline;gap:4px clamp(9px,1.5vw,18px)}
