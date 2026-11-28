@@ -259,7 +259,7 @@ Azul claro|Azul-claro|Azul Claro
 Blanco roto|Off-white|OFF
 Natural|Natural
 Safari|Safari
-Camisa de gasa doble, 100% algodón. Liviana y respirable, con textura natural. Cómoda sin perder elegancia.|Camisa em gaze dupla, 100% algodão. Leve e respirável, com textura natural. Confortável sem perder a elegância.
+Confeccionada en gasa doble 100% algodón, un tejido liviano y respirable con una sensación térmica que no ofrece ninguna otra camisa. Su textura sofisticada le da un aire elegante, ideal si valorás la comodidad sin renunciar al estilo.|Confeccionada em gaze dupla 100% algodão, um tecido leve, respirável e com uma sensação térmica única que nenhuma outra camisa oferece. Sua textura sofisticada confere um ar elegante, perfeito para quem valoriza conforto sem abrir mão do estilo.
 Camisa de puro algodón con trama rústica y textura marcada.|Camisa de algodão com trama rústica e textura marcante.|É uma camisa 100% algodão com trama de aspecto rústico. Traz textura e personalidade para um look casual elegante.
 Short de lino y viscosa, suave y liviano, con cintura ajustable.|Short de linho com viscose, toque macio, caimento leve e cintura ajustável.|É um short de linho com viscose, com toque macio, caimento leve e cintura ajustável. Ideal para um visual de verão mais elegante.
 Pantalón de lino con elastano, de caída suave y cómodo para moverse.|Calça de linho com elastano, com caimento leve e liberdade de movimento.|É uma calça de linho com elastano, que combina uma aparência arrumada com liberdade de movimento.

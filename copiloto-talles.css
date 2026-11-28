@@ -1,0 +1,21 @@
+.nmFitTrigger{position:fixed;inset:auto max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) auto;z-index:9;display:flex;align-items:center;gap:7px;min-height:44px;padding:0 14px;background:#272624;color:#fff;border:1px solid #4d4a43;border-radius:40px;box-shadow:0 4px 16px #221e1828;font:550 .77rem/1.2 NachoShop,system-ui,sans-serif;cursor:pointer}
+.nmFitTrigger svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.4;stroke-linejoin:round}
+.nmFitDialog{position:fixed;inset:auto max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) auto;margin:0;width:min(calc(100% - 24px),390px);max-height:min(80vh,630px);overflow:auto;overscroll-behavior:contain;box-sizing:border-box;padding:18px;color:#262421;background:#fcfaf5;border:1px solid #9b9488;border-radius:9px;box-shadow:0 10px 50px #24201944;font:400 .86rem/1.45 NachoShop,system-ui,sans-serif}
+.nmFitDialog::backdrop{background:#24201935}
+.nmFitDialog header{display:flex;align-items:center;justify-content:space-between;gap:7px}
+.nmFitDialog h2{margin:0;font:600 1.06rem/1.2 NachoShop,system-ui,sans-serif}
+.nmFitClose,.nmFitSubmit{min-height:44px;cursor:pointer;font:inherit}
+.nmFitClose{width:44px;flex:none;background:none;border:0;font-size:1.45rem;color:inherit}
+.nmFitContext{margin:1px 0 6px;font-weight:650}
+.nmFitIntro,.nmFitDialog #nmFitHint{margin:0 0 9px;color:#514b42}
+.nmFitDialog label{display:block;margin:8px 0 4px;font-weight:580}
+.nmFitDialog input,.nmFitDialog select{display:block;width:100%;box-sizing:border-box;min-height:44px;border:1px solid #988e81;border-radius:3px;background:#fff;color:#24211f;padding:5px 9px;font-size:16px}
+.nmFitDialog #nmFitHint{margin:5px 0;font-size:.76rem}
+.nmFitSubmit{margin-top:9px;padding:0 15px;border:0;border-radius:3px;background:#272624;color:#fff}
+.nmFitAnswer{margin:10px 0 0}
+.nmFitAnswer:empty{margin:0}
+.nmFitDialog details{margin-top:8px}
+.nmFitDialog summary{cursor:pointer;padding:7px 0;text-decoration:underline}
+.nmFitDialog ul{margin:0;padding-inline-start:18px}
+.nmFitDialog [hidden]{display:none}
+.nmFitDialog :focus-visible,.nmFitTrigger:focus-visible{outline:2px solid #857557;outline-offset:2px}

@@ -3,7 +3,7 @@
     "id": "nm-camisa-swell",
     "name": "Camisa Swell",
     "category": "Camisas",
-    "description": "Camisa em gaze dupla, 100% algodão. Leve e respirável, com textura natural. Confortável sem perder a elegância.",
+    "description": "Confeccionada em gaze dupla 100% algodão, um tecido leve, respirável e com uma sensação térmica única que nenhuma outra camisa oferece. Sua textura sofisticada confere um ar elegante, perfeito para quem valoriza conforto sem abrir mão do estilo.",
     "descriptionLanguage": "pt-BR",
     "colors": [
       {
@@ -14,7 +14,13 @@
           "texture": "assets/coleccion-detalles/swell-off-textura.webp",
           "profile": "assets/perchero-detalle/rack-swell-side.webp"
         },
-        "illustration": true
+        "illustration": true,
+        "sizes": [
+          "P",
+          "M",
+          "G",
+          "GG"
+        ]
       },
       {
         "name": "Preto",
@@ -24,7 +30,13 @@
           "texture": "assets/coleccion-detalles/swell-preto-textura.webp",
           "profile": "assets/perchero-detalle/rack-swell-preto-side.webp"
         },
-        "illustration": true
+        "illustration": true,
+        "sizes": [
+          "P",
+          "M",
+          "G",
+          "GG"
+        ]
       },
       {
         "name": "Mascavo",
@@ -34,7 +46,13 @@
           "texture": "assets/coleccion-detalles/swell-mascavo-textura.webp",
           "profile": "assets/perchero-detalle/rack-swell-mascavo-side.webp"
         },
-        "illustration": true
+        "illustration": true,
+        "sizes": [
+          "P",
+          "M",
+          "G",
+          "GG"
+        ]
       },
       {
         "name": "Verde",
@@ -44,7 +62,13 @@
           "texture": "assets/coleccion-detalles/swell-verde-textura.webp",
           "profile": "assets/perchero-detalle/rack-swell-verde-side.webp"
         },
-        "illustration": true
+        "illustration": true,
+        "sizes": [
+          "P",
+          "M",
+          "G",
+          "GG"
+        ]
       }
     ],
     "draft": true,
@@ -72,7 +96,13 @@
           "texture": "assets/coleccion-detalles/rustic-safari-textura.webp",
           "profile": "assets/perchero-detalle/rack-rustic-side.webp"
         },
-        "illustration": true
+        "illustration": true,
+        "sizes": [
+          "P",
+          "M",
+          "G",
+          "GG"
+        ]
       },
       {
         "name": "Azul Claro",
@@ -82,7 +112,13 @@
           "texture": "assets/coleccion-detalles/rustic-azul-textura.webp",
           "profile": "assets/perchero-detalle/rack-rustic-azul-side.webp"
         },
-        "illustration": true
+        "illustration": true,
+        "sizes": [
+          "P",
+          "M",
+          "G",
+          "GG"
+        ]
       },
       {
         "name": "Areia",
@@ -92,7 +128,13 @@
           "texture": "assets/coleccion-detalles/rustic-areia-textura.webp",
           "profile": "assets/perchero-detalle/rack-rustic-areia-side.webp"
         },
-        "illustration": true
+        "illustration": true,
+        "sizes": [
+          "P",
+          "M",
+          "G",
+          "GG"
+        ]
       },
       {
         "name": "Branco",
@@ -102,7 +144,13 @@
           "texture": "assets/coleccion-detalles/rustic-branco-textura.webp",
           "profile": "assets/perchero-detalle/rack-rustic-branco-side.webp"
         },
-        "illustration": true
+        "illustration": true,
+        "sizes": [
+          "P",
+          "M",
+          "G",
+          "GG"
+        ]
       }
     ],
     "draft": true,
@@ -165,7 +213,13 @@
           "profile": "assets/coleccion-detalles/calca-preto-perfil-v2.webp",
           "ambient": "assets/coleccion-detalles/calca-preto-ambientada-cordon.webp"
         },
-        "illustration": true
+        "illustration": true,
+        "sizes": [
+          "P",
+          "M",
+          "G",
+          "GG"
+        ]
       },
       {
         "name": "Branco",
@@ -176,7 +230,13 @@
           "profile": "assets/coleccion-detalles/calca-branco-perfil-v2.webp",
           "ambient": "assets/coleccion-detalles/calca-branco-ambientada-cordon.webp"
         },
-        "illustration": true
+        "illustration": true,
+        "sizes": [
+          "P",
+          "M",
+          "G",
+          "GG"
+        ]
       },
       {
         "name": "Bege",
@@ -187,7 +247,13 @@
           "profile": "assets/coleccion-detalles/calca-bege-perfil-v2.webp",
           "ambient": "assets/coleccion-detalles/calca-bege-ambientada-cordon.webp"
         },
-        "illustration": true
+        "illustration": true,
+        "sizes": [
+          "P",
+          "M",
+          "G",
+          "GG"
+        ]
       }
     ],
     "draft": true,
@@ -216,7 +282,13 @@
           "texture": "assets/coleccion-detalles/champy-branco-textura.webp",
           "profile": "assets/coleccion-detalles/champy-branco-perfil.webp"
         },
-        "illustration": true
+        "illustration": true,
+        "sizes": [
+          "P",
+          "M",
+          "G",
+          "GG"
+        ]
       }
     ],
     "demoPricing": {
