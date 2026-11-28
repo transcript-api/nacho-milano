@@ -180,19 +180,20 @@ function draftSizeUI(p,state,host,onSelect){
  });
  host.replaceChildren(group.field);
 }
-function draftBuy(p,state,status){
+function draftBuy(p,state,status,quantity=1){
  const options=draftSizes(p,state.color);
  if(options.length&&!draftVariant(p,state.color,state.size)){
   status.textContent='Elegí un talle antes de agregar';return;
  }
- if(addDraft(p,state.color,state.size))showBag();
+ if(addDraft(p,state.color,state.size,quantity))showBag();
  else status.textContent='Ya llegaste al máximo de unidades de esta variante.';
 }
-function addDraft(p,index,size){
+function addDraft(p,index,size,quantity=1){
  const options=draftSizes(p,index);
  if(options.length&&!draftVariant(p,index,size))return false;
  const key=draftKey(p,index,options.length?size:null);
- if(!change(key,1))return false;
+ if(!Number.isSafeInteger(quantity)||quantity<1||quantity+(cart.get(key)||0)>9)return false;
+ if(change(key,quantity)!==quantity)return false;
  announce(p.name+(size?' · '+size:'')+' en el carrito');return true;
 }
 function quickDraft(p,start=null,origin=null,options={}){
@@ -450,16 +451,61 @@ function startCover(){
 
 }
 function startHeroSwipe(){
- const hero=$('.hero'),slideCount=hero.querySelector('.heroSlides')?.children.length||0;if(slideCount<2)return;let index=0;
- const paint=d=>{hero.style.setProperty('--hero-offset',(-index*100)+'%');hero.style.setProperty('--hero-dx',d.toFixed(1)+'px');hero.dataset.slide=String(index)};
- const select=i=>{index=clamp(i,0,slideCount-1);paint(0)};
+ const hero=$('.hero'),track=hero.querySelector('.heroSlides'),cover=$('#cover');
+ const slides=[...(track?.children||[])],slideCount=slides.length;if(slideCount<2)return;
+ let index=0,timer=0,wrapTimer=0,wrap=false,visible=false,hold=null,paused=false;
+ const clone=slides[0].cloneNode(true), cloneImg=clone.querySelector('img');
+ clone.dataset.heroClone='';cloneImg?.setAttribute('fetchpriority','low');cloneImg?.setAttribute('loading','lazy');
+ track.append(clone);
+ const paint=(d=0,slot=index)=>{hero.style.setProperty('--hero-offset',(-slot*100)+'%');hero.style.setProperty('--hero-dx',d.toFixed(1)+'px');hero.dataset.slide=String(index)};
+ const preload=i=>{const image=slides[i]?.querySelector('img');if(image)image.loading='eager'};
+ const stop=()=>{clearTimeout(timer);timer=0};
+ const focused=()=>hero.contains(document.activeElement)&&document.activeElement!==document.body;
+ const canMove=()=>visible&&!document.hidden&&!quiet.matches&&!paused&&hold===null&&!focused()&&!drawer?.open&&!zoom?.open&&(!cover||cover.hidden);
+ function schedule(){
+  stop();if(!canMove())return;
+  preload((index+1)%slideCount);
+  timer=setTimeout(()=>{if(canMove())advance();else schedule()},3000);
+ }
+ function finishWrap(){
+  if(!wrap)return;
+  clearTimeout(wrapTimer);wrap=false;
+  hero.classList.add('moving');paint();void track.offsetWidth;hero.classList.remove('moving');
+ }
+ function select(i){
+  finishWrap();index=clamp(i,0,slideCount-1);preload(index);preload((index+1)%slideCount);paint();schedule();
+ }
+ function advance(){
+  if(index!==slideCount-1){select(index+1);return}
+  index=0;wrap=true;paint(0,slideCount);wrapTimer=setTimeout(finishWrap,580);schedule();
+ }
+ track.addEventListener('transitionend',e=>{if(e.target===track&&e.propertyName==='transform')finishWrap()});
+ hero.addEventListener('pointerdown',e=>{if(e.isPrimary&&(e.pointerType==='touch'||e.button===0)){finishWrap();hold=e.pointerId;stop()}});
+ const releaseHold=e=>{if(hold===e.pointerId){hold=null;schedule()}};
+ for(const type of ['pointerup','pointercancel'])window.addEventListener(type,releaseHold);
+ window.addEventListener('blur',()=>{hold=null;paint();schedule()});
  gesture(hero,{
   move:d=>{const w=hero.clientWidth;const edge=(index===0&&d>0)||(index===slideCount-1&&d<0);paint(edge?clamp(d*.14,-45,45):clamp(d,-w,w))},
-  release:(dir,d,speed)=>{const threshold=Math.min(90,hero.clientWidth*.17);if(Math.abs(d)>threshold||(Math.abs(d)>30&&Math.abs(speed)>.28))select(index+dir);else paint(0)},
-  cancel:()=>paint(0)
+  release:(dir,d,speed)=>{const threshold=Math.min(90,hero.clientWidth*.17);if(Math.abs(d)>threshold||(Math.abs(d)>30&&Math.abs(speed)>.28))select(index+dir);else paint()},
+  cancel:()=>paint()
  });
- hero.addEventListener('keydown',e=>{if(e.target.closest('.heroLink,.nmCampaignNav a'))return;if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;e.preventDefault();select(e.key==='Home'?0:e.key==='End'?slideCount-1:index+(e.key==='ArrowRight'?1:-1))});
+ hero.addEventListener('keydown',e=>{
+  if(e.target.closest('.heroLink,.nmCampaignNav a'))return;
+  if(e.key===' '){e.preventDefault();paused=!paused;hero.dataset.autoplayPaused=String(paused);schedule();return}
+  if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;
+  e.preventDefault();select(e.key==='Home'?0:e.key==='End'?slideCount-1:index+(e.key==='ArrowRight'?1:-1));
+ });
  hero.addEventListener('click',e=>{if(e.detail&&performance.now()<muteClick&&e.target.closest('.heroLink,.nmCampaignNav a')){e.preventDefault();e.stopImmediatePropagation()}},true);
+ hero.addEventListener('focusin',schedule);hero.addEventListener('focusout',()=>queueMicrotask(schedule));
+ document.addEventListener('visibilitychange',schedule);
+ const visibilityChanged=()=>{if(quiet.matches)finishWrap();schedule()};
+ quiet.addEventListener('change',visibilityChanged);
+ const blockers=new MutationObserver(schedule);
+ if(cover)blockers.observe(cover,{attributes:true,attributeFilter:['hidden']});
+ for(const dlg of [drawer,zoom])if(dlg)blockers.observe(dlg,{attributes:true,attributeFilter:['open']});
+ if(typeof IntersectionObserver==='function'){
+  new IntersectionObserver(entries=>{visible=entries[0].isIntersecting&&entries[0].intersectionRatio>=.4;schedule()},{threshold:[0,.4]}).observe(hero);
+ }else{visible=true}
  select(0)
 }
 function startRack(){
@@ -706,8 +752,16 @@ function startDraftProduct(p){
   index=i;state.color=i;state.size=preferredDraftSize(p,i);
   colors.update();draftSizeUI(p,state,sizes,syncAddress);paint();syncAddress();
  });
- const add=btn('Agregar al carrito',()=>draftBuy(p,state,status),'buy');
- const row=el('div',undefined,'purchaseRow');row.append(add,save);
+ let quantity=1;
+ const stepper=el('div',undefined,'productQuantity'), value=el('output','1','productQuantity__value');
+ stepper.setAttribute('role','group');stepper.setAttribute('aria-label','Cantidad');
+ value.setAttribute('aria-label','Cantidad elegida');value.setAttribute('aria-live','polite');
+ const adjust=d=>{quantity=clamp(quantity+d,1,9);value.textContent=String(quantity);less.disabled=quantity===1;more.disabled=quantity===9;status.textContent=''};
+ const less=btn('−',()=>adjust(-1),'productQuantity__step'),more=btn('+',()=>adjust(1),'productQuantity__step');
+ less.setAttribute('aria-label','Reducir cantidad');more.setAttribute('aria-label','Aumentar cantidad');less.disabled=true;
+ stepper.append(less,value,more);
+ const add=btn('Agregar al carrito',()=>draftBuy(p,state,status,quantity),'buy');
+ const row=el('div',undefined,'purchaseRow');row.dataset.quantity='';row.append(stepper,add,save);
  const price=demoPrice(p);if(price){row.dataset.pricePreview='';row.prepend(price)}
  if(colorsHost)colorsHost.append(colors.field);else wrap.append(colors.field);
  draftSizeUI(p,state,sizes,syncAddress);wrap.append(sizes,row,status);

@@ -169,3 +169,31 @@
  .draftGallery .productThumbs.draftThumbs[data-ambient] .productThumb{width:100%;min-width:0}
  .draftGallery .productThumbs.draftThumbs[data-ambient] .productThumbLabel{font-size:clamp(8px,2.25vw,10px)}
 }
+
+/* Compact +/- control in the same purchase row, between price and CTA. */
+.manlyProduct .purchaseRow[data-quantity]{grid-template-columns:max-content minmax(0,1fr) 49px;align-items:center}
+.manlyProduct .purchaseRow[data-price-preview][data-quantity]{grid-template-columns:max-content max-content minmax(0,1fr) 49px;gap:clamp(5px,1.25vw,11px)}
+.productQuantity{display:grid;grid-template-columns:35px minmax(20px,1fr) 35px;align-items:center;justify-items:center;color:#242522;background:#fff;border:1px solid #d6d2c8;border-radius:5px;min-height:46px;white-space:nowrap}
+.productQuantity .productQuantity__step{border:0;background:none;color:inherit;width:100%;height:44px;padding:0;font:500 1.1rem/1 NachoShop,system-ui,sans-serif;cursor:pointer}
+.productQuantity .productQuantity__step:disabled{opacity:.28;cursor:default}
+.productQuantity__value{font:650 .87rem/1 NachoShop,system-ui,sans-serif;min-width:19px;text-align:center;font-variant-numeric:tabular-nums}
+.productQuantity__step:focus-visible{outline:2px solid #75684e;outline-offset:-3px}
+@media(max-width:650px){
+ .manlyProduct .purchaseRow[data-price-preview][data-quantity]{grid-template-columns:max-content max-content minmax(0,1fr) 44px;gap:5px}
+ .manlyProduct .purchaseRow[data-quantity] .productSave{width:44px}
+ .manlyProduct .purchaseRow[data-quantity] .buy{font-size:clamp(.75rem,3.2vw,.86rem);padding-inline:4px}
+ .manlyProduct .purchaseRow[data-quantity] .buy::before{display:none}
+ .productQuantity{grid-template-columns:30px 20px 30px}
+}
+@media(max-width:370px){
+ .manlyProduct .purchaseRow[data-price-preview][data-quantity]{gap:4px}
+ .manlyProduct .purchaseRow[data-quantity] .demoPrice__current{flex-wrap:wrap;max-width:72px}
+ .manlyProduct .purchaseRow[data-quantity] .buy{min-height:48px}
+}
+@media(max-width:370px){
+ .manlyProduct .purchaseRow[data-price-preview][data-quantity]{grid-template-columns:62px max-content minmax(64px,1fr) 44px}
+ .manlyProduct .purchaseRow[data-quantity] .demoPrice{min-width:0;width:62px}
+ .manlyProduct .purchaseRow[data-quantity] .demoPrice__current strong{font-size:.98rem}
+ .manlyProduct .purchaseRow[data-quantity] .demoPrice__currency{display:block;font-size:.54rem}
+ .manlyProduct .purchaseRow[data-quantity] .demoPrice__note{font-size:.58rem}
+}
